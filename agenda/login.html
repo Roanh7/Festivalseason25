@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Inloggen - Festival Agenda 2025</title>
-  <link rel="stylesheet" href="agenda.css">
+  <link rel="stylesheet" href="/agenda/agenda.css">
 </head>
 <body>
   <header>
@@ -22,6 +22,10 @@
       <li><a href="extra-info.html">Extra Info</a></li>
       <li><a href="register.html">Registreren</a></li>
       <li><a href="login.html" class="active">Inloggen</a></li>
+      <!-- Verborgen link, tonen we via JS als we ingelogd zijn -->
+      <li id="myFestivalsLink" style="display:none;">
+        <a href="mijn-festivals.html">Mijn Festivals</a>
+      </li>
     </ul>
   </nav>
 
@@ -29,8 +33,8 @@
     <div class="login-container">
       <h2>Inloggen</h2>
 
-      <!-- Formulier POST naar /login -->
-      <form action="/login" method="POST">
+      <!-- Form zonder action/method, zodat JS de login afhandelt -->
+      <form id="loginForm">
         <div class="form-group">
           <label for="email">E-mail</label>
           <input
@@ -51,10 +55,11 @@
           />
         </div>
 
-        <button type="submit" class="btn">Inloggen</button>
+        <!-- Let op id="loginBtn" voor de JS-eventlistener -->
+        <button type="submit" id="loginBtn" class="btn">Inloggen</button>
       </form>
 
-      <!-- Optioneel: plek voor meldingen als je met serverresponses werkt -->
+      <!-- Hier tonen we feedback (succes/foutmelding) -->
       <div id="loginResult" class="info-message"></div>
 
       <p>
@@ -68,7 +73,26 @@
     <p>&copy; 2025 Festival Agenda - Gecreëerd door [Jouw Naam], S-team vertegenwoordiger</p>
   </footer>
 
+  <!-- 
+    JE EIGEN login.js: hierin doe je 
+      document.getElementById('loginBtn').addEventListener('click', async (e) => {...})
+    om de AJAX/fetch call naar /login te doen. 
+  -->
+  <script src="login.js"></script>
 
-<script src="login.js"></script>
+  <script>
+    // We vragen /auth/me op om te zien of we ingelogd zijn
+    fetch('/auth/me', { credentials: 'include' })
+      .then(res => {
+        if (res.ok) {
+          // user is ingelogd => toon de link
+          document.getElementById('myFestivalsLink').style.display = 'block';
+        }
+      })
+      .catch(err => {
+        console.warn('Error checking login status:', err);
+      });
+  </script>
+
 </body>
 </html>

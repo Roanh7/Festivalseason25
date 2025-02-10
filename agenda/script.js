@@ -164,7 +164,7 @@
         "Verbond": "https://www.verbondfestival.nl",
         "Awakenings Upclose": "https://www.awakenings.nl",
         "Soenda": "https://www.soenda.com",
-        "909": "https://www.909festival.nl",
+        "909": "https://www.loveland.nl",
         "Open Air": "https://www.amsterdamopenair.nl",
         "Free Your Mind": "https://www.freeyourmindfestival.nl",
         "Mystic Garden Festival": "https://www.mysticgardenfestival.nl",
@@ -174,7 +174,7 @@
         "No Art": "https://www.noartfestival.com",
         "Loveland": "https://www.loveland.nl",
         "Latin Village": "https://www.latinvillage.nl",
-        "Strafwerk": "https://www.strafwerkfestival.nl",
+        "Strafwerk": "https://www.strafwerkfestival.org",
         "Parels van de stad": "https://www.parelsvandestad.nl",
         "Into the woods": "https://www.intothewoodsfestival.nl"
     };
@@ -191,3 +191,33 @@
             }
         });
     });
+
+
+// 1. Pak alle checkboxes
+const checkboxes = document.querySelectorAll('.attend-checkbox');
+
+// 2. Lees eventueel al opgeslagen data
+//    Of creëer een lege array als er niks is
+let attendingFestivals = JSON.parse(localStorage.getItem('attendingFestivals')) || [];
+
+// 3. Markeer de checkboxes die in localStorage zaten als "checked"
+checkboxes.forEach((cb) => {
+  const festName = cb.dataset.festival;
+  if (attendingFestivals.includes(festName)) {
+    cb.checked = true;
+  }
+
+  // Luister naar veranderingen
+  cb.addEventListener('change', () => {
+    if (cb.checked) {
+      // Voeg toe
+      attendingFestivals.push(festName);
+    } else {
+      // Verwijder uit de array
+      attendingFestivals = attendingFestivals.filter(f => f !== festName);
+    }
+    // Sla op in localStorage
+    localStorage.setItem('attendingFestivals', JSON.stringify(attendingFestivals));
+  });
+});
+

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Mijn Festivals</title>
+  <link rel="stylesheet" href="agenda.css">
+</head>
+<body>
+<header>
+  <h1>Mijn Festivals</h1>
+</header>
+
+<nav class="nav-bar">
+  <ul>
+    <li><a href="agenda.html">Home</a></li>
+    <li><a href="reviews.html">Reviews</a></li>
+    <li><a href="extra-info.html">Extra Info</a></li>
+    <li><a href="register.html">Registreren</a></li>
+    <li><a href="login.html">Inloggen</a></li>
+    <li><a href="mijn-festivals.html" class="active">Mijn Festivals</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div id="contentArea"></div>
+</main>
+
+<footer>
+  <p>&copy; 2025 Festival Agenda</p>
+</footer>
+
+<script>
+  const API_URL = 'https://jouw-api-url.vercel.app/api';
+  const contentDiv = document.getElementById('contentArea');
+
+  async function loadMyFestivals() {
+    try {
+      // 1. Check: is user ingelogd?
+      const meResp = await fetch(`${API_URL}/auth/me`, {
+        credentials: 'include'
+      });
+      if(meResp.status === 401) {
+        // Niet ingelogd
+        contentDiv.innerHTML = `
+          <p style="color:red;">Log in om je lijst te bekijken</p>
+          <button onclick="window.location.href='login.html'">Login</button>
+        `;
+        return;
+      }
+      // Zo ja, user info:
+      const userData = await meResp.json();
+
+      // 2. Haal festivals op voor deze user
+      const myResp = await fetch(`${API_URL}/festivals/my`, {
+        credentials: 'include'
+      });
+      if(!myResp.ok) {
+        contentDiv.innerHTML = `<p>Kon je festival-lijst niet laden.</p>`;
+        return;
+      }
+      const myFestivals = await myResp.json();
+
+      // 3. Toon de lijst
+      if(myFestivals.length === 0) {
+        contentDiv.innerHTML = `
+          <p>Hallo ${userData.username}, je hebt nog geen festivals geselecteerd.</p>
+          <p>Ga naar de <a href="agenda.html">agenda</a> om festivals te kiezen.</p>
+        `;
+      } else {
+        let html = `<h3>Hallo ${userData.username}, dit zijn jouw geselecteerde festivals:</h3>`;
+        html += '<ul>';
+        myFestivals.forEach(f => {
+          html += `<li>${f.name} - ${f.date || ''}</li>`;
+        });
+        html += '</ul>';
+
+        contentDiv.innerHTML = html;
+      }
+
+    } catch(e) {
+      console.error(e);
+      contentDiv.innerHTML = `<p>Er ging iets fout.</p>`;
+    }
+  }
+
+  loadMyFestivals();
+</script>
+</body>
+</html>

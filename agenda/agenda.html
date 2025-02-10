@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Festival Agenda 2025</title>
-    <link rel="stylesheet" href="agenda.css">
+    <link rel="stylesheet" href="/agenda/agenda.css">
 </head>
 
 <body>
@@ -25,6 +25,7 @@
             <li><a href="extra-info.html">Extra Info</a></li>
             <li><a href="register.html">Registreren</a></li>
             <li><a href="login.html">Inloggen</a></li>
+            <li><a href="mijn-festivals.html">Mijn Festivals</a></li>
         </ul>
     </nav>
 
@@ -45,6 +46,7 @@
                 <thead>
                     <tr>
                         <th>nr.</th>
+                        <th>Ga ik?</th>
                         <th>Datum</th>
                         <th>Naam</th>
                         <th>Locatie</th>
@@ -53,9 +55,16 @@
                         <th>Chip Scale</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="festivalTbody">
                     <tr class="highlight-green">
                         <td>1.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Wavy" 
+                            />
+                          </td>
                         <td>21 december 2024</td>
                         <td><a href="#" class="festival-link" data-name="Wavy">Wavy</a></td>
                         <td>Thuisaven, Amsterdam</td>
@@ -65,6 +74,13 @@
                     </tr>
                     <tr class="highlight-yellow">
                         <td>2.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="DGTL" 
+                            />
+                          </td>
                         <td>18-20 april 2025</td>
                         <td><a href="#" class="festival-link" data-name="DGTL">DGTL</a></td>
                         <td>NDSM, Amsterdam</td>
@@ -74,6 +90,13 @@
                     </tr>
                     <tr class="highlight-green">
                         <td>3.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Free your mind Kingsday" 
+                            />
+                          </td>
                         <td>26 april 2025</td> 
                         <td><a href="#" class="festival-link" data-name="Free your mind Kingsday">Free your mind Kingsday</a></td>
                         <td>Breda International Airport, Bosschenhoofd</td>
@@ -83,6 +106,13 @@
                     </tr>
                     <tr class="highlight-yellow">
                         <td>4.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Loveland Kingsday" 
+                            />
+                          </td>
                         <td>26 april 2025</td>
                         <td><a href="#" class="festival-link" data-name="Loveland Kingsday">Loveland Kingsday</a></td>
                         <td>Meerpark, Amsterdam</td>
@@ -92,6 +122,13 @@
                     </tr>
                     <tr class="highlight-green">
                         <td>5.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Verbond" 
+                            />
+                          </td>
                         <td>5 mei 2025</td>
                         <td><a href="#" class="festival-link" data-name="Verbond">Verbond</a></td>
                         <td>Olympisch stadion, Amsterdam</td>
@@ -101,6 +138,13 @@
                     </tr>
                     <tr class="highlight-yellow">
                         <td>6.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Awakenings Upclose" 
+                            />
+                          </td>
                         <td>17-18 mei 2025</td>
                         <td><a href="#" class="festival-link" data-name="Awakenings Upclose">Awakenings Upclose</a></td>
                         <td>Spaarnwoude, Amsterdam</td>
@@ -110,6 +154,13 @@
                     </tr>
                     <tr class="highlight-green">
                         <td>7.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Soenda" 
+                            />
+                          </td>
                         <td>31 mei 2025</td>
                         <td><a href="#" class="festival-link" data-name="Soenda">Soenda</a></td>
                         <td>Ruigenhoekse polder, Utrecht</td>
@@ -119,6 +170,13 @@
                     </tr>
                     <tr class="highlight-yellow">
                         <td>8.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="909" 
+                            />
+                          </td>
                         <td>7 juni 2025</td>
                         <td><a href="#" class="festival-link" data-name="909">909</a></td>
                         <td>Amsterdamse bos, Amsterdam</td>
@@ -128,6 +186,13 @@
                     </tr>
                     <tr class="highlight-green">
                         <td>9.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Open Air" 
+                            />
+                          </td>
                         <td>8 juni 2025</td>
                         <td><a href="#" class="festival-link" data-name="Open Air">Open Air</a></td>
                         <td>Gaasperpark, Amsterdam</td>
@@ -137,6 +202,13 @@
                     </tr>
                     <tr class="highlight-yellow">
                         <td>10.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Free Your Mind" 
+                            />
+                          </td>
                         <td>7-8 juni 2025</td>
                         <td><a href="#" class="festival-link" data-name="Free Your Mind">Free Your Mind</a></td>
                         <td>Stadsblokken, Arnhem</td>
@@ -146,6 +218,13 @@
                     </tr>
                     <tr class="highlight-green">
                         <td>11.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Mystic Garden Festival" 
+                            />
+                          </td>
                         <td>14 juni 2025</td>
                         <td><a href="#" class="festival-link" data-name="Mystic Garden Festival">Mystic Garden Festival</a></td>
                         <td>Sloterpark, Amsterdam</td>
@@ -155,6 +234,13 @@
                     </tr>
                     <tr class="highlight-yellow">
                         <td>12.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Boothstock Festival" 
+                            />
+                          </td>
                         <td>12 juli 2025</td>
                         <td>Boothstock Festival</td>
                         <td>Kralingse Bos, Rotterdam</td>
@@ -163,6 +249,13 @@
                     </tr>
                     <tr class="highlight-green">
                         <td>13.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Awakenings Festival" 
+                            />
+                          </td>
                         <td>11-13 juli 2025</td>
                         <td><a href="#" class="festival-link" data-name="Awakenings Festival">Awakenings Festival</a></td>
                         <td>Beekse Bergen, Hilvarenbeek</td>
@@ -172,6 +265,13 @@
                     </tr>
                     <tr class="highlight-yellow">
                         <td>14.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Tomorrowland" 
+                            />
+                          </td>
                         <td>18-27 juli 2025</td>
                         <td><a href="#" class="festival-link" data-name="Tomorrowland">Tomorrowland</a></td>
                         <td>Boom, België</td>
@@ -181,6 +281,13 @@
                     </tr>
                     <tr class="highlight-green">
                         <td>15.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Mysteryland" 
+                            />
+                          </td>
                         <td>22-24 juli 2025</td>
                         <td><a href="#" class="festival-link" data-name="Mysteryland">Mysteryland</a></td>
                         <td>Floriadeterrein, Haarlemmermeer</td>
@@ -190,6 +297,13 @@
                     </tr>
                     <tr class="highlight-yellow">
                         <td>16.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="No Art" 
+                            />
+                          </td>
                         <td>26 juli 2025</td>
                         <td><a href="#" class="festival-link" data-name="No Art">No Art</a></td>
                         <td>Flevopark, Amsterdam</td>
@@ -199,6 +313,13 @@
                     </tr>
                     <tr class="highlight-green">
                         <td>17.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Loveland" 
+                            />
+                          </td>
                         <td>9 augustus 2025</td>
                         <td><a href="#" class="festival-link" data-name="Loveland">Loveland</a></td>
                         <td>Sloterpark, Amsterdam</td>
@@ -208,6 +329,13 @@
                     </tr>
                     <tr class="highlight-yellow">
                         <td>18.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Latin Village" 
+                            />
+                          </td>
                         <td>17 augustus 2025</td>
                         <td><a href="#" class="festival-link" data-name="Latin Village">Latin Village</a></td>
                         <td>Spaarnwoude, Amsterdam</td>
@@ -217,6 +345,13 @@
                     </tr>
                     <tr class="highlight-green">
                         <td>19.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Strafwerk" 
+                            />
+                          </td>
                         <td>To be announced</td>
                         <td><a href="#" class="festival-link" data-name="Strafwerk">Strafwerk</a></td>
                         <td>Havenpark, Amsterdam</td>
@@ -226,6 +361,13 @@
                     </tr>
                     <tr class="highlight-yellow">
                         <td>20.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Parels van de stad" 
+                            />
+                          </td>
                         <td>13-14 september 2025</td>
                         <td><a href="#" class="festival-link" data-name="Parels van de stad">Parels van de stad</a></td>
                         <td>Riekerhaven, Amsterdam</td>
@@ -235,6 +377,13 @@
                     </tr>
                     <tr class="highlight-green">
                         <td>21.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="PIV" 
+                            />
+                          </td>
                         <td>To be announced</td>
                         <td><a href="#" class="festival-link" data-name="PIV">PIV</a></td>
                         <td>Amsterdam</td>
@@ -244,6 +393,13 @@
                     </tr>
                     <tr class="highlight-yellow">
                         <td>22.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Into the woods" 
+                            />
+                          </td>
                         <td>19-20 september</td>
                         <td><a href="#" class="festival-link" data-name="Into the woods">Into the woods</a></td>               
                         <td>Openluchttheater, Amersfoort</td>
@@ -337,13 +493,120 @@
             <input type="password" id="regPassword" placeholder="Wachtwoord" />
             <button type="submit">Registreer</button>
           </form>
-          
           <div id="registerResult"></div>
     </main>
 
     <footer>
         <p>&copy; 2025 Festival Agenda - Gecreëerd door Roan Hassan, S-team vertegenwoordiger</p>
     </footer>
+    <script>
+        /*******************************************
+         * 1. CHECK LOGIN STATUS + TOON CHECKBOX LOGICA
+         *******************************************/
+        fetch('/auth/me', { credentials: 'include' })
+          .then(res => {
+            if (res.ok) {
+              // Gebruiker is ingelogd: 
+              // - Zet eventListeners op de checkboxes
+              initCheckboxListeners();
+            } else {
+              // Niet ingelogd: 
+              // Optioneel: disable checkboxes of toon melding
+              console.warn('Niet ingelogd, checkboxes uitgeschakeld');
+              document.querySelectorAll('.attend-checkbox').forEach(cb => {
+                cb.disabled = true;
+              });
+            }
+          })
+          .catch(err => {
+            console.error('Error checking login status:', err);
+          });
+    
+    
+        /*******************************************
+         * 2. Functie om checkboxes te luisteren
+         *******************************************/
+        function initCheckboxListeners() {
+          // Pak alle checkboxes
+          const checkboxes = document.querySelectorAll('.attend-checkbox');
+    
+          checkboxes.forEach((cb) => {
+            cb.addEventListener('change', async () => {
+              const festName = cb.dataset.festival; 
+              // Of als je in DB festival ID gebruikt, data-id bijv.
+    
+              if (cb.checked) {
+                // POST /festivals/my
+                try {
+                  const resp = await fetch('/festivals/my', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ festivalName: festName })
+                    // of { festivalId: 1 } etc.
+                  });
+                  if (!resp.ok) {
+                    const text = await resp.text();
+                    alert('Kon festival niet toevoegen: ' + text);
+                    cb.checked = false; // revert
+                  }
+                } catch (error) {
+                  console.error(error);
+                  cb.checked = false;
+                }
+    
+              } else {
+                // DELETE /festivals/my/:festivalId (of :festivalName)
+                try {
+                  // LET OP: als je server route /festivals/my/:festivalId heeft, 
+                  // dan heb je geen 'festivalName' maar 'festivalId' nodig.
+                  // Hier doen we even alsof je naam in je route stopt 
+                  // => /festivals/my/Wavy
+                  // In je index.js moet je dat pad wel goed parsen.
+                  const resp = await fetch(`/festivals/my/${festName}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                  });
+                  if (!resp.ok) {
+                    const text = await resp.text();
+                    alert('Kon festival niet verwijderen: ' + text);
+                    cb.checked = true; // revert
+                  }
+                } catch (error) {
+                  console.error(error);
+                  cb.checked = true;
+                }
+              }
+            });
+          });
+        }
+    
+        /*******************************************
+         * 3. (Optioneel) Als je festivals dynamisch wilt ophalen
+         *******************************************/
+        /*
+        async function loadFestivals() {
+          try {
+            const resp = await fetch('/festivals', { credentials: 'include' });
+            const festivals = await resp.json(); 
+            // Bouw de tabel dynamisch...
+          } catch (err) {
+            console.error('Error loading festivals', err);
+          }
+        }
+        */
+
+        fetch('/festivals/my', { credentials: 'include' })
+  .then(resp => resp.json())
+  .then(myFests => {
+    // myFests is array, bv: [ { id: 1, name: 'Wavy' }, ... ]
+    myFests.forEach(fest => {
+      const cb = document.querySelector(`.attend-checkbox[data-festival="${fest.name}"]`);
+      if (cb) cb.checked = true;
+    });
+  });
+      </script>
+
 </body>
 <script src="script.js"></script>
 </html>
