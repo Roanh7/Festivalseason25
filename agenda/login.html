@@ -28,28 +28,47 @@
   <main>
     <div class="login-container">
       <h2>Inloggen</h2>
-      <form id="loginForm">
+
+      <!-- Formulier POST naar /login -->
+      <form action="/login" method="POST">
         <div class="form-group">
-          <label for="username">Gebruikersnaam</label>
-          <input type="text" id="username" name="username" required />
+          <label for="email">E-mail</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+          />
         </div>
+
         <div class="form-group">
           <label for="password">Wachtwoord</label>
-          <input type="password" id="password" name="password" required />
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+          />
         </div>
+
         <button type="submit" class="btn">Inloggen</button>
       </form>
 
-      <div id="result" class="info-message"></div>
+      <!-- Optioneel: plek voor meldingen als je met serverresponses werkt -->
+      <div id="loginResult" class="info-message"></div>
 
-      <p>Nog geen account? <a href="register.html">Registreer hier</a></p>
+      <p>
+        Nog geen account?
+        <a href="register.html">Registreer hier</a>
+      </p>
     </div>
   </main>
 
   <footer>
-    <p>&copy; 2025 Festival Agenda - Gecreëerd door Roan Hassan, S-team vertegenwoordiger</p>
+    <p>&copy; 2025 Festival Agenda - Gecreëerd door [Jouw Naam], S-team vertegenwoordiger</p>
   </footer>
 
-  <script src="login.js"></script>
+
+<script src="login.js"></script>
 </body>
 </html>

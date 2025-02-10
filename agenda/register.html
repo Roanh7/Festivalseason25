@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registreren - Festival Agenda 2025</title>
-  <!-- Hier hetzelfde CSS-bestand als bij je agenda -->
   <link rel="stylesheet" href="agenda.css">
 </head>
 
@@ -13,7 +12,7 @@
     <h1>Festival Agenda 2025</h1>
   </header>
 
-  <!-- Logo -->
+  
   <div class="logo-container">
     <img src="images/logo.png" alt="Festival Logo">
   </div>
@@ -24,7 +23,7 @@
       <li><a href="agenda.html">Home</a></li>
       <li><a href="reviews.html">Reviews</a></li>
       <li><a href="extra-info.html">Extra Info</a></li>
-      <li><a href="register.html">Registreren</a></li>
+      <li><a href="register.html" class="active">Registreren</a></li>
       <li><a href="login.html">Inloggen</a></li>
     </ul>
   </nav>
@@ -32,18 +31,33 @@
   <main>
     <div class="form-container">
       <h2>Maak een account aan</h2>
-      <form id="registerForm">
+
+      <!-- Dit formulier stuurt een POST-request naar /register -->
+      <form action="/register" method="POST">
         <div class="form-group">
-          <label for="regUsername">Gebruikersnaam</label>
-          <input type="text" id="regUsername" name="regUsername" required>
+          <label for="email">E-mail</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+          />
         </div>
+
         <div class="form-group">
-          <label for="regPassword">Wachtwoord</label>
-          <input type="password" id="regPassword" name="regPassword" required>
+          <label for="password">Wachtwoord</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+          />
         </div>
+
         <button type="submit" class="btn">Registreren</button>
       </form>
 
+      <!-- Eventueel een plek voor meldingen als je wilt -->
       <div id="registerResult" class="info-message"></div>
 
       <p>
@@ -53,10 +67,10 @@
   </main>
 
   <footer>
-    <p>&copy; 2025 Festival Agenda - Gecreëerd door Roan Hassan, S-team vertegenwoordiger</p>
+    <p>&copy; 2025 Festival Agenda - Gecreëerd door [Jouw Naam], S-team vertegenwoordiger</p>
   </footer>
 
-  <!-- Je JavaScript -->
-  <script src="register.js"></script>
+  <!-- Eventueel je eigen JavaScript-bestand -->
+  <script src="register.js"></script> 
 </body>
 </html>
