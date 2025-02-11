@@ -10,7 +10,6 @@ const port = process.env.PORT || 3000;
 // Middleware to parse form data (for login form submissions)
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static('public'));
 
 // PostgreSQL client setup
 const client = new Client({
