@@ -110,6 +110,93 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// =============== STAP 2: Nieuwe endpoints voor festivals bijwonen ===============
+
+// POST /attend => Gebruiker meldt zich aan voor een festival
+app.post('/attend', async (req, res) => {
+  try {
+    const { email, festival } = req.body;
+    if (!email || !festival) {
+      return res.status(400).json({ message: 'Missing email or festival' });
+    }
+
+    // Voorbeeld: we kunnen 'ON CONFLICT DO NOTHING' gebruiken als je
+    // in de DB 'UNIQUE(user_email, festival_name)' hebt ingesteld:
+    await client.query(
+      `INSERT INTO attendances (user_email, festival_name)
+       VALUES ($1, $2)
+       ON CONFLICT (user_email, festival_name) DO NOTHING`,
+      [email, festival]
+    );
+
+    return res.json({ message: `You are attending ${festival}!` });
+  } catch (err) {
+    console.error('Error in /attend:', err);
+    return res.status(500).json({ message: 'Could not attend festival.' });
+  }
+});
+
+// DELETE /attend => Gebruiker meldt zich af voor een festival
+app.delete('/attend', async (req, res) => {
+  try {
+    const { email, festival } = req.body;
+    if (!email || !festival) {
+      return res.status(400).json({ message: 'Missing email or festival' });
+    }
+
+    await client.query(
+      'DELETE FROM attendances WHERE user_email=$1 AND festival_name=$2',
+      [email, festival]
+    );
+    return res.json({ message: `You are no longer attending ${festival}.` });
+  } catch (err) {
+    console.error('Error in DELETE /attend:', err);
+    return res.status(500).json({ message: 'Could not unattend festival.' });
+  }
+});
+
+// GET /my-festivals => Alle festivals van de ingelogde user
+app.get('/my-festivals', async (req, res) => {
+  try {
+    const userEmail = req.query.email;
+    if (!userEmail) {
+      return res.status(400).json({ message: 'No email provided' });
+    }
+
+    const result = await client.query(
+      'SELECT festival_name FROM attendances WHERE user_email=$1',
+      [userEmail]
+    );
+    const festivals = result.rows.map(r => r.festival_name);
+
+    return res.json({ festivals });
+  } catch (err) {
+    console.error('Error in /my-festivals:', err);
+    return res.status(500).json({ message: 'Could not get user festivals' });
+  }
+});
+
+// GET /festival-attendees => Alle gebruikers die dit festival bezoeken
+app.get('/festival-attendees', async (req, res) => {
+  try {
+    const festival = req.query.festival;
+    if (!festival) {
+      return res.status(400).json({ message: 'No festival provided' });
+    }
+
+    const result = await client.query(
+      'SELECT user_email FROM attendances WHERE festival_name=$1',
+      [festival]
+    );
+    const attendees = result.rows.map(r => r.user_email);
+
+    return res.json({ festival, attendees });
+  } catch (err) {
+    console.error('Error in /festival-attendees:', err);
+    return res.status(500).json({ message: 'Could not get attendees' });
+  }
+});
+
 // 9) Server starten
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);

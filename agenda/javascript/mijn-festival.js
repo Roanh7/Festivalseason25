@@ -1,41 +1,80 @@
-// 1. Lees uit localStorage welke festivals de gebruiker heeft aangevinkt
-let attendingFestivals = JSON.parse(localStorage.getItem('attendingFestivals')) || [];
+// mijn-festivals.js
+document.addEventListener('DOMContentLoaded', async () => {
+  const userMenu = document.getElementById('userMenu');  // optioneel
+  const myFestList = document.getElementById('myFestList');
+  const festivalDetails = document.getElementById('festivalDetails');
 
-// 2. Pak het DOM-element waar de lijst moet komen
-const myFestivalsList = document.getElementById('myFestivalsList');
+  // 1) Check of ingelogd
+  const token = localStorage.getItem('token');
+  const email = localStorage.getItem('email');
+  if (!token || !email) {
+    myFestList.innerHTML = "<li>Je bent niet ingelogd.</li>";
+    return;
+  }
 
-// 3. Als er geen festivals zijn, toon een melding
-if (attendingFestivals.length === 0) {
-  myFestivalsList.innerHTML = `
-    <p>Je hebt (nog) geen festivals aangevinkt op de <a href="agenda.html">agenda</a>.</p>
-  `;
-} else {
-  // 4. Anders, bouw een HTML-lijst van festivals
-  let html = '<ul>';
-  attendingFestivals.forEach(festivalName => {
-    // Voor DEMO: we tonen ook "Andere bezoekers" uit localStorage of uit een mock 
-    // (In het echt zou je hier een API-call doen naar je database om 'echte' andere gebruikers op te halen)
-    const otherAttendees = getOtherAttendeesMock(festivalName);
-    
-    html += `
-      <li style="margin-bottom:20px;">
-        <strong>${festivalName}</strong><br/>
-        <em>Andere bezoekers:</em> ${otherAttendees.join(', ')}
-      </li>
-    `;
-  });
-  html += '</ul>';
+  // 2) Haal eigen festivals
+  try {
+    const res = await fetch(`/my-festivals?email=${email}`);
+    const data = await res.json(); 
+    // data.festivals = ["Open Air", "DGTL", ...] 
+    const myFests = data.festivals || [];
 
-  myFestivalsList.innerHTML = html;
-}
+    if (myFests.length === 0) {
+      myFestList.innerHTML = "<li>Je hebt nog geen festivals aangevinkt.</li>";
+      return;
+    }
 
-/**
- * Voorbeeld: deze functie simuleert een lijst van andere mensen die ook
- * naar een bepaald festival gaan. In een echte app zou je hiervoor een 
- * API-aanvraag naar je database/backend doen.
- */
-fetch(`/api/festivals/${festivalName}/attendees`)
-  .then(response => response.json())
-  .then(data => {
-    // data kan bv. een array zijn met user-namen
-  });
+    // 3) Bouw UI
+    myFests.forEach(festival => {
+      const li = document.createElement('li');
+      li.textContent = festival;
+      
+      // Maak een knop "Wie gaat er nog meer?"
+      const btn = document.createElement('button');
+      btn.textContent = "Wie gaan er nog meer?";
+      btn.addEventListener('click', () => {
+        showAttendees(festival);
+      });
+
+      li.appendChild(btn);
+      myFestList.appendChild(li);
+    });
+
+  } catch (err) {
+    myFestList.innerHTML = `<li>Fout bij ophalen festivals: ${err}</li>`;
+  }
+
+  // 4) Functie om attendees te laten zien
+  async function showAttendees(festival) {
+    // clear
+    festivalDetails.innerHTML = "";
+    try {
+      const resp = await fetch(`/festival-attendees?festival=${encodeURIComponent(festival)}`);
+      const result = await resp.json(); 
+      // result.attendees = ["roan@example.com", "chip@example.com", ...]
+
+      const container = document.createElement('div');
+      container.innerHTML = `<h3>${festival}</h3>`;
+
+      const ul = document.createElement('ul');
+      // Filter je eigen email eruit als je jezelf niet wil zien
+      const others = result.attendees.filter(u => u !== email);
+
+      if (others.length === 0) {
+        ul.innerHTML = `<li>Geen andere gebruikers hebben zich aangemeld.</li>`;
+      } else {
+        others.forEach(u => {
+          const li = document.createElement('li');
+          li.textContent = u;
+          ul.appendChild(li);
+        });
+      }
+
+      container.appendChild(ul);
+      festivalDetails.appendChild(container);
+
+    } catch (e) {
+      festivalDetails.textContent = "Fout bij ophalen attendees.";
+    }
+  }
+});
