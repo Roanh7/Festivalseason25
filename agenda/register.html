@@ -2,22 +2,18 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registreren - Festival Agenda 2025</title>
   <link rel="stylesheet" href="/styling/agenda.css">
 </head>
-
 <body>
   <header>
     <h1>Festival Agenda 2025</h1>
   </header>
 
-  
   <div class="logo-container">
     <img src="/images/logo.png" alt="Festival Logo">
   </div>
 
-  <!-- Navigatiebalk -->
   <nav class="nav-bar">
     <ul>
       <li><a href="agenda.html">Home</a></li>
@@ -33,45 +29,32 @@
     <div class="form-container">
       <h2>Maak een account aan</h2>
 
-      <!-- Dit formulier stuurt een POST-request naar /register -->
-      <form action="/register" method="POST">
+      <!-- Formulier zonder action/method, we doen het via JS -->
+      <form id="registerForm">
         <div class="form-group">
           <label for="email">E-mail</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-          />
+          <input type="email" id="email" required />
         </div>
 
         <div class="form-group">
           <label for="password">Wachtwoord</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            required
-          />
+          <input type="password" id="password" required />
         </div>
 
         <button type="submit" class="btn">Registreren</button>
       </form>
 
-      <!-- Eventueel een plek voor meldingen als je wilt -->
       <div id="registerResult" class="info-message"></div>
 
-      <p>
-        Heb je al een account? <a href="login.html">Log hier in</a>
-      </p>
+      <p>Heb je al een account? <a href="login.html">Log hier in</a></p>
     </div>
   </main>
 
   <footer>
-    <p>&copy; 2025 Festival Agenda - Gecreëerd door Roan Hassan, S-team vertegenwoordiger</p>
+    <p>&copy; 2025 Festival Agenda</p>
   </footer>
 
-  <!-- Eventueel je eigen JavaScript-bestand -->
+  <!-- Eigen JS -->
   <script src="/javascript/register.js"></script> 
 </body>
 </html>

@@ -1,44 +1,48 @@
 // login.js
 
-// 1. Luister op de klik van de Inloggen-knop
-document.getElementById('loginBtn').addEventListener('click', async (e) => {
-  e.preventDefault(); // voorkom eventueel form-submit
-
-  // 2. Haal email & password uit de inputvelden
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-
-  // 3. Selecteer het divje waar we feedback tonen
+// 1. Wacht tot de DOM geladen is, zodat elementen bestaan
+document.addEventListener('DOMContentLoaded', () => {
+  const loginForm = document.getElementById('loginForm');
   const resultDiv = document.getElementById('loginResult');
 
-  // 4. Doe een fetch POST naar /login
-  try {
-    const response = await fetch('/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',  // belangrijk om sessie-cookie mee te sturen
-      body: JSON.stringify({ email, password })
-    });
+  // 2. Vang de submit-event van het formulier
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault(); // voorkom echte form-submission
 
-    // Server stuurt (bijv.) text terug. Wil je JSON, gebruik dan response.json()
-    const text = await response.text();
+    // 3. Haal email & password uit de inputvelden
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
-    if (response.ok) {
-      // Login geslaagd
-      resultDiv.style.color = 'green';
-      resultDiv.textContent = text;
+    // 4. Verstuur een POST-request naar /login met JSON
+    try {
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        // credentials: 'include' als je cookies/sessies gebruikt
+        body: JSON.stringify({ email, password })
+      });
 
-      // Eventueel direct doorverwijzen naar "mijn-festivals.html":
-      // window.location.href = 'mijn-festivals.html';
+      // 5. Lees de tekst van de server (bijv. 'Welcome <email>')
+      const text = await response.text();
 
-    } else {
-      // Fout (401, 400, 500, etc.)
+      if (response.ok) {
+        // Succesvol ingelogd
+        resultDiv.style.color = 'green';
+        resultDiv.textContent = text;
+
+        // Eventueel doorverwijzen:
+        // window.location.href = 'mijn-festivals.html';
+      } else {
+        // Fout, bijv. 401 (verkeerde login) of 500 (server-error)
+        resultDiv.style.color = 'red';
+        resultDiv.textContent = `Fout: ${text}`;
+      }
+    } catch (err) {
+      console.error('Error:', err);
       resultDiv.style.color = 'red';
-      resultDiv.textContent = `Fout: ${text}`;
+      resultDiv.textContent = 'Er is een fout opgetreden bij het inloggen.';
     }
-  } catch (err) {
-    console.error('Error:', err);
-    resultDiv.style.color = 'red';
-    resultDiv.textContent = 'Er is een fout opgetreden bij het inloggen.';
-  }
+  });
 });

@@ -30,29 +30,18 @@
     <div class="login-container">
       <h2>Inloggen</h2>
 
-      <!-- Form zonder action/method, zodat JS de login afhandelt -->
+      <!-- Form zonder action/method, we doen het via JS -->
       <form id="loginForm">
         <div class="form-group">
           <label for="email">E-mail</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-          />
+          <input type="email" id="email" name="email" required />
         </div>
 
         <div class="form-group">
           <label for="password">Wachtwoord</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            required
-          />
+          <input type="password" id="password" name="password" required />
         </div>
 
-        <!-- Let op id="loginBtn" voor de JS-eventlistener -->
         <button type="submit" id="loginBtn" class="btn">Inloggen</button>
       </form>
 
@@ -70,26 +59,24 @@
     <p>&copy; 2025 Festival Agenda - Gecreëerd door Roan Hassan, S-team vertegenwoordiger</p>
   </footer>
 
-  <!-- 
-    JE EIGEN login.js: hierin doe je 
-      document.getElementById('loginBtn').addEventListener('click', async (e) => {...})
-    om de AJAX/fetch call naar /login te doen. 
-  -->
+  <!-- Link naar je login.js-script -->
   <script src="/javascript/login.js"></script>
 
+  <!-- Voorbeeld-code om te checken of iemand al ingelogd is
+       (optioneel, alleen als je server hier endpoints voor heeft) -->
   <script>
-    // We vragen /auth/me op om te zien of we ingelogd zijn
+    /*
     fetch('/auth/me', { credentials: 'include' })
       .then(res => {
         if (res.ok) {
-          // user is ingelogd => toon de link
-          document.getElementById('myFestivalsLink').style.display = 'block';
+          // user is ingelogd => verberg of toon iets
+          document.getElementById('loginForm').style.display = 'none';
         }
       })
       .catch(err => {
         console.warn('Error checking login status:', err);
       });
+    */
   </script>
-
 </body>
 </html>
