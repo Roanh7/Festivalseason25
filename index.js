@@ -1,81 +1,95 @@
+// index.js
 const express = require('express');
-const { Client } = require('pg');  // pg client
-
-// Environment variables from .env (Optional if you want local environment support)
-require('dotenv').config();
+const path = require('path');
+app.use('/styling', express.static(path.join(__dirname, 'styling')));
+const { Client } = require('pg');
+const bcrypt = require('bcrypt');
+require('dotenv').config(); // if using .env locally
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware to parse form data (for login form submissions)
+// Middleware to parse form data
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// PostgreSQL client setup
+// Connect to Postgres
 const client = new Client({
-  connectionString: process.env.DATABASE_URL,  // We'll set this on Vercel
+  connectionString: process.env.DATABASE_URL,
 });
-client.connect()
+client
+  .connect()
   .then(() => console.log('Connected to Postgres!'))
   .catch((err) => console.error('Connection error', err.stack));
 
-// Simple Home Route
+// Serve all static files inside "agenda" folder
+app.use(express.static('agenda'));
+
+// ============== ROUTES ==============
+
+// [1] GET / => Serve the main page (agenda.html)
 app.get('/', (req, res) => {
-  res.send(`<h1>Welcome</h1>
-    <p>Go to <a href="/login">/login</a> to log in.</p>
-  `);
+  res.sendFile(path.join(__dirname, 'agenda', 'agenda.html'));
+  res.sendFile(path.join(__dirname, 'agenda', 'reviews.html'));
+  res.sendFile(path.join(__dirname, 'agenda', 'extra-info.html'));
+  res.sendFile(path.join(__dirname, 'agenda', 'register.html'));
+  res.sendFile(path.join(__dirname, 'agenda', 'login.html'));
 });
 
-// Login Page (GET)
-app.get('/login', (req, res) => {
-  // A simple HTML form for demonstration
-  const form = `
-    <h1>Login</h1>
-    <form action="/login" method="POST">
-      <label>Email:</label>
-      <input type="text" name="email" required />
-      <br />
-      <label>Password:</label>
-      <input type="password" name="password" required />
-      <br />
-      <button type="submit">Login</button>
-    </form>
-  `;
-  res.send(form);
-});
-
-// Login Handler (POST)
-app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
+// [2] POST /register => Handle registration
+app.post('/register', async (req, res) => {
   try {
-    // Query the database for a user with the given email
+    // Haal de juiste velden uit req.body
+    const { email, password } = req.body;
+
+    // Wachtwoord hashen
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // In de database opslaan
+    await client.query(
+      'INSERT INTO users (email, password) VALUES ($1, $2)',
+      [email, hashedPassword]
+    );
+
+    return res.send('Registration successful! You can now log in.');
+  } catch (error) {
+    console.error('Error registering user:', error);
+    return res.status(500).send('Registration failed.');
+  }
+});
+
+// [3] POST /login => Handle login
+app.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Zoeken in de database
     const userResult = await client.query(
       'SELECT * FROM users WHERE email = $1',
       [email]
     );
-    
     if (userResult.rows.length === 0) {
-      // No user found
-      return res.status(401).send('Invalid email or password!');
+      return res.status(401).send('Invalid email or password');
     }
 
     const user = userResult.rows[0];
 
-    // For a real app, you would compare hashed passwords using bcrypt.compare
-    if (user.password !== password) {
-      return res.status(401).send('Invalid email or password!');
+    // Wachtwoord vergelijken met bcrypt
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(401).send('Invalid email or password');
     }
 
-    // If password matches
-    return res.send(`Welcome, ${user.email}! You have successfully logged in.`);
+    // Gelukt
+    return res.send(`Welcome ${email}, you are logged in!`);
   } catch (error) {
     console.error('Error during login:', error);
-    return res.status(500).send('Internal Server Error');
+    return res.status(500).send('Login failed.');
   }
 });
 
-// Start the server locally
+
+// [4] Start server locally
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server running on http://localhost:${port}`);
 });
