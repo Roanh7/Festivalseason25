@@ -1,19 +1,22 @@
 // index.js
+
+require('dotenv').config();  // Als je .env-lokaal gebruikt
 const express = require('express');
 const path = require('path');
-app.use('/styling', express.static(path.join(__dirname, 'styling')));
 const { Client } = require('pg');
 const bcrypt = require('bcrypt');
-require('dotenv').config(); // if using .env locally
 
-const app = express();
+const app = express();                     // <--- Eerst app aanmaken!
 const port = process.env.PORT || 3000;
 
-// Middleware to parse form data
+// Als je de map "styling" wilt serveren op /styling
+app.use('/styling', express.static(path.join(process.cwd(), 'styling')));
+
+// Middleware om form-data (POST) te kunnen verwerken
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Connect to Postgres
+// Postgres-connectie instellen
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
 });
@@ -22,24 +25,39 @@ client
   .then(() => console.log('Connected to Postgres!'))
   .catch((err) => console.error('Connection error', err.stack));
 
-// Serve all static files inside "agenda" folder
+// 1) Alle bestanden in "agenda" statisch serveren
+//    Daardoor kun je bijvoorbeeld surfen naar /agenda.html, /reviews.html, etc.
 app.use(express.static('agenda'));
 
-// ============== ROUTES ==============
-
-// [1] GET / => Serve the main page (agenda.html)
+// 2) Aparte routes om direct pages te serveren (optioneel)
 app.get('/', (req, res) => {
+  // Stuur de 'agenda.html' als homepage
   res.sendFile(path.join(__dirname, 'agenda', 'agenda.html'));
+});
+
+// Reviews-pagina
+app.get('/reviews', (req, res) => {
   res.sendFile(path.join(__dirname, 'agenda', 'reviews.html'));
+});
+
+// Extra info
+app.get('/extra-info', (req, res) => {
   res.sendFile(path.join(__dirname, 'agenda', 'extra-info.html'));
+});
+
+// Registratieformulier
+app.get('/register', (req, res) => {
   res.sendFile(path.join(__dirname, 'agenda', 'register.html'));
+});
+
+// Loginformulier
+app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'agenda', 'login.html'));
 });
 
-// [2] POST /register => Handle registration
+// ====== REGISTREREN (POST) ======
 app.post('/register', async (req, res) => {
   try {
-    // Haal de juiste velden uit req.body
     const { email, password } = req.body;
 
     // Wachtwoord hashen
@@ -58,12 +76,12 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// [3] POST /login => Handle login
+// ====== INLOGGEN (POST) ======
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Zoeken in de database
+    // Opzoeken in de database
     const userResult = await client.query(
       'SELECT * FROM users WHERE email = $1',
       [email]
@@ -74,13 +92,13 @@ app.post('/login', async (req, res) => {
 
     const user = userResult.rows[0];
 
-    // Wachtwoord vergelijken met bcrypt
+    // Vergelijk de gehashte wachtwoorden
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
       return res.status(401).send('Invalid email or password');
     }
 
-    // Gelukt
+    // Succes!
     return res.send(`Welcome ${email}, you are logged in!`);
   } catch (error) {
     console.error('Error during login:', error);
@@ -88,8 +106,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-
-// [4] Start server locally
+// ====== SERVER STARTEN ======
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
