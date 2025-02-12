@@ -61,39 +61,4 @@
   <script src="/javascript/navstatus.js"></script>
 </body>
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const userMenu = document.getElementById('userMenu');
-    
-    // Check localStorage
-    const token = localStorage.getItem('token');
-    const email = localStorage.getItem('email');
-  
-    if (token && email) {
-      // Gebruiker is ingelogd, toon de naam en een "klik om uit te loggen" link
-      userMenu.innerHTML = `
-        <span style="cursor:pointer;" id="userNameSpan">Hallo, ${email}</span>
-      `;
-      
-      // Event listener om popup te tonen
-      const userNameSpan = document.getElementById('userNameSpan');
-      userNameSpan.addEventListener('click', () => {
-        // Simpele confirm popup
-        const confirmLogout = confirm('Wil je uitloggen?');
-        if (confirmLogout) {
-          // Uitloggen
-          localStorage.removeItem('token');
-          localStorage.removeItem('email');
-          // Refresh of redirect
-          window.location.reload();
-        }
-      });
-  
-    } else {
-      // Niet ingelogd; desnoods tonen we niets of een login-knop
-      userMenu.textContent = '';
-    }
-  });
-  </script>
-
 </html>
