@@ -15,8 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // 3) PostgreSQL-connectie maken
-//    LET OP: Als jouw Neon-URL nog geen sslmode=require heeft, zet dan ssl: { rejectUnauthorized: false } er expliciet bij.
-//    Hieronder zie je dat in commentaar. Gebruik het als je een SSL-foutmelding krijgt.
+//    LET OP: Als jouw Neon-URL geen sslmode=require heeft, zet dan ssl: { rejectUnauthorized: false } er expliciet bij.
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
   /*
@@ -87,12 +86,16 @@ app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     // Check of user bestaat
-    const userResult = await client.query('SELECT * FROM users WHERE email = $1', [email]);
+    const userResult = await client.query(
+      'SELECT * FROM users WHERE email = $1',
+      [email]
+    );
     if (userResult.rows.length === 0) {
       return res.status(401).send('Invalid email or password');
     }
 
     const user = userResult.rows[0];
+
     // Wachtwoord vergelijken
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
