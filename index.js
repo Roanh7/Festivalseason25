@@ -1,6 +1,6 @@
 // index.js
 
-require('dotenv').config(); // als je .env-lokaal gebruikt
+require('dotenv').config(); // Als je .env lokaal gebruikt
 const express = require('express');
 const path = require('path');
 const { Client } = require('pg');
@@ -15,16 +15,23 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // 3) PostgreSQL-connectie maken
+//    LET OP: Als jouw Neon-URL nog geen sslmode=require heeft, zet dan ssl: { rejectUnauthorized: false } er expliciet bij.
+//    Hieronder zie je dat in commentaar. Gebruik het als je een SSL-foutmelding krijgt.
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
+  /*
+  ssl: {
+    rejectUnauthorized: false,
+  },
+  */
 });
+
 client
   .connect()
   .then(() => console.log('Connected to Postgres!'))
   .catch((err) => console.error('Connection error', err.stack));
 
 // 4) Alle bestanden in de map "agenda" statisch serveren
-//    Zo kun je rechtstreeks /agenda.html, /styling/agenda.css, /images/logo.png, etc. laden
 app.use(express.static(path.join(__dirname, 'agenda')));
 
 // 5) Root-route: bij bezoek aan "/" sturen we agenda.html
@@ -32,7 +39,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'agenda', 'agenda.html'));
 });
 
-// 6) Aparte GET-routes voor de overige HTML-pagina's (optioneel)
+// 6) Aparte GET-routes voor de overige HTML-pagina's
 app.get('/reviews', (req, res) => {
   res.sendFile(path.join(__dirname, 'agenda', 'reviews.html'));
 });
