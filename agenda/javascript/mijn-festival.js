@@ -1,22 +1,27 @@
-// mijn-festivals.js
+// agenda/javascript/mijn-festivals.js
+
 document.addEventListener('DOMContentLoaded', async () => {
-  const userMenu = document.getElementById('userMenu');  // optioneel
+  // Eventueel userMenu-element, als je daarin iets wilt tonen
+  const userMenu = document.getElementById('userMenu'); 
   const myFestList = document.getElementById('myFestList');
   const festivalDetails = document.getElementById('festivalDetails');
 
   // 1) Check of ingelogd
   const token = localStorage.getItem('token');
   const email = localStorage.getItem('email');
+
   if (!token || !email) {
     myFestList.innerHTML = "<li>Je bent niet ingelogd.</li>";
     return;
   }
 
-  // 2) Haal eigen festivals
+  // 2) Haal eigen festivals op
   try {
-    const res = await fetch(`/my-festivals?email=${email}`);
+    const res = await fetch(`/my-festivals?email=${encodeURIComponent(email)}`);
+    if (!res.ok) {
+      throw new Error(`Server returned ${res.status}`);
+    }
     const data = await res.json(); 
-    // data.festivals = ["Open Air", "DGTL", ...] 
     const myFests = data.festivals || [];
 
     if (myFests.length === 0) {
@@ -24,12 +29,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // 3) Bouw UI
+    // 3) Bouw de lijst in de UI
     myFests.forEach(festival => {
       const li = document.createElement('li');
       li.textContent = festival;
-      
-      // Maak een knop "Wie gaat er nog meer?"
+
+      // Maak een knop "Wie gaan er nog meer?"
       const btn = document.createElement('button');
       btn.textContent = "Wie gaan er nog meer?";
       btn.addEventListener('click', () => {
@@ -41,15 +46,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
   } catch (err) {
-    myFestList.innerHTML = `<li>Fout bij ophalen festivals: ${err}</li>`;
+    myFestList.innerHTML = `<li>Fout bij ophalen van jouw festivals: ${err.message}</li>`;
   }
 
-  // 4) Functie om attendees te laten zien
+  // 4) Functie om attendees te tonen
   async function showAttendees(festival) {
-    // clear
+    // Leegmaken van festivalDetails
     festivalDetails.innerHTML = "";
+
     try {
       const resp = await fetch(`/festival-attendees?festival=${encodeURIComponent(festival)}`);
+      if (!resp.ok) {
+        throw new Error(`Server returned ${resp.status}`);
+      }
       const result = await resp.json(); 
       // result.attendees = ["roan@example.com", "chip@example.com", ...]
 
@@ -57,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       container.innerHTML = `<h3>${festival}</h3>`;
 
       const ul = document.createElement('ul');
-      // Filter je eigen email eruit als je jezelf niet wil zien
+      // Filter je eigen email eruit als je jezelf niet wilt zien
       const others = result.attendees.filter(u => u !== email);
 
       if (others.length === 0) {
@@ -74,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       festivalDetails.appendChild(container);
 
     } catch (e) {
-      festivalDetails.textContent = "Fout bij ophalen attendees.";
+      festivalDetails.textContent = `Fout bij ophalen van attendees: ${e.message}`;
     }
   }
 });
