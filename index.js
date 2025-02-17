@@ -1,6 +1,6 @@
 // index.js
 
-require('dotenv').config(); // Als je .env lokaal gebruikt
+require('dotenv').config(); // Om .env-variabelen in te laden (DATABASE_URL, etc.)
 const express = require('express');
 const path = require('path');
 const { Client } = require('pg');
@@ -14,31 +14,37 @@ const port = process.env.PORT || 3000;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// 3) PostgreSQL-connectie maken
-//    LET OP: Als jouw Neon-URL geen sslmode=require heeft, zet dan ssl: { rejectUnauthorized: false } er expliciet bij.
+// 3) PostgreSQL-connectie maken (Neon)
+//    Let op: zorg dat je .env de juiste DATABASE_URL heeft, bv:
+//    DATABASE_URL = "postgres://user:password@host:port/dbname?sslmode=require"
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
+  // Als ssl niet automatisch wordt afgedwongen, uncomment dan onderstaande:
   /*
   ssl: {
-    rejectUnauthorized: false,
-  },
+    rejectUnauthorized: false
+  }
   */
 });
 
 client
   .connect()
   .then(() => console.log('Connected to Postgres!'))
-  .catch((err) => console.error('Connection error', err.stack));
+  .catch((err) => console.error('Connection error:', err.stack));
 
-// 4) Alle bestanden in de map "agenda" statisch serveren
+// 4) Serve alle bestanden in de map "agenda" statisch.
+//    Dus agenda/agenda.html => http://localhost:3000/agenda.html
+//    agenda/javascript/mijn-festivals.js => http://localhost:3000/javascript/mijn-festivals.js
 app.use(express.static(path.join(__dirname, 'agenda')));
 
-// 5) Root-route: bij bezoek aan "/" sturen we agenda.html
+// 5) Root-route: bij bezoek aan "/" sturen we de agenda-pagina
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'agenda', 'agenda.html'));
 });
 
-// 6) Aparte GET-routes voor de overige HTML-pagina's
+// 6) Aparte GET-routes voor andere pagina's (optioneel, want je kunt
+//    ook direct de statische bestanden gebruiken).
+//    Dit is handig als je misschien later 404 checks of auth wilt doen.
 app.get('/reviews', (req, res) => {
   res.sendFile(path.join(__dirname, 'agenda', 'reviews.html'));
 });
@@ -59,7 +65,7 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'agenda', 'login.html'));
 });
 
-// 7) POST /register => gebruikersregistratie
+// 7) POST /register => gebruiker registreren
 app.post('/register', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -67,11 +73,11 @@ app.post('/register', async (req, res) => {
     // Wachtwoord hashen
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Nieuwe gebruiker in de database zetten
-    await client.query('INSERT INTO users (email, password) VALUES ($1, $2)', [
-      email,
-      hashedPassword,
-    ]);
+    // In DB zetten
+    await client.query(
+      'INSERT INTO users (email, password) VALUES ($1, $2)',
+      [email, hashedPassword]
+    );
 
     res.send('Registration successful! You can now log in.');
   } catch (err) {
@@ -80,12 +86,12 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// 8) POST /login => gebruikerslogin
+// 8) POST /login => gebruiker inloggen
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Check of user bestaat
+    // Zoeken in DB
     const userResult = await client.query(
       'SELECT * FROM users WHERE email = $1',
       [email]
@@ -96,13 +102,13 @@ app.post('/login', async (req, res) => {
 
     const user = userResult.rows[0];
 
-    // Wachtwoord vergelijken
+    // Password check
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
       return res.status(401).send('Invalid email or password');
     }
 
-    // Gelukt!
+    // Gelukt! (Hier zou je eventueel een JWT kunnen sturen)
     res.send(`Welcome ${email}, you are logged in!`);
   } catch (err) {
     console.error('Error during login:', err);
@@ -110,9 +116,9 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// =============== STAP 2: Nieuwe endpoints voor festivals bijwonen ===============
+// ============ FESTIVAL-ENDPOINTS =================
 
-// POST /attend => Gebruiker meldt zich aan voor een festival
+// POST /attend => gebruiker meldt zich aan voor festival
 app.post('/attend', async (req, res) => {
   try {
     const { email, festival } = req.body;
@@ -120,8 +126,8 @@ app.post('/attend', async (req, res) => {
       return res.status(400).json({ message: 'Missing email or festival' });
     }
 
-    // Voorbeeld: we kunnen 'ON CONFLICT DO NOTHING' gebruiken als je
-    // in de DB 'UNIQUE(user_email, festival_name)' hebt ingesteld:
+    // In attendances-table zetten (gebruik ON CONFLICT als je
+    // UNIQUE constraint op (user_email, festival_name) hebt)
     await client.query(
       `INSERT INTO attendances (user_email, festival_name)
        VALUES ($1, $2)
@@ -136,7 +142,7 @@ app.post('/attend', async (req, res) => {
   }
 });
 
-// DELETE /attend => Gebruiker meldt zich af voor een festival
+// DELETE /attend => gebruiker meldt zich af voor festival
 app.delete('/attend', async (req, res) => {
   try {
     const { email, festival } = req.body;
@@ -155,7 +161,7 @@ app.delete('/attend', async (req, res) => {
   }
 });
 
-// GET /my-festivals => Alle festivals van de ingelogde user
+// GET /my-festivals => lijst van festivals die de user bezoekt
 app.get('/my-festivals', async (req, res) => {
   try {
     const userEmail = req.query.email;
@@ -176,7 +182,7 @@ app.get('/my-festivals', async (req, res) => {
   }
 });
 
-// GET /festival-attendees => Alle gebruikers die dit festival bezoeken
+// GET /festival-attendees => lijst van users die dit festival bezoeken
 app.get('/festival-attendees', async (req, res) => {
   try {
     const festival = req.query.festival;
