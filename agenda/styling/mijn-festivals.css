@@ -22,13 +22,12 @@ main {
 .logo-container {
   text-align: center;
   margin: 0;
-  background-color: #fff;
+  background-color: #fff; 
 }
 .logo-container img {
-  width: 100px;
+  width: 100%;
   height: auto;
   display: block;
-  margin: 0 auto;
 }
 .nav-bar {
   background-color: #4CAF50;
