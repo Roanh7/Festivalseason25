@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registreren - Festival Agenda 2025</title>
   <link rel="stylesheet" href="/styling/agenda.css">
   <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
@@ -16,7 +17,8 @@
   </div>
 
   <nav class="nav-bar">
-    <ul>
+    <div id="navToggle" class="nav-toggle">☰</div>
+    <ul class="nav-menu" id="navMenu">
       <li><a href="agenda.html">Home</a></li>
       <li><a href="reviews.html">Reviews</a></li>
       <li><a href="extra-info.html">Extra Info</a></li>
@@ -24,42 +26,36 @@
       <li><a href="login.html">Inloggen</a></li>
       <li><a href="mijn-festivals.html">Mijn Festivals</a></li>
     </ul>
-
     <div id="userMenu" style="float:right;"></div>
   </nav>
 
   <main>
     <div class="form-container">
       <h2>Maak een account aan</h2>
-
-      <!-- Formulier zonder action/method, we doen het via JS -->
       <form id="registerForm">
         <div class="form-group">
           <label for="email">E-mail</label>
           <input type="email" id="email" required />
         </div>
-
         <div class="form-group">
           <label for="password">Wachtwoord</label>
           <input type="password" id="password" required />
         </div>
-
         <button type="submit" class="btn">Registreren</button>
       </form>
-
       <div id="registerResult" class="info-message"></div>
 
-      <p>Heb je al een account? <a href="login.html">Log hier in</a></p>
+      <p>Heb je al een account?
+        <a href="login.html">Log hier in</a>
+      </p>
     </div>
   </main>
 
   <footer>
-    <p>&copy; 2025 Festival Agenda</p>
-  </footer>
+    <p>&copy; 2025 Festival Agenda - Gecreëerd door Roan Hassan, S-team vertegenwoordiger</p>
+   </footer>
 
-  <!-- Eigen JS -->
-  <script src="/javascript/register.js"></script> 
+  <script src="/javascript/register.js"></script>
   <script src="/javascript/navstatus.js"></script>
 </body>
-
 </html>

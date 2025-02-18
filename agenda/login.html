@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Inloggen - Festival Agenda 2025</title>
-  <link rel="stylesheet" href="/styling/agenda.css">
+  <link rel="stylesheet" href="/styling/agenda.css" />
   <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
 </head>
 <body>
@@ -17,7 +17,8 @@
   </div>
 
   <nav class="nav-bar">
-    <ul>
+    <div id="navToggle" class="nav-toggle">☰</div>
+    <ul class="nav-menu" id="navMenu">
       <li><a href="agenda.html">Home</a></li>
       <li><a href="reviews.html">Reviews</a></li>
       <li><a href="extra-info.html">Extra Info</a></li>
@@ -25,46 +26,36 @@
       <li><a href="login.html" class="active">Inloggen</a></li>
       <li><a href="mijn-festivals.html">Mijn Festivals</a></li>
     </ul>
-
     <div id="userMenu" style="float:right;"></div>
   </nav>
 
   <main>
     <div class="login-container">
       <h2>Inloggen</h2>
-
-      <!-- Form zonder action/method, we doen het via JS -->
       <form id="loginForm">
         <div class="form-group">
           <label for="email">E-mail</label>
           <input type="email" id="email" name="email" required />
         </div>
-
         <div class="form-group">
           <label for="password">Wachtwoord</label>
           <input type="password" id="password" name="password" required />
         </div>
-
         <button type="submit" id="loginBtn" class="btn">Inloggen</button>
       </form>
-
-      <!-- Hier tonen we feedback (succes/foutmelding) -->
       <div id="loginResult" class="info-message"></div>
 
-      <p>
-        Nog geen account?
+      <p>Nog geen account?
         <a href="register.html">Registreer hier</a>
       </p>
     </div>
   </main>
 
   <footer>
-    <p>&copy; 2025 Festival Agenda - Gecreëerd door Roan Hassan, S-team vertegenwoordiger</p>
+   <p>&copy; 2025 Festival Agenda - Gecreëerd door Roan Hassan, S-team vertegenwoordiger</p>
   </footer>
 
-  <!-- Link naar je login.js-script -->
   <script src="/javascript/login.js"></script>
   <script src="/javascript/navstatus.js"></script>
-
 </body>
 </html>

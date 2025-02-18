@@ -2,10 +2,9 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mijn Festivals</title>
-
   <link rel="stylesheet" href="/styling/mijn-festivals.css">
   <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
 </head>
@@ -18,9 +17,10 @@
     <img src="/images/logo.png" alt="Festival Logo">
   </div>
 
-  <!-- Navigatiebalk -->
+  <!-- Navigatiebalk  -->
   <nav class="nav-bar">
-    <ul>
+    <div id="navToggle" class="nav-toggle">☰</div>
+    <ul class="nav-menu" id="navMenu">
       <li><a href="agenda.html">Home</a></li>
       <li><a href="reviews.html">Reviews</a></li>
       <li><a href="extra-info.html">Extra Info</a></li>
@@ -37,14 +37,18 @@
     <p id="upcomingCount"></p>
     <div id="upcomingFestContainer"></div>
 
-    <!-- Sectie voor voorbijge festivals -->
+    <!-- Sectie voor voorbije festivals -->
     <h2>Festivals die zijn geweest</h2>
     <p id="pastCount"></p>
     <div id="pastFestContainer"></div>
   </main>
 
-  <!-- Scripts -->
+  <footer>
+    <p>&copy; 2025 Festival Agenda - Gecreëerd door Roan Hassan, S-team vertegenwoordiger</p>
+   </footer>
+
   <script src="/javascript/mijn-festivals.js"></script>
   <script src="/javascript/navstatus.js"></script>
+
 </body>
 </html>
