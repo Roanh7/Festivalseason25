@@ -129,19 +129,22 @@ tr:hover {
   font-weight: bold;
 }
 
-/* Field-container (S-TEAM) */
+/* ====================== VELD (S-TEAM) ====================== */
 .field-container {
   text-align: center;
   margin: 2rem auto;
   width: 90%;
   max-width: 800px;
 }
+
 .field-title {
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 1rem;
+  color: #333;
   text-transform: uppercase;
 }
+
 .field {
   position: relative;
   width: 100%;
@@ -151,8 +154,11 @@ tr:hover {
   border: 5px solid white;
   border-radius: 15px;
   margin: 0 auto;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
+
+/* Middenlijn */
 .field::before {
   content: "";
   position: absolute;
@@ -163,6 +169,8 @@ tr:hover {
   background-color: white;
   transform: translateY(-50%);
 }
+
+/* Cirkel in het midden */
 .field::after {
   content: "";
   position: absolute;
@@ -173,16 +181,13 @@ tr:hover {
   border: 2px solid white;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  pointer-events: none;
+  pointer-events: none; 
   z-index: 0;
 }
-/* Speler-posities */
-.player-container {
-  position: absolute;
-  width: 60px;
-  height: 80px;
-  text-align: center;
-}
+
+
+
+/* Speler-icoontjes */
 .player {
   position: absolute;
   width: 60px;
@@ -191,15 +196,24 @@ tr:hover {
   border: 2px solid white;
   border-radius: 50%;
   color: white;
+  text-align: center;
   line-height: 60px;
   font-weight: bold;
   font-size: 1.2rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
   cursor: pointer;
   z-index: 10;
 }
 .player:hover {
   transform: scale(1.1);
+}
+
+/* Omhulsel voor speler en naam */
+.player-container {
+  position: absolute;
+  width: 60px;
+  height: 80px; 
+  text-align: center;
 }
 .player-name {
   position: absolute;
@@ -212,6 +226,33 @@ tr:hover {
   left: 50%;
   transform: translateX(-50%);
   z-index: 5;
+}
+
+/* Posities - voorbeeld */
+.goalkeeper {
+  top: 85%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.defender-left {
+  top: 65%;
+  left: 25%;
+  transform: translateX(-50%);
+}
+.defender-right {
+  top: 65%;
+  left: 75%;
+  transform: translateX(-50%);
+}
+.midfielder {
+  top: 45%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.striker {
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 /* Bank */

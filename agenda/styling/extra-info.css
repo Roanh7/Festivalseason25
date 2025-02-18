@@ -102,6 +102,14 @@ main {
   background-color: #45a049;
 }
 
+/* Footer */
+footer {
+  text-align: center;
+  margin: 2rem 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
 /* Responsiveness */
 @media (max-width: 768px) {
   main {
