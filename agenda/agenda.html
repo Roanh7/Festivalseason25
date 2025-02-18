@@ -2,29 +2,31 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- Zodat het op mobiel schaalt -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Festival Agenda 2025</title>
-  <!-- Verwijst naar agenda.css, waarin ook de hamburger-styles staan -->
+
+  <!-- Link naar je CSS waar de hamburger-styles in staan -->
   <link rel="stylesheet" href="/styling/agenda.css" />
   <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
 </head>
 <body>
-
   <header>
     <h1>Festival Agenda 2025</h1>
   </header>
 
+  <!-- Logo-container met full-width logo -->
   <div class="logo-container">
     <img src="/images/logo.png" alt="Festival Logo" />
   </div>
 
   <!-- Navigatiebalk -->
   <nav class="nav-bar">
-    <!-- Hamburger-knop, alleen op mobiel zichtbaar -->
+    <!-- Hamburger-knop -->
     <div id="navToggle" class="nav-toggle">☰</div>
 
-    <!-- UL-menu -->
-    <ul class="nav-menu" id="navMenu">
+    <!-- Menu-lijst -->
+    <ul id="navMenu" class="nav-menu">
       <li><a href="agenda.html" class="active">Home</a></li>
       <li><a href="reviews.html">Reviews</a></li>
       <li><a href="extra-info.html">Extra Info</a></li>
@@ -33,9 +35,10 @@
       <li><a href="mijn-festivals.html">Mijn Festivals</a></li>
     </ul>
 
-    <!-- userMenu -->
+    <!-- Usermenu -->
     <div id="userMenu" style="float:right;"></div>
   </nav>
+
 
   <main>
     <!-- Jouw countdown, tabel, etc. -->

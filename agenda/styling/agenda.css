@@ -67,6 +67,35 @@ header {
   text-decoration: underline;
 }
 
+/* Hamburger-knop */
+.nav-toggle {
+  /* Standaard op desktop niet zichtbaar */
+  display: none;
+  font-size: 1.8rem;
+  color: white;
+  cursor: pointer;
+}
+
+/* De menu-lijst */
+.nav-menu {
+  list-style-type: none;
+  display: flex; /* horizontaal op desktop */
+  margin: 0;
+  padding: 0;
+}
+.nav-menu li {
+  margin: 0 1rem;
+}
+.nav-menu a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+}
+.nav-menu a:hover {
+  background-color: #45a049;
+}
+
 /* Tabel (agenda.html) */
 .table-container {
   width: 90%;
@@ -441,5 +470,27 @@ footer {
   }
   #festival-name {
     font-size: 1rem;
+  }
+}
+
+
+/* -------- MEDIA QUERY (mobiel) -------- */
+@media (max-width: 768px) {
+  /* Toon hamburger op mobiel */
+  .nav-toggle {
+    display: block;
+  }
+  /* Verberg de .nav-menu tot de user klikt */
+  .nav-menu {
+    display: none;            /* standaard verborgen op mobiel */
+    flex-direction: column;   /* verticaal als open */
+    width: 100%;
+    background-color: #4CAF50; /* Groene achtergrond doorlopend */
+  }
+  .nav-menu.open {
+    display: flex; /* alleen als .open is getoggled door JS */
+  }
+  .nav-menu li {
+    margin: 0.5rem 1rem;
   }
 }
