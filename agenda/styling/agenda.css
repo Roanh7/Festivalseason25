@@ -1,414 +1,404 @@
-/* ====================== agenda.css ====================== */
+/* =============== agenda.css =============== */
 
-/* Algemene basisstijl */
+/* Basisreset */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-    color: #333;
-  }
-  
-  /* Header */
-  header {
-    background: #4CAF50;
-    color: white;
-    text-align: center;
-    padding: 1rem 0;
-  }
-  
-  /* Logo-container */
-  .logo-container {
-    text-align: center;
-    background-color: #fff; 
-  }
-  .logo-container img {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-  
-  /* Navigatiebalk */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body en algemene tekst */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+/* Header-balk */
+header {
+  background: #4CAF50;
+  color: white;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+/* Logo-container */
+.logo-container {
+  text-align: center;
+  background-color: #fff;
+}
+.logo-container img {
+  width: 100%; /* past zich aan de containerbreedte aan */
+  height: auto;
+  display: block;
+}
+
+/* Navigatiebalk */
+.nav-bar {
+  background-color: #4CAF50;
+  width: 100%;
+  display: flex; /* horizontaal op desktop */
+  padding: 1rem 1.5rem;
+  transition: background-color 0.3s ease;
+}
+.nav-bar ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+.nav-bar li {
+  margin: 0 1rem;
+}
+.nav-bar a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.3s ease;
+}
+.nav-bar a:hover {
+  background-color: #45a049;
+}
+.nav-bar .active {
+  text-decoration: underline;
+}
+
+/* Tabel (agenda.html) */
+.table-container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 2rem auto;
+  overflow-x: auto;
+  display: block;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+th, td {
+  border: 1px solid #ddd;
+  text-align: center;
+  padding: 0.8rem;
+}
+th {
+  background-color: #4CAF50;
+  color: white;
+}
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+tr:hover {
+  background-color: #ddd;
+}
+.highlight-green {
+  background-color: #d4edda;
+}
+.highlight-yellow {
+  background-color: #fff3cd;
+}
+.festival-link {
+  color: #060606;
+  text-decoration: underline;
+}
+.festival-link:hover {
+  text-decoration: underline;
+}
+
+/* Countdown (optioneel) */
+#countdown-container {
+  text-align: center;
+  margin: 2rem auto;
+  padding: 1rem;
+  background-color: #f4f4f4;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  max-width: 600px;
+}
+#countdown-container h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+#countdown {
+  font-size: 1.2rem;
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+/* Field-container (S-TEAM) */
+.field-container {
+  text-align: center;
+  margin: 2rem auto;
+  width: 90%;
+  max-width: 800px;
+}
+.field-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+.field {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  height: 800px;
+  background: linear-gradient(to bottom, #228B22, #006400);
+  border: 5px solid white;
+  border-radius: 15px;
+  margin: 0 auto;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+.field::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: white;
+  transform: translateY(-50%);
+}
+.field::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  border: 2px solid white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+}
+/* Speler-posities */
+.player-container {
+  position: absolute;
+  width: 60px;
+  height: 80px;
+  text-align: center;
+}
+.player {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background-color: #4CAF50;
+  border: 2px solid white;
+  border-radius: 50%;
+  color: white;
+  line-height: 60px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  cursor: pointer;
+  z-index: 10;
+}
+.player:hover {
+  transform: scale(1.1);
+}
+.player-name {
+  position: absolute;
+  width: 100px;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+  top: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+
+/* Bank */
+.bank-container {
+  text-align: center;
+  margin: 2rem auto;
+  width: 90%;
+  max-width: 600px;
+}
+.bank-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-decoration: underline;
+}
+.bank-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+.bank-player {
+  font-size: 1rem;
+  color: #555;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+.bank-player:hover {
+  background-color: #f2f2f2;
+}
+
+/* PDF-download */
+.download-link-container {
+  text-align: center;
+  margin: 1rem auto;
+  width: 90%;
+  max-width: 1200px;
+}
+.download-link {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 1rem;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+.download-link:hover {
+  background-color: #45a049;
+}
+
+/* Popup (spelerstats) */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 1000;
+}
+.popup.hidden {
+  display: none;
+}
+.popup-content {
+  background-color: #f4f4f4;
+  border: 3px solid #4CAF50;
+  border-radius: 15px;
+  padding: 2rem;
+  max-width: 450px;
+  width: 90%;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  text-align: center;
+  color: #333;
+}
+.close-popup-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.close-popup-btn:hover {
+  background-color: #45a049;
+  transform: scale(1.1);
+}
+
+/* Form containers (login/register) */
+.form-container, .login-container {
+  width: 90%;
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 1rem;
+  background-color: #fff;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+}
+.form-container h2, .login-container h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.form-group {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+.form-group input {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+.btn {
+  display: block;
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.btn:hover {
+  background-color: #45a049;
+}
+.info-message {
+  margin-top: 1rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  margin: 2rem 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Responsiveness: nav in kolom bij small screens */
+@media (max-width: 768px) {
   .nav-bar {
-    background-color: #4CAF50; 
-    width: 100%;
+    display: block;
+    padding: 0.5rem;
   }
   .nav-bar ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    display: flex;           
-    justify-content: center; 
+    flex-direction: column; 
+    align-items: flex-start;
   }
   .nav-bar li {
-    margin: 0;
+    margin: 0.5rem 0;
   }
-  .nav-bar a {
-    display: block;
-    color: white;
-    text-decoration: none;
-    padding: 1rem 1.5rem;  
-    font-weight: bold;
-    transition: background-color 0.3s ease;
+  .table-container {
+    width: 95%;
+    margin: 1rem auto;
   }
-  .nav-bar a:hover {
-    background-color: #45a049;
+  .field-container {
+    width: 95%;
   }
-  
-  /* Countdown-container (optioneel) */
+}
+@media (max-width: 480px) {
   #countdown-container {
-    text-align: center;
-    margin: 2rem auto;
-    padding: 1rem;
-    background-color: #f4f4f4;
-    border: 2px solid #ddd;
-    border-radius: 10px;
-    max-width: 600px;
-  }
-  #countdown-container h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    padding: 0.5rem;
   }
   #countdown {
-    font-size: 1.2rem;
-    color: #4CAF50;
-    font-weight: bold;
+    font-size: 0.8rem;
   }
-  
-  /* Tabel (festival-lijst) */
-  .table-container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 2rem auto;
-    overflow-x: auto; 
-    display: block;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 600px; 
-  }
-  th, td {
-    border: 1px solid #ddd;
-    text-align: center;
-    padding: 0.8rem;
-  }
-  th {
-    background-color: #4CAF50;
-    color: white;
-  }
-  tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-  tr:hover {
-    background-color: #ddd;
-  }
-  
-  /* Kleuren/highlights */
-  .highlight-green {
-    background-color: #d4edda;
-  }
-  .highlight-yellow {
-    background-color: #fff3cd;
-  }
-  
-  /* Links in de tabel */
-  .festival-link {
-    color: #060606;
-    text-decoration: underline;
-  }
-  .festival-link:hover {
-    text-decoration: underline;
-  }
-  
-  /* Field-container (S-team opstelling) */
-  .field-container {
-    text-align: center;
-    margin: 2rem auto;
-    width: 90%;
-    max-width: 800px;
-  }
-  .field-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    text-transform: uppercase;
-  }
-  .field {
-    position: relative;
-    width: 100%;
-    max-width: 600px;
-    height: 800px;
-    background: linear-gradient(to bottom, #228B22, #006400);
-    border: 5px solid white;
-    border-radius: 15px;
-    margin: 0 auto;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  }
-  .field::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: white;
-    transform: translateY(-50%);
-  }
-  .field::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 150px;
-    height: 150px;
-    border: 2px solid white;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none; 
-    z-index: 0;
-  }
-  /* Spelers */
-  .player-container {
-    position: absolute;
-    width: 60px;
-    height: 80px;
-    text-align: center;
-  }
-  .player {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    background-color: #4CAF50;
-    border: 2px solid white;
-    border-radius: 50%;
-    color: white;
-    line-height: 60px;
-    font-weight: bold;
-    font-size: 1.2rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    cursor: pointer;
-    z-index: 10;
-  }
-  .player:hover {
-    transform: scale(1.1);
-  }
-  .player-name {
-    position: absolute;
-    width: 100px;
-    text-align: center;
+  #festival-name {
     font-size: 1rem;
-    font-weight: bold;
-    color: white;
-    top: calc(100% + 5px);
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 5;
   }
-  /* Posities */
-  .goalkeeper {
-    top: 85%;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  .defender-left {
-    top: 65%;
-    left: 25%;
-    transform: translateX(-50%);
-  }
-  .defender-right {
-    top: 65%;
-    left: 75%;
-    transform: translateX(-50%);
-  }
-  .midfielder {
-    top: 45%;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  .striker {
-    top: 15%;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  
-  /* Bank-container */
-  .bank-container {
-    text-align: center;
-    margin: 2rem auto;
-    width: 90%;
-    max-width: 600px;
-  }
-  .bank-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    text-decoration: underline;
-  }
-  .bank-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-  }
-  .bank-player {
-    font-size: 1rem;
-    color: #555;
-    margin: 0.5rem 0;
-    padding: 0.5rem;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-  }
-  .bank-player:hover {
-    background-color: #f2f2f2;
-  }
-  
-  /* PDF download-link */
-  .download-link-container {
-    text-align: center;
-    margin: 1rem auto;
-    width: 90%;
-    max-width: 1200px;
-  }
-  .download-link {
-    display: inline-block;
-    padding: 0.8rem 1.5rem;
-    background-color: #4CAF50;
-    color: white;
-    font-size: 1rem;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-  }
-  .download-link:hover {
-    background-color: #45a049;
-  }
-  
-  /* Popup */
-  .popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-  }
-  .popup.hidden {
-    display: none;
-  }
-  .popup-content {
-    background-color: #f4f4f4;
-    border: 3px solid #4CAF50;
-    border-radius: 15px;
-    padding: 2rem;
-    max-width: 450px;
-    width: 90%;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-    text-align: center;
-    color: #333;
-  }
-  .close-popup-btn {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 0.8rem 1.5rem;
-    border-radius: 10px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-  }
-  .close-popup-btn:hover {
-    background-color: #45a049;
-    transform: scale(1.1);
-  }
-  
-  /* Footer */
-  footer {
-    text-align: center;
-    margin: 2rem 0;
-    font-size: 0.9rem;
-    color: #666;
-  }
-  
-  /* Login/Register form containers (optioneel) */
-  .form-container, .login-container {
-    width: 90%;
-    max-width: 400px;
-    margin: 2rem auto;
-    padding: 1rem;
-    background-color: #fff;
-    border: 2px solid #ddd;
-    border-radius: 10px;
-  }
-  .form-container h2, .login-container h2 {
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-  .form-group {
-    margin-bottom: 1rem;
-    text-align: left;
-  }
-  .form-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    color: #333;
-  }
-  .form-group input {
-    width: 100%;
-    padding: 0.6rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  .btn {
-    display: block;
-    width: 100%;
-    padding: 0.8rem;
-    background-color: #4CAF50;
-    color: white;
-    font-size: 1rem;
-    font-weight: bold;
-    text-align: center;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  .btn:hover {
-    background-color: #45a049;
-  }
-  .info-message {
-    margin-top: 1rem;
-    text-align: center;
-    font-weight: bold;
-  }
-  
-  /* Responsiveness */
-  @media (max-width: 768px) {
-    .table-container {
-      width: 95%;
-      margin: 1rem auto;
-    }
-    .field-container {
-      width: 95%;
-    }
-  }
-  @media (max-width: 480px) {
-    #countdown-container {
-      font-size: 0.9rem;
-      padding: 0.5rem;
-    }
-    #countdown {
-      font-size: 0.8rem;
-    }
-    #festival-name {
-      font-size: 1rem;
-    }
-  }
+}
