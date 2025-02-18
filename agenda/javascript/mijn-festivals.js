@@ -1,89 +1,92 @@
 // agenda/javascript/mijn-festivals.js
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Eventueel userMenu-element, als je daarin iets wilt tonen
-  const userMenu = document.getElementById('userMenu'); 
-  const myFestList = document.getElementById('myFestList');
-  const festivalDetails = document.getElementById('festivalDetails');
+  const userMenu = document.getElementById('userMenu');
+  const festivalsContainer = document.getElementById('festivalsContainer');
 
-  // 1) Check of ingelogd
+  // 1) Check of we ingelogd zijn via localStorage
   const token = localStorage.getItem('token');
   const email = localStorage.getItem('email');
 
   if (!token || !email) {
-    myFestList.innerHTML = "<li>Je bent niet ingelogd.</li>";
+    festivalsContainer.innerHTML = "<p>Je bent niet ingelogd.</p>";
     return;
   }
 
-  // 2) Haal eigen festivals op
+  // 2) Ophalen van de festivals voor deze gebruiker
   try {
     const res = await fetch(`/my-festivals?email=${encodeURIComponent(email)}`);
     if (!res.ok) {
-      throw new Error(`Server returned ${res.status}`);
+      throw new Error(`Server returned status ${res.status}`);
     }
-    const data = await res.json(); 
+    const data = await res.json();
     const myFests = data.festivals || [];
 
     if (myFests.length === 0) {
-      myFestList.innerHTML = "<li>Je hebt nog geen festivals aangevinkt.</li>";
+      festivalsContainer.innerHTML = "<p>Je hebt nog geen festivals aangevinkt.</p>";
       return;
     }
 
-    // 3) Bouw de lijst in de UI
+    // 3) Voor elk festival maken we een 'uitleg'-hokje
     myFests.forEach(festival => {
-      const li = document.createElement('li');
-      li.textContent = festival;
+      // Buitenste div met class="uitleg"
+      const card = document.createElement('div');
+      card.classList.add('uitleg');
 
-      // Maak een knop "Wie gaan er nog meer?"
+      // Titel
+      const titleDiv = document.createElement('div');
+      titleDiv.classList.add('uitleg-title');
+      titleDiv.textContent = festival;
+      card.appendChild(titleDiv);
+
+      // Knop "Wie gaan er nog meer?" in een uitleg-text
+      const buttonParagraph = document.createElement('div');
+      buttonParagraph.classList.add('uitleg-text');
       const btn = document.createElement('button');
       btn.textContent = "Wie gaan er nog meer?";
-      btn.addEventListener('click', () => {
-        showAttendees(festival);
+      buttonParagraph.appendChild(btn);
+      card.appendChild(buttonParagraph);
+
+      // Div voor attendees (ook uitleg-text zodat het op de rest lijkt)
+      const attendeesDiv = document.createElement('div');
+      attendeesDiv.classList.add('uitleg-text');
+      // (Nog leeg)
+      card.appendChild(attendeesDiv);
+
+      // Click event => haal andere gebruikers op
+      btn.addEventListener('click', async () => {
+        try {
+          const resp = await fetch(`/festival-attendees?festival=${encodeURIComponent(festival)}`);
+          if (!resp.ok) {
+            throw new Error(`Attendees fetch returned ${resp.status}`);
+          }
+          const result = await resp.json();
+          const allAttendees = result.attendees || [];
+
+          // Jezelf niet tonen? Dan filter je:
+          const others = allAttendees.filter(u => u !== email);
+
+          // Toon in attendeesDiv
+          if (others.length === 0) {
+            attendeesDiv.textContent = "Geen andere gebruikers hebben zich aangemeld.";
+          } else {
+            attendeesDiv.innerHTML = "";
+            others.forEach(u => {
+              const p = document.createElement('p');
+              p.textContent = u;
+              attendeesDiv.appendChild(p);
+            });
+          }
+        } catch (err) {
+          attendeesDiv.textContent = `Fout bij ophalen attendees: ${err.message}`;
+        }
       });
 
-      li.appendChild(btn);
-      myFestList.appendChild(li);
+      // Voeg de "card" toe aan de container
+      festivalsContainer.appendChild(card);
     });
 
   } catch (err) {
-    myFestList.innerHTML = `<li>Fout bij ophalen van jouw festivals: ${err.message}</li>`;
-  }
-
-  // 4) Functie om attendees te tonen
-  async function showAttendees(festival) {
-    // Leegmaken van festivalDetails
-    festivalDetails.innerHTML = "";
-
-    try {
-      const resp = await fetch(`/festival-attendees?festival=${encodeURIComponent(festival)}`);
-      if (!resp.ok) {
-        throw new Error(`Server returned ${resp.status}`);
-      }
-      const result = await resp.json(); 
-      // result.attendees = ["roan@example.com", "chip@example.com", ...]
-
-      const container = document.createElement('div');
-      container.innerHTML = `<h3>${festival}</h3>`;
-
-      const ul = document.createElement('ul');
-      // Filter je eigen email eruit als je jezelf niet wilt zien
-      const others = result.attendees.filter(u => u !== email);
-
-      if (others.length === 0) {
-        ul.innerHTML = `<li>Geen andere gebruikers hebben zich aangemeld.</li>`;
-      } else {
-        others.forEach(u => {
-          const li = document.createElement('li');
-          li.textContent = u;
-          ul.appendChild(li);
-        });
-      }
-
-      container.appendChild(ul);
-      festivalDetails.appendChild(container);
-
-    } catch (e) {
-      festivalDetails.textContent = `Fout bij ophalen van attendees: ${e.message}`;
-    }
+    festivalsContainer.innerHTML = `<p>Fout bij ophalen van jouw festivals: ${err.message}</p>`;
   }
 });

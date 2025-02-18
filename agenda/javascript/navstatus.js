@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const email = localStorage.getItem('email');
 
   if (token && email) {
-    userMenu.innerHTML = `<span id="userNameSpan">uitloggen, ${email}</span>`;
+    userMenu.innerHTML = `<span id="userNameSpan"> Hier uitloggen, ${email}</span>`;
     document.getElementById('userNameSpan').addEventListener('click', () => {
       if (confirm('Wil je uitloggen?')) {
         localStorage.removeItem('token');

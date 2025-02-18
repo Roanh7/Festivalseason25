@@ -2,11 +2,13 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mijn Festivals</title>
-  <!-- Verwijs naar je CSS (pas pad aan als nodig) -->
-  <link rel="stylesheet" href="/styling/agenda.css">
-  <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/styling/mijn-festivals.css" />
+  <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
 </head>
 <body>
   <header>
@@ -14,10 +16,10 @@
   </header>
 
   <div class="logo-container">
-    <img src="/images/logo.png" alt="Festival Logo">
+    <img src="/images/logo.png" alt="Festival Logo" />
   </div>
 
-  <!-- Navigatiebalk  -->
+  <!-- Navigatiebalk -->
   <nav class="nav-bar">
     <ul>
       <li><a href="agenda.html">Home</a></li>
@@ -32,14 +34,10 @@
 
   <main>
     <h2>Jouw aangemelde festivals:</h2>
-    <ul id="myFestList"></ul>
-
-    <!-- Voor elk festival tonen we "Wie gaan er nog meer?" -->
-    <div id="festivalDetails"></div>
+    <div id="festivalsContainer"></div>
   </main>
 
   <!-- Scripts -->
-  <!-- Zorg dat deze paden kloppen met jouw projectstructuur -->
   <script src="/javascript/mijn-festivals.js"></script>
   <script src="/javascript/navstatus.js"></script>
 </body>
