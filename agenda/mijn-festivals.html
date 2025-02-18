@@ -2,13 +2,12 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mijn Festivals</title>
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="/styling/mijn-festivals.css" />
-  <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="/styling/mijn-festivals.css">
+  <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
 </head>
 <body>
   <header>
@@ -16,7 +15,7 @@
   </header>
 
   <div class="logo-container">
-    <img src="/images/logo.png" alt="Festival Logo" />
+    <img src="/images/logo.png" alt="Festival Logo">
   </div>
 
   <!-- Navigatiebalk -->
@@ -33,11 +32,15 @@
   </nav>
 
   <main>
-    <h2>Jouw aangemelde festivals:</h2>
-    <p id="festCount"></p>
-    
-    <!-- festival-hokjes  -->
-    <div id="festivalsContainer"></div>
+    <!-- Sectie voor toekomstige festivals -->
+    <h2>Jouw aangemelde festivals</h2>
+    <p id="upcomingCount"></p>
+    <div id="upcomingFestContainer"></div>
+
+    <!-- Sectie voor voorbijge festivals -->
+    <h2>Festivals die zijn geweest</h2>
+    <p id="pastCount"></p>
+    <div id="pastFestContainer"></div>
   </main>
 
   <!-- Scripts -->
