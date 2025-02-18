@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // 2) Haal de festivals op
+  // 2) Festivals ophalen
   try {
     const res = await fetch(`/my-festivals?email=${encodeURIComponent(email)}`);
     if (!res.ok) {
@@ -31,18 +31,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       festCountEl.textContent = `Je bent aangemeld voor ${myFests.length} festival(s).`;
     }
 
-    // 3) Bouw per festival een "festival"-hokje
+    // 3) Per festival een "festival"-hokje
     myFests.forEach(festivalName => {
       const card = document.createElement('div');
       card.classList.add('festival');
 
-      // Festivalnaam
+      // Titel
       const titleDiv = document.createElement('div');
       titleDiv.classList.add('festival-title');
       titleDiv.textContent = festivalName;
       card.appendChild(titleDiv);
 
-      // Knop (Wie gaan er nog meer?)
+      // Knop
       const buttonRow = document.createElement('div');
       buttonRow.classList.add('festival-text');
 
@@ -51,27 +51,30 @@ document.addEventListener('DOMContentLoaded', async () => {
       buttonRow.appendChild(toggleBtn);
       card.appendChild(buttonRow);
 
-      // Div voor andere attendees
+      // Div voor andere deelnemers => collapsible
       const attendeesDiv = document.createElement('div');
-      attendeesDiv.classList.add('festival-text');
-      attendeesDiv.style.display = "none"; // begint verborgen
+      attendeesDiv.classList.add('festival-text', 'collapsible');
+      // (Standaard niet expanded)
       card.appendChild(attendeesDiv);
 
       let fetched = false;  // al data opgehaald?
-      let expanded = false; // uit-/ingeklapt?
+      let expanded = false; // staat het open?
 
-      // 4) Klik op de knop => toggle
+      // 4) Klik => togglen
       toggleBtn.addEventListener('click', async () => {
         if (!expanded) {
-          // Uitklappen
+          // Gaat nu uitklappen
           expanded = true;
           toggleBtn.textContent = "Verbergen";
-          attendeesDiv.style.display = "block";
+          // CSS-animatie via class
+          attendeesDiv.classList.add('expanded');
 
+          // Data nog niet opgehaald => haal op
           if (!fetched) {
-            // Data nog niet opgehaald, dus nu doen
             try {
-              const resp = await fetch(`/festival-attendees?festival=${encodeURIComponent(festivalName)}`);
+              const resp = await fetch(
+                `/festival-attendees?festival=${encodeURIComponent(festivalName)}`
+              );
               if (!resp.ok) {
                 throw new Error(`Attendees fetch returned ${resp.status}`);
               }
@@ -94,16 +97,15 @@ document.addEventListener('DOMContentLoaded', async () => {
               attendeesDiv.textContent = `Fout bij ophalen attendees: ${err.message}`;
             }
           }
-
         } else {
           // Inklappen
           expanded = false;
           toggleBtn.textContent = "Wie gaan er nog meer?";
-          attendeesDiv.style.display = "none";
+          attendeesDiv.classList.remove('expanded');
         }
       });
 
-      // Voeg de "festival"-card toe aan container
+      // Plaats de card in container
       festivalsContainer.appendChild(card);
     });
   } catch (err) {

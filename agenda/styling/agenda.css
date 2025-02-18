@@ -1,68 +1,65 @@
-/* ====================== RESET & BASIS ====================== */
+/* ====================== agenda.css ====================== */
+
+/* Algemene basisstijl */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-}
-
-body {
+  }
+  body {
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
     background-color: #f9f9f9;
     color: #333;
-}
-
-/* ====================== HEADER ====================== */
-header {
+  }
+  
+  /* Header */
+  header {
     background: #4CAF50;
     color: white;
     text-align: center;
     padding: 1rem 0;
-    /* Geen extra margin hier om de pagina volledig te laten aansluiten */
-}
-
-/* ====================== LOGO-CONTAINER (exact als reviews) ====================== */
-.logo-container {
+  }
+  
+  /* Logo-container */
+  .logo-container {
     text-align: center;
-    margin: 0;               /* Geen marges */
-    background-color: #fff;  /* Exact zoals reviews-pagina */
-}
-.logo-container img {
+    background-color: #fff; 
+  }
+  .logo-container img {
     width: 100%;
     height: auto;
-    display: block;          /* Voorkomt inline gap onder de afbeelding */
-}
-
-/* ====================== NAVIGATIEBALK ====================== */
-.nav-bar {
+    display: block;
+  }
+  
+  /* Navigatiebalk */
+  .nav-bar {
     background-color: #4CAF50; 
     width: 100%;
-}
-.nav-bar ul {
+  }
+  .nav-bar ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
     display: flex;           
     justify-content: center; 
-}
-.nav-bar li {
+  }
+  .nav-bar li {
     margin: 0;
-}
-.nav-bar a {
+  }
+  .nav-bar a {
     display: block;
     color: white;
     text-decoration: none;
     padding: 1rem 1.5rem;  
     font-weight: bold;
     transition: background-color 0.3s ease;
-}
-.nav-bar a:hover {
-    background-color: #45a049; 
-}
-
-/* ====================== COUNTDOWN (optioneel, indien aanwezig) ====================== */
-#countdown-container {
+  }
+  .nav-bar a:hover {
+    background-color: #45a049;
+  }
+  
+  /* Countdown-container (optioneel) */
+  #countdown-container {
     text-align: center;
     margin: 2rem auto;
     padding: 1rem;
@@ -70,86 +67,77 @@ header {
     border: 2px solid #ddd;
     border-radius: 10px;
     max-width: 600px;
-    font-family: Arial, sans-serif;
-}
-#countdown-container h2 {
+  }
+  #countdown-container h2 {
     font-size: 1.5rem;
     margin-bottom: 1rem;
-}
-#countdown {
+  }
+  #countdown {
     font-size: 1.2rem;
     color: #4CAF50;
     font-weight: bold;
-}
-
-/* ====================== TABLE & AGENDA ====================== */
-.table-container {
+  }
+  
+  /* Tabel (festival-lijst) */
+  .table-container {
     width: 90%;
     max-width: 1200px;
-    margin: 2rem auto;      /* Ruimte boven/onder */
-    overflow-x: auto;       /* Scroll als de tabel breder is dan de container */
+    margin: 2rem auto;
+    overflow-x: auto; 
     display: block;
-}
-
-table {
+  }
+  table {
     width: 100%;
     border-collapse: collapse;
     min-width: 600px; 
-}
-
-th, td {
+  }
+  th, td {
     border: 1px solid #ddd;
     text-align: center;
     padding: 0.8rem;
-    word-wrap: break-word;
-}
-
-th {
+  }
+  th {
     background-color: #4CAF50;
     color: white;
-}
-
-tr:nth-child(even) {
+  }
+  tr:nth-child(even) {
     background-color: #f2f2f2;
-}
-tr:hover {
+  }
+  tr:hover {
     background-color: #ddd;
-}
-
-/* Highlight-kleuren */
-.highlight-green {
+  }
+  
+  /* Kleuren/highlights */
+  .highlight-green {
     background-color: #d4edda;
-}
-.highlight-yellow {
+  }
+  .highlight-yellow {
     background-color: #fff3cd;
-}
-
-.festival-link {
+  }
+  
+  /* Links in de tabel */
+  .festival-link {
     color: #060606;
     text-decoration: underline;
-}
-
-.festival-link:hover {
+  }
+  .festival-link:hover {
     text-decoration: underline;
-}
-
-/* ====================== VELD (S-TEAM) ====================== */
-.field-container {
+  }
+  
+  /* Field-container (S-team opstelling) */
+  .field-container {
     text-align: center;
     margin: 2rem auto;
     width: 90%;
     max-width: 800px;
-}
-
-.field-title {
+  }
+  .field-title {
     font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 1rem;
-    color: #333;
     text-transform: uppercase;
-}
-
-.field {
+  }
+  .field {
     position: relative;
     width: 100%;
     max-width: 600px;
@@ -158,12 +146,9 @@ tr:hover {
     border: 5px solid white;
     border-radius: 15px;
     margin: 0 auto;
-    overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-}
-
-/* Middenlijn */
-.field::before {
+  }
+  .field::before {
     content: "";
     position: absolute;
     top: 50%;
@@ -172,10 +157,8 @@ tr:hover {
     height: 2px;
     background-color: white;
     transform: translateY(-50%);
-}
-
-/* Cirkel in het midden */
-.field::after {
+  }
+  .field::after {
     content: "";
     position: absolute;
     top: 50%;
@@ -187,12 +170,15 @@ tr:hover {
     transform: translate(-50%, -50%);
     pointer-events: none; 
     z-index: 0;
-}
-
-
-
-/* Speler-icoontjes */
-.player {
+  }
+  /* Spelers */
+  .player-container {
+    position: absolute;
+    width: 60px;
+    height: 80px;
+    text-align: center;
+  }
+  .player {
     position: absolute;
     width: 60px;
     height: 60px;
@@ -200,26 +186,17 @@ tr:hover {
     border: 2px solid white;
     border-radius: 50%;
     color: white;
-    text-align: center;
     line-height: 60px;
     font-weight: bold;
     font-size: 1.2rem;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     cursor: pointer;
     z-index: 10;
-}
-.player:hover {
+  }
+  .player:hover {
     transform: scale(1.1);
-}
-
-/* Omhulsel voor speler en naam */
-.player-container {
-    position: absolute;
-    width: 60px;
-    height: 80px; 
-    text-align: center;
-}
-.player-name {
+  }
+  .player-name {
     position: absolute;
     width: 100px;
     text-align: center;
@@ -230,55 +207,53 @@ tr:hover {
     left: 50%;
     transform: translateX(-50%);
     z-index: 5;
-}
-
-/* Posities - voorbeeld */
-.goalkeeper {
+  }
+  /* Posities */
+  .goalkeeper {
     top: 85%;
     left: 50%;
     transform: translateX(-50%);
-}
-.defender-left {
+  }
+  .defender-left {
     top: 65%;
     left: 25%;
     transform: translateX(-50%);
-}
-.defender-right {
+  }
+  .defender-right {
     top: 65%;
     left: 75%;
     transform: translateX(-50%);
-}
-.midfielder {
+  }
+  .midfielder {
     top: 45%;
     left: 50%;
     transform: translateX(-50%);
-}
-.striker {
+  }
+  .striker {
     top: 15%;
     left: 50%;
     transform: translateX(-50%);
-}
-
-/* ====================== BANK ====================== */
-.bank-container {
+  }
+  
+  /* Bank-container */
+  .bank-container {
     text-align: center;
     margin: 2rem auto;
     width: 90%;
     max-width: 600px;
-}
-.bank-title {
+  }
+  .bank-title {
     font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 1rem;
-    color: #333;
     text-decoration: underline;
-}
-.bank-list {
+  }
+  .bank-list {
     list-style-type: none;
     padding: 0;
     margin: 0;
-}
-.bank-player {
+  }
+  .bank-player {
     font-size: 1rem;
     color: #555;
     margin: 0.5rem 0;
@@ -287,19 +262,19 @@ tr:hover {
     border: 1px solid #ddd;
     border-radius: 5px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-}
-.bank-player:hover {
+  }
+  .bank-player:hover {
     background-color: #f2f2f2;
-}
-
-/* ====================== DOWNLOAD-LINK ====================== */
-.download-link-container {
+  }
+  
+  /* PDF download-link */
+  .download-link-container {
     text-align: center;
     margin: 1rem auto;
     width: 90%;
     max-width: 1200px;
-}
-.download-link {
+  }
+  .download-link {
     display: inline-block;
     padding: 0.8rem 1.5rem;
     background-color: #4CAF50;
@@ -308,13 +283,13 @@ tr:hover {
     text-decoration: none;
     border-radius: 5px;
     transition: background-color 0.3s ease;
-}
-.download-link:hover {
+  }
+  .download-link:hover {
     background-color: #45a049;
-}
-
-/* ====================== POPUP ====================== */
-.popup {
+  }
+  
+  /* Popup */
+  .popup {
     position: fixed;
     top: 0;
     left: 0;
@@ -325,11 +300,11 @@ tr:hover {
     align-items: center;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 1000;
-}
-.popup.hidden {
+  }
+  .popup.hidden {
     display: none;
-}
-.popup-content {
+  }
+  .popup-content {
     background-color: #f4f4f4;
     border: 3px solid #4CAF50;
     border-radius: 15px;
@@ -339,8 +314,8 @@ tr:hover {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
     text-align: center;
     color: #333;
-}
-.close-popup-btn {
+  }
+  .close-popup-btn {
     background-color: #4CAF50;
     color: white;
     border: none;
@@ -349,27 +324,22 @@ tr:hover {
     font-size: 1.1rem;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
-}
-.close-popup-btn:hover {
+  }
+  .close-popup-btn:hover {
     background-color: #45a049;
     transform: scale(1.1);
-}
-
-/* ====================== TABEL-RIJ KLIKBAAR ====================== */
-table tr {
-    cursor: pointer;
-}
-
-/* ====================== FOOTER ====================== */
-footer {
+  }
+  
+  /* Footer */
+  footer {
     text-align: center;
     margin: 2rem 0;
     font-size: 0.9rem;
     color: #666;
-}
-
-/* Form container */
-.form-container {
+  }
+  
+  /* Login/Register form containers (optioneel) */
+  .form-container, .login-container {
     width: 90%;
     max-width: 400px;
     margin: 2rem auto;
@@ -378,31 +348,26 @@ footer {
     border: 2px solid #ddd;
     border-radius: 10px;
   }
-  
-  .form-container h2 {
+  .form-container h2, .login-container h2 {
     text-align: center;
     margin-bottom: 1rem;
   }
-  
   .form-group {
     margin-bottom: 1rem;
     text-align: left;
   }
-  
   .form-group label {
     display: block;
     font-weight: bold;
     margin-bottom: 0.5rem;
     color: #333;
   }
-  
   .form-group input {
     width: 100%;
     padding: 0.6rem;
     border: 1px solid #ccc;
     border-radius: 5px;
   }
-  
   .btn {
     display: block;
     width: 100%;
@@ -416,102 +381,34 @@ footer {
     border-radius: 5px;
     cursor: pointer;
   }
-  
   .btn:hover {
     background-color: #45a049;
   }
-  
   .info-message {
     margin-top: 1rem;
     text-align: center;
     font-weight: bold;
   }
-
-  /* ====================== LOGIN FORM ====================== */
-
-/* Containerelement voor het formulier */
-.login-container {
-    width: 90%;
-    max-width: 400px;
-    margin: 2rem auto;
-    padding: 1rem;
-    background-color: #fff;
-    border: 2px solid #ddd;
-    border-radius: 10px;
-  }
   
-  /* Titel kop */
-  .login-container h2 {
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-  
-  /* Algemene styling van de label en input */
-  .login-container .form-group {
-    margin-bottom: 1rem;
-    text-align: left;
-  }
-  
-  .login-container label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    color: #333;
-  }
-  
-  .login-container input[type="text"],
-  .login-container input[type="password"] {
-    width: 100%;
-    padding: 0.6rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  /* Knopstijl (kan gedeeld worden met register-knop) */
-  .login-container .btn {
-    display: block;
-    width: 100%;
-    padding: 0.8rem;
-    background-color: #4CAF50;
-    color: white;
-    font-size: 1rem;
-    font-weight: bold;
-    text-align: center;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .login-container .btn:hover {
-    background-color: #45a049;
-  }
-  
-  /* Om berichten te tonen, zoals success/foutmelding */
-  .login-container .info-message {
-    margin-top: 1rem;
-    text-align: center;
-    font-weight: bold;
-  }
-
-/* ====================== RESPONSIVE BREAKPOINTS ====================== */
-@media (max-width: 768px) {
+  /* Responsiveness */
+  @media (max-width: 768px) {
     .table-container {
-        width: 95%;
-        margin: 1rem auto;
+      width: 95%;
+      margin: 1rem auto;
     }
     .field-container {
-        width: 95%;
+      width: 95%;
     }
-}
-@media (max-width: 480px) {
+  }
+  @media (max-width: 480px) {
     #countdown-container {
-        font-size: 0.9rem;
-        padding: 0.5rem;
+      font-size: 0.9rem;
+      padding: 0.5rem;
     }
     #countdown {
-        font-size: 0.8rem;
+      font-size: 0.8rem;
     }
     #festival-name {
-        font-size: 1rem;
+      font-size: 1rem;
     }
-}
+  }
