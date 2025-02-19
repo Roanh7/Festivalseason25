@@ -69,17 +69,17 @@ header {
 
 /* Hamburger-knop */
 .nav-toggle {
-  display: none; /* op desktop niet zichtbaar */
+  /* Standaard op desktop niet zichtbaar */
+  display: none;
   font-size: 1.8rem;
   color: white;
   cursor: pointer;
-  user-select: none;
 }
 
 /* De menu-lijst */
 .nav-menu {
   list-style-type: none;
-  display: flex; 
+  display: flex; /* horizontaal op desktop */
   margin: 0;
   padding: 0;
 }
@@ -94,9 +94,6 @@ header {
 }
 .nav-menu a:hover {
   background-color: #45a049;
-}
-.nav-menu .active {
-  text-decoration: underline;
 }
 
 /* Tabel (agenda.html) */
@@ -466,8 +463,7 @@ footer {
 /* Responsiveness: nav in kolom bij small screens */
 @media (max-width: 768px) {
   .nav-bar {
-
-  
+    display: block;
     padding: 0.5rem;
   }
   .nav-bar ul {
