@@ -40,6 +40,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     "Strafwerk": "2025-08-16",
     "Latin Village": "2025-08-17",
     "Parels van de stad": "2025-09-13",
+    "Vunzige Deuntjes": "2025-05-10",
+    "Toffler": "2025-06-30",
     "Into the woods": "2025-09-19"
   };
 
