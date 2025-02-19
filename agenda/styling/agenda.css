@@ -36,10 +36,10 @@ header {
 /* Navigatiebalk */
 .nav-bar {
   background-color: #4CAF50;
-  width: 100%;
-  display: flex; /* horizontaal op desktop */
-  padding: 1rem 1.5rem;
-  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
 }
 .nav-bar ul {
   list-style-type: none;
@@ -69,17 +69,17 @@ header {
 
 /* Hamburger-knop */
 .nav-toggle {
-  /* Standaard op desktop niet zichtbaar */
-  display: none;
+  display: none; /* op desktop niet zichtbaar */
   font-size: 1.8rem;
   color: white;
   cursor: pointer;
+  user-select: none;
 }
 
 /* De menu-lijst */
 .nav-menu {
   list-style-type: none;
-  display: flex; /* horizontaal op desktop */
+  display: flex; 
   margin: 0;
   padding: 0;
 }
@@ -94,6 +94,9 @@ header {
 }
 .nav-menu a:hover {
   background-color: #45a049;
+}
+.nav-menu .active {
+  text-decoration: underline;
 }
 
 /* Tabel (agenda.html) */

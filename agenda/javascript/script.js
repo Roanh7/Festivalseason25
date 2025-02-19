@@ -75,6 +75,8 @@ function updateCountdown() {
 setInterval(updateCountdown, 1000);
 updateCountdown(); // direct uitvoeren
 
+
+
 // ================================
 // 2. SPELER-STATS (popup)
 // ================================
@@ -154,6 +156,16 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("close-popup").addEventListener("click", () => {
     document.getElementById("player-stats-popup").classList.add("hidden");
   });
+
+   // A) Hamburger-klik
+   const navToggle = document.getElementById('navToggle');
+   const navMenu = document.getElementById('navMenu');
+   if (navToggle && navMenu) {
+     navToggle.addEventListener('click', () => {
+       navMenu.classList.toggle('open');
+     });
+   }
+ 
 });
 
 // ================================
