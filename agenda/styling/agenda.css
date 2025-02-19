@@ -466,7 +466,8 @@ footer {
 /* Responsiveness: nav in kolom bij small screens */
 @media (max-width: 768px) {
   .nav-bar {
-    display: block;
+
+  
     padding: 0.5rem;
   }
   .nav-bar ul {
