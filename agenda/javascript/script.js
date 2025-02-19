@@ -159,27 +159,29 @@ document.addEventListener("DOMContentLoaded", () => {
 // ================================
 // 3. FESTIVAL-LINKS
 // ================================
-const festivalLinks = {
-  "Wavy": "https://www.wavyfestival.nl",
-  "DGTL": "https://www.dgtl.nl",
-  "Free your mind Kingsday": "https://www.freeyourmindfestival.nl",
-  "Loveland Kingsday": "https://www.loveland.nl",
-  "Verbond": "https://www.verbondfestival.nl",
-  "Awakenings Upclose": "https://www.awakenings.nl",
-  "Soenda": "https://www.soenda.com",
-  "909": "https://www.loveland.nl",
-  "Open Air": "https://www.amsterdamopenair.nl",
-  "Free Your Mind": "https://www.freeyourmindfestival.nl",
-  "Mystic Garden Festival": "https://www.mysticgardenfestival.nl",
-  "Awakenings Festival": "https://www.awakenings.nl",
-  "Tomorrowland": "https://www.tomorrowland.com",
-  "Mysteryland": "https://www.mysteryland.com",
-  "No Art": "https://www.noartfestival.com",
-  "Loveland": "https://www.loveland.nl",
-  "Latin Village": "https://www.latinvillage.nl",
-  "Strafwerk": "https://www.strafwerkfestival.org",
-  "Parels van de stad": "https://www.parelsvandestad.nl",
-  "Into the woods": "https://www.intothewoodsfestival.nl"
+   const festivalLinks = {
+    "Wavy": "https://www.wavyfestival.nl",
+    "DGTL": "https://www.dgtl.nl",
+    "Free your mind Kingsday": "https://www.freeyourmindfestival.nl",
+    "Loveland Kingsday": "https://www.loveland.nl",
+    "Verbond": "https://hetamsterdamsverbond.nl",
+    "Awakenings Upclose": "https://www.awakenings.nl",
+    "Soenda": "https://www.soenda.com",
+    "909": "https://www.909festival.nl",
+    "Open Air": "https://www.amsterdamopenair.nl",
+    "Free Your Mind": "https://www.freeyourmindfestival.nl",
+    "Mystic Garden Festival": "https://www.mysticgardenfestival.nl",
+    "Awakenings Festival": "https://www.awakenings.nl",
+    "Tomorrowland": "https://www.tomorrowland.com",
+    "Mysteryland": "https://www.mysteryland.com",
+    "No Art": "https://www.noartfestival.com",
+    "Loveland": "https://www.loveland.nl",
+    "Vunzige Deuntjes": "https://www.vunzigedeuntjes.nl",
+    "Latin Village": "https://www.latinvillage.nl",
+    "Strafwerk": "https://www.strafwerkfestival.nl",
+    "Parels van de stad": "https://www.parelsvandestad.nl",
+    "Toffler": "https://tofflerfestival.nl",
+    "Into the woods": "https://www.intothewoodsfestival.nl"
 };
 
 document.querySelectorAll(".festival-link").forEach(link => {
@@ -252,3 +254,38 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+  // Vind alle 'attendees-btn' knoppen:
+  const attendeeButtons = document.querySelectorAll('.attendees-btn');
+
+  attendeeButtons.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const festName = btn.dataset.festival; // "Wavy", "DGTL", etc.
+
+      try {
+        // 1) Haal de andere gebruikers op
+        const resp = await fetch(`/festival-attendees?festival=${encodeURIComponent(festName)}`);
+        if (!resp.ok) {
+          throw new Error(`Server returned ${resp.status}`);
+        }
+        const result = await resp.json(); 
+        // result.attendees = ["jouw@vriend.com", "andere@user.nl", ...]
+
+        // 2) Verwijder jouw eigen email als je dat wilt
+        const userEmail = localStorage.getItem('email') || '';
+        const others = result.attendees.filter(u => u !== userEmail);
+
+        // 3) Toon in pop-up of alert, of in DOM
+        if (others.length === 0) {
+          alert(`Niemand anders heeft zich nog aangemeld voor ${festName}.`);
+        } else {
+          alert(`De volgende gebruikers gaan naar ${festName}:\n\n• ${others.join('\n• ')}`);
+        }
+
+      } catch (err) {
+        console.error('Fout bij ophalen andere gebruikers:', err);
+        alert('Er ging iets mis bij het ophalen van de aanwezigen.');
+      }
+    });
+  });
+});
