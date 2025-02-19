@@ -1,17 +1,13 @@
-<!-- agenda/mijn-festivals.html -->
 <!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mijn Festivals</title>
-
-  <!-- Verwijs naar de CSS voor Mijn Festivals -->
   <link rel="stylesheet" href="/styling/mijn-festivals.css" />
   <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
 </head>
 <body>
-
   <header>
     <h1>Mijn Festivals</h1>
   </header>
@@ -22,10 +18,7 @@
 
   <!-- Navigatiebalk met hamburger -->
   <nav class="nav-bar">
-    <!-- Hamburgerknop (alleen zichtbaar op mobiel door CSS) -->
     <div id="navToggle" class="nav-toggle">☰</div>
-
-    <!-- Het menu - op desktop direct zichtbaar, op mobiel standaard ingeklapt -->
     <ul class="nav-menu" id="navMenu">
       <li><a href="agenda.html">Home</a></li>
       <li><a href="reviews.html">Reviews</a></li>
@@ -34,7 +27,6 @@
       <li><a href="login.html">Inloggen</a></li>
       <li><a href="mijn-festivals.html" class="active">Mijn Festivals</a></li>
     </ul>
-
     <div id="userMenu" style="float:right;"></div>
   </nav>
 
@@ -44,7 +36,7 @@
     <p id="upcomingCount"></p>
     <div id="upcomingFestContainer"></div>
 
-    <!-- Sectie voor voorbijge festivals -->
+    <!-- Sectie voor voorbije festivals (met Review-knop) -->
     <h2>Festivals die zijn geweest</h2>
     <p id="pastCount"></p>
     <div id="pastFestContainer"></div>

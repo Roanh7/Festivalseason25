@@ -1,15 +1,22 @@
-// agenda/javascript/mijn-festivals.js
+// mijn-festivals.js
 
 document.addEventListener('DOMContentLoaded', async () => {
   const userMenu = document.getElementById('userMenu');
-
-  // Containers voor de twee lijsten
   const upcomingContainer = document.getElementById('upcomingFestContainer');
   const upcomingCountEl = document.getElementById('upcomingCount');
   const pastContainer = document.getElementById('pastFestContainer');
   const pastCountEl = document.getElementById('pastCount');
 
-  // 1) Check of de gebruiker is ingelogd
+  // A) Hamburger toggle
+  const navToggle = document.getElementById('navToggle');
+  const navMenu = document.getElementById('navMenu');
+  if (navToggle && navMenu) {
+    navToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('open');
+    });
+  }
+
+  // 1) Check of ingelogd
   const token = localStorage.getItem('token');
   const email = localStorage.getItem('email');
   if (!token || !email) {
@@ -18,8 +25,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // 2) Definieer alle festivals + datum (pas aan naar jouw data)
-  //    "name" moet exact overeenkomen met hoe je 'm in de DB hebt opgeslagen
+  // 2) Definieer alle festivals + datum
+  //    (Moet overeenkomen met de festivalnamen in DB)
   const festivalDates = {
     "Wavy": "2024-12-21",
     "DGTL": "2025-04-18",
@@ -45,7 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     "Into the woods": "2025-09-19"
   };
 
-  // Helper om datum als "YYYY-MM-DD" om te zetten naar "DD-MM-YYYY"
+  // Helper om ISO "YYYY-MM-DD" => "DD-MM-YYYY"
   function formatDate(isoDate) {
     const d = new Date(isoDate);
     const day = String(d.getDate()).padStart(2, '0');
@@ -54,8 +61,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     return `${day}-${month}-${year}`;
   }
 
-  // 3) Haal festivals op uit DB (enkel namen)
   try {
+    // 3) Haal festivals (namen) op voor deze user
     const res = await fetch(`/my-festivals?email=${encodeURIComponent(email)}`);
     if (!res.ok) {
       throw new Error(`Server returned ${res.status}`);
@@ -63,45 +70,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = await res.json();
     const festNames = data.festivals || [];
 
-    // Verrijk met datum en filter: [ { name, date }, ... ]
-    const now = new Date().setHours(0, 0, 0, 0); // middernacht vandaag
+    // We delen op in upcoming & past
+    const now = new Date().setHours(0,0,0,0);
     let upcomingFests = [];
     let pastFests = [];
 
     festNames.forEach(name => {
       const isoDate = festivalDates[name];
       if (!isoDate) {
-        // Festival niet gevonden in festivalDates - evt. overslaan of datum "Onbekend"
+        // Niet gevonden in festivalDates => skip
         return;
       }
-      const dateObj = new Date(isoDate).setHours(0, 0, 0, 0);
+      const dateObj = new Date(isoDate).setHours(0,0,0,0);
       const festivalObj = { name, date: isoDate, dateValue: dateObj };
 
-      // Splitsen in upcoming vs past
       if (dateObj >= now) {
+        // toekomstdig
         upcomingFests.push(festivalObj);
       } else {
+        // verleden
         pastFests.push(festivalObj);
       }
     });
 
-    // Sorteer beide arrays op oplopende datum
-    upcomingFests.sort((a, b) => a.dateValue - b.dateValue);
-    pastFests.sort((a, b) => a.dateValue - b.dateValue);
+    // Sorteer
+    upcomingFests.sort((a,b) => a.dateValue - b.dateValue);
+    pastFests.sort((a,b) => a.dateValue - b.dateValue);
 
     // Telling
     upcomingCountEl.textContent = `Je bent aangemeld voor ${upcomingFests.length} festival(s).`;
     pastCountEl.textContent = `Je hebt ${pastFests.length} festival(s) meegemaakt.`;
 
-    // 4) Maak cards voor upcoming festivals
+    // 4) Voor upcoming: maak cards zonder ratingknop
     upcomingFests.forEach(fest => {
-      const card = createFestivalCard(fest.name, fest.date, email);
+      const card = createFestivalCard(fest.name, fest.date, email, false); // false => geen ratingknop
       upcomingContainer.appendChild(card);
     });
 
-    // 5) Maak cards voor past festivals
+    // 5) Voor past: maak cards mét ratingknop
     pastFests.forEach(fest => {
-      const card = createFestivalCard(fest.name, fest.date, email);
+      const card = createFestivalCard(fest.name, fest.date, email, true); // true => wel ratingknop
       pastContainer.appendChild(card);
     });
 
@@ -110,43 +118,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     pastContainer.innerHTML = "";
   }
 
-  // =========== Hulpfunctie om een festival-card te bouwen ===========
-  function createFestivalCard(festName, isoDate, currentUserEmail) {
-    // Outer div
+  // =========== Functie om een festival-card te bouwen ===========
+  function createFestivalCard(festName, isoDate, currentUserEmail, allowRating) {
     const card = document.createElement('div');
     card.classList.add('festival-card');
 
-    // Title + datum
+    // Titel (naam + datum)
     const titleDiv = document.createElement('div');
     titleDiv.classList.add('festival-title');
     titleDiv.textContent = `${festName} - ${formatDate(isoDate)}`;
     card.appendChild(titleDiv);
 
-    // Knop
-    const btnRow = document.createElement('div');
-    btnRow.classList.add('festival-text');
+    // Een "Wie gaan er nog meer?"-knop
+    const attendeesRow = document.createElement('div');
+    attendeesRow.classList.add('festival-text');
     const toggleBtn = document.createElement('button');
     toggleBtn.textContent = "Wie gaan er nog meer?";
-    btnRow.appendChild(toggleBtn);
-    card.appendChild(btnRow);
+    attendeesRow.appendChild(toggleBtn);
+    card.appendChild(attendeesRow);
 
-    // Attendees-list (collapsible)
+    // Collapsible div voor attendees
     const attendeesDiv = document.createElement('div');
-    attendeesDiv.classList.add('festival-text', 'collapsible');
+    attendeesDiv.classList.add('festival-text','collapsible');
     card.appendChild(attendeesDiv);
 
     let expanded = false;
     let fetched = false;
-
     toggleBtn.addEventListener('click', async () => {
       if (!expanded) {
-        // Openen
         expanded = true;
         toggleBtn.textContent = "Verbergen";
         attendeesDiv.classList.add('expanded');
 
         if (!fetched) {
-          // Haal pas nu de data op
           try {
             const resp = await fetch(`/festival-attendees?festival=${encodeURIComponent(festName)}`);
             if (!resp.ok) {
@@ -154,7 +158,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             const result = await resp.json();
             const allAttendees = result.attendees || [];
-            // Filter jezelf eruit
             const others = allAttendees.filter(u => u !== currentUserEmail);
 
             if (others.length === 0) {
@@ -173,26 +176,50 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }
       } else {
-        // Inklappen
         expanded = false;
         toggleBtn.textContent = "Wie gaan er nog meer?";
         attendeesDiv.classList.remove('expanded');
       }
     });
 
+    // Als allowRating=true (festival is voorbij), maken we ook een "Geef rating"-knop
+    if (allowRating) {
+      const ratingRow = document.createElement('div');
+      ratingRow.classList.add('festival-text');
+
+      const rateBtn = document.createElement('button');
+      rateBtn.textContent = "Geef rating (1-10)";
+      ratingRow.appendChild(rateBtn);
+      card.appendChild(ratingRow);
+
+      rateBtn.addEventListener('click', async () => {
+        // Simpel prompt om rating te vragen
+        const input = prompt(`Geef jouw rating (1-10) voor ${festName}:`);
+        if (input === null) return; // user canceled
+        const ratingValue = parseInt(input, 10);
+        if (isNaN(ratingValue) || ratingValue < 1 || ratingValue > 10) {
+          alert('Ongeldige rating! (1-10)');
+          return;
+        }
+        // Verstuur POST /rating
+        try {
+          const resp = await fetch('/rating', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: currentUserEmail, festival: festName, rating: ratingValue })
+          });
+          const rjson = await resp.json();
+          if (resp.ok) {
+            alert(`Rating opgeslagen! ${rjson.message || ''}`);
+          } else {
+            alert(`Kon rating niet opslaan: ${rjson.message}`);
+          }
+        } catch (err) {
+          alert(`Er ging iets mis bij het versturen van je rating: ${err}`);
+        }
+      });
+    }
+
     return card;
   }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  const navToggle = document.getElementById('navToggle');
-  const navMenu = document.getElementById('navMenu');
-
-  if (navToggle && navMenu) {
-    navToggle.addEventListener('click', () => {
-      navMenu.classList.toggle('open');
-    });
-  }
-
-  // Eventueel rest van je userMenu / token-check code
 });
