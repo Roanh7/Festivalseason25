@@ -183,3 +183,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     return card;
   }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  const navToggle = document.getElementById('navToggle');
+  const navMenu = document.getElementById('navMenu');
+
+  if (navToggle && navMenu) {
+    navToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('open');
+    });
+  }
+
+  // Eventueel rest van je userMenu / token-check code
+});

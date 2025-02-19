@@ -1,6 +1,6 @@
 // index.js
 
-require('dotenv').config();  // Als je .env-variabelen wilt gebruiken
+require('dotenv').config(); // Als je .env-variabelen wilt gebruiken
 const express = require('express');
 const path = require('path');
 const { Client } = require('pg');
@@ -10,18 +10,18 @@ const bcrypt = require('bcrypt');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// 2) Middleware om form-data (POST) te kunnen verwerken
+// 2) Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // 3) Connectie met Neon (Postgres)
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
-  /* 
+  /*
   // Als je SSL nodig hebt:
   ssl: {
     rejectUnauthorized: false
-  } 
+  }
   */
 });
 client
@@ -29,11 +29,10 @@ client
   .then(() => console.log('Connected to Postgres!'))
   .catch(err => console.error('Connection error', err.stack));
 
-// 4) Statische bestanden: alles uit ./agenda (HTML, CSS, JS, images)
+// 4) Statische bestanden uit ./agenda map
 app.use(express.static(path.join(__dirname, 'agenda')));
 
-// 5) HTML-routes (optioneel), zodat /reviews.html etc. direct geladen wordt.
-//    (Je kunt ook enkel rely-en op express.static en de root-route.)
+// 5) HTML-routes (optioneel)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'agenda', 'agenda.html'));
 });
@@ -53,17 +52,15 @@ app.get('/login.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'agenda', 'login.html'));
 });
 
-// 6) POST /register => nieuwe gebruiker registreren
+// 6) POST /register => gebruiker registreren
 app.post('/register', async (req, res) => {
   try {
     const { email, password } = req.body;
     const hashed = await bcrypt.hash(password, 10);
-
     await client.query(
       'INSERT INTO users (email, password) VALUES ($1, $2)',
       [email, hashed]
     );
-
     res.send('Registration successful! You can now log in.');
   } catch (err) {
     console.error('Error registering user:', err);
@@ -90,7 +87,7 @@ app.post('/login', async (req, res) => {
       return res.status(401).send('Invalid email or password');
     }
 
-    // Succes
+    // Gelukt
     res.send(`Welcome ${email}, you are logged in!`);
   } catch (err) {
     console.error('Error during login:', err);
@@ -105,14 +102,12 @@ app.post('/attend', async (req, res) => {
     if (!email || !festival) {
       return res.status(400).json({ message: 'Missing email or festival' });
     }
-
     await client.query(
       `INSERT INTO attendances (user_email, festival_name)
        VALUES ($1, $2)
        ON CONFLICT (user_email, festival_name) DO NOTHING`,
       [email, festival]
     );
-
     res.json({ message: `You are attending ${festival}!` });
   } catch (err) {
     console.error('Error in /attend:', err);
@@ -127,12 +122,10 @@ app.delete('/attend', async (req, res) => {
     if (!email || !festival) {
       return res.status(400).json({ message: 'Missing email or festival' });
     }
-
     await client.query(
       'DELETE FROM attendances WHERE user_email=$1 AND festival_name=$2',
       [email, festival]
     );
-
     res.json({ message: `You are no longer attending ${festival}.` });
   } catch (err) {
     console.error('Error in DELETE /attend:', err);
@@ -147,7 +140,6 @@ app.get('/my-festivals', async (req, res) => {
     if (!userEmail) {
       return res.status(400).json({ message: 'No email provided' });
     }
-
     const result = await client.query(
       'SELECT festival_name FROM attendances WHERE user_email=$1',
       [userEmail]
@@ -161,14 +153,13 @@ app.get('/my-festivals', async (req, res) => {
   }
 });
 
-// 11) GET /festival-attendees => lijst van gebruikers bij een festival
+// 11) GET /festival-attendees => lijst van users bij een festival
 app.get('/festival-attendees', async (req, res) => {
   try {
     const festival = req.query.festival;
     if (!festival) {
       return res.status(400).json({ message: 'No festival provided' });
     }
-
     const result = await client.query(
       'SELECT user_email FROM attendances WHERE festival_name=$1',
       [festival]
@@ -186,3 +177,73 @@ app.get('/festival-attendees', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
+
+
+// ============== NIEUWE AANPASSINGEN: RATING FUNCTIONALITEIT ==============
+
+// 13) POST /rating => gebruiker geeft cijfer (1–10) aan een festival
+// 
+
+app.post('/rating', async (req, res) => {
+  try {
+    const { email, festival, rating } = req.body;
+    if (!email || !festival || rating == null) {
+      return res.status(400).json({ message: 'Missing rating data' });
+    }
+
+    // Check dat rating tussen 1 en 10 ligt (optioneel)
+    if (rating < 1 || rating > 10) {
+      return res.status(400).json({ message: 'Rating must be between 1 and 10' });
+    }
+
+    // Upsert in de tabel 'ratings'
+    await client.query(
+      `INSERT INTO ratings (user_email, festival_name, rating)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (user_email, festival_name)
+       DO UPDATE SET rating = EXCLUDED.rating`,
+      [email, festival, rating]
+    );
+
+    res.json({ message: `Rating ${rating} saved for festival ${festival}` });
+  } catch (err) {
+    console.error('Error in POST /rating:', err);
+    res.status(500).json({ message: 'Could not save rating' });
+  }
+});
+
+// 14) GET /rating => haal gemiddelde rating (en evt. alle ratings) op
+// Voorbeeld: GET /rating?festival=DGTL
+app.get('/rating', async (req, res) => {
+  try {
+    const fest = req.query.festival;
+    if (!fest) {
+      return res.status(400).json({ message: 'No festival provided' });
+    }
+
+    // Haal gemiddelde op
+    const avgResult = await client.query(
+      'SELECT AVG(rating) as avg_rating FROM ratings WHERE festival_name=$1',
+      [fest]
+    );
+    const average = avgResult.rows[0].avg_rating;
+
+    // Eventueel ook alle individuele ratings ophalen:
+    const allResult = await client.query(
+      'SELECT user_email, rating FROM ratings WHERE festival_name=$1',
+      [fest]
+    );
+    const allRatings = allResult.rows; // [{ user_email, rating }, ...]
+
+    res.json({
+      festival: fest,
+      averageRating: average,   // kan null zijn als nog geen ratings
+      ratings: allRatings
+    });
+  } catch (err) {
+    console.error('Error in GET /rating:', err);
+    res.status(500).json({ message: 'Could not get rating' });
+  }
+  
+});
+

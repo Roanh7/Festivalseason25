@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="stylesheet" href="/styling/reviews.css">
-  <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
   <title>Festival Reviews</title>
+
+  <!-- Verwijs naar onze nieuwe CSS -->
+  <link rel="stylesheet" href="/styling/reviews.css" />
+  <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
 </head>
 <body>
+
   <header>
     <h1>Festival Reviews</h1>
   </header>
@@ -16,7 +19,7 @@
     <img src="/images/logo.png" alt="Festival Logo">
   </div>
 
-  <!-- Navigatiebalk (hamburger) -->
+  <!-- Navigatiebalk met hamburger -->
   <nav class="nav-bar">
     <div id="navToggle" class="nav-toggle">☰</div>
     <ul class="nav-menu" id="navMenu">
@@ -27,26 +30,21 @@
       <li><a href="login.html">Inloggen</a></li>
       <li><a href="mijn-festivals.html">Mijn Festivals</a></li>
     </ul>
-
     <div id="userMenu" style="float:right;"></div>
   </nav>
-    <main>
-        <div class="review">
-            <div class="review-title">Wavy </div>
-            <div class="review-title">21-12-2024 </div>
-            <p class="review-text">Thuishaven vibe hier. Werd lekker gedraaid. Hier en daar regen, maar vanuit hier kan het alleen maar beter.</p>
-            <p class="review-text">Stand:</p>
-            <p class="review-text">- Jef 1</p>
-            <p class="review-text">- Chip 1</p>
-            <p class="review-text">- Roan 0</p>
-        </div>
-      
-        <div class="back-button-container">
-          <a href="agenda.html" class="back-button">Terug naar agenda</a>
-      </div>
-    </main>
+
+  <main>
+    <h2>Gemiddelde ratings per festival</h2>
+    <!-- Container waarin we via JS een tabel of kaarten gaan plaatsen -->
+    <div id="reviewsContainer"></div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Festival Agenda - Gecreëerd door Roan Hassan, S-team vertegenwoordiger</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/javascript/reviews.js"></script>
+  <script src="/javascript/navstatus.js"></script>
 </body>
-
-<script src="/javascript/navstatus.js"></script>
-
 </html>
