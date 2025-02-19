@@ -24,6 +24,8 @@ const festivals = [
   { name: "Latin Village", date: "2025-08-17" },
   { name: "Parels van de stad", date: "2025-09-13" },
   { name: "Into the woods", date: "2025-09-19" },
+  { name: "Vunzige Deuntjes", date: "2025-07-05" },
+  { name: "Toffler", date: "2025-05-31" },
 ];
 
 function updateCountdown() {
