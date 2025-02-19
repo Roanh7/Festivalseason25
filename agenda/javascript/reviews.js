@@ -1,7 +1,8 @@
 // reviews.js
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // A) Hamburger toggle (als je niet navstatus.js gebruikt, kun je dit herhalen)
+
+  // A) Hamburger
   const navToggle = document.getElementById('navToggle');
   const navMenu = document.getElementById('navMenu');
   if (navToggle && navMenu) {
@@ -10,23 +11,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // B) We definiëren hier de festivals die we willen tonen op de reviewspagina
-  // (of haal ze op uit de DB / server, dat kan ook)
+  // B) Festival-lijst
   const festivalList = [
-    "Wavy", 
-    "DGTL", 
+    "Wavy",
+    "DGTL",
     "Free your mind Kingsday",
     "Loveland Kingsday",
-    "Verbond",
     "Vunzige Deuntjes",
     "Toffler",
-    // etc. 
+    "Boothstock",
+    "Mysteryland",
+    "No Art",
+    "Loveland",
+    "Strafwerk",
+    "Latin Village",
+    "Parels van de stad",
+    "Awakenings Festival",
+    "Tomorrowland",
+    "Mystic Garden Festival",
+    "Open Air",
+    "Free Your Mind",
+    "Awakenings Upclose",
+    "Soenda",
+    "909",
+    "Into the woods",
+    "Verbond"
   ];
 
-  // C) We maken een tabel om de data in te tonen
+  // C) Bouw een tabel
   const reviewsContainer = document.getElementById('reviewsContainer');
-
-  // Bouw de basis van de tabel
   const table = document.createElement('table');
   table.classList.add('reviews-table');
 
@@ -35,54 +48,92 @@ document.addEventListener('DOMContentLoaded', async () => {
   thead.innerHTML = `
     <tr>
       <th>Festival</th>
-      <th>Gemiddelde Rating</th>
+      <th>Gemiddelde (1-10)</th>
+      <th>Sterren</th>
       <th>Aantal Reviews</th>
     </tr>
   `;
   table.appendChild(thead);
 
-  // Tabel-body
+  // Tbody
   const tbody = document.createElement('tbody');
   table.appendChild(tbody);
 
-  // Plaats de tabel in de container
+  // Plaats de tabel in container
   reviewsContainer.appendChild(table);
 
-  // D) Voor elk festival, haal average rating op
+  // D) Voor elk festival rating ophalen
   for (const festName of festivalList) {
     try {
       const resp = await fetch(`/rating?festival=${encodeURIComponent(festName)}`);
       if (!resp.ok) {
-        // Als er nog geen rating is, bijv. 404 of 400?
-        // We doen hier ff no-op of fallback
-        throw new Error(`Server returned ${resp.status}`);
+        throw new Error(`Server returned status ${resp.status}`);
       }
+      const data = await resp.json();
+      // { festival:..., averageRating:..., ratings:[...] }
+      const avgRaw = data.averageRating; 
+      // Kan null zijn als geen ratings
+      let avgNum = avgRaw ? Number(avgRaw) : 0;
+      // afronden op 1 decimaal
+      const avgOneDecimal = avgNum.toFixed(1);
 
-      const data = await resp.json(); 
-      // data = { festival: "DGTL", averageRating: 7.5, ratings: [...] }
+      // Maak ster-string
+      const starHTML = makeStarString(avgNum);
 
-      const avg = data.averageRating ? Number(data.averageRating).toFixed(1) : '-';
       const count = data.ratings ? data.ratings.length : 0;
 
-      // Maak een row
+      // Maak row
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${festName}</td>
-        <td>${avg}</td>
+        <td>${avgRaw ? avgOneDecimal : '-'}</td>
+        <td>${starHTML}</td>
         <td>${count}</td>
       `;
       tbody.appendChild(tr);
 
     } catch (err) {
-      console.error('Fout bij ophalen rating voor', festName, err);
-      // We maken evengoed een row, maar met no rating
+      console.error('Fout bij rating fetch voor', festName, err);
+      // Rij zonder data
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${festName}</td>
-        <td>?</td>
+        <td>-</td>
+        <td></td>
         <td>0</td>
       `;
       tbody.appendChild(tr);
     }
   }
 });
+
+/**
+ * Converteert een gemiddelde rating (0-10) naar 0-5 sterren (met evt. halve ster).
+ */
+function makeStarString(ratingOutOf10) {
+  const maxStars = 5;
+  // Schaal 0-10 => 0-5
+  const starValue = (ratingOutOf10 / 10) * maxStars; 
+  // starValue is nu bijv. 3.7 => ~3.7 sterren
+  
+  let fullStars = Math.floor(starValue);        // bv 3
+  let hasHalf = (starValue - fullStars) >= 0.5; // check of er halve ster is
+
+  // Bouw HTML
+  let result = '';
+  // Voeg de volle sterren toe
+  for (let i = 0; i < fullStars; i++) {
+    result += `<span class="star-full">★</span>`;
+  }
+  // Voeg halve ster toe indien nodig
+  if (hasHalf && fullStars < maxStars) {
+    result += `<span class="star-half">★</span>`; 
+    // Of Unicode half-star: star-half, of we kunnen special char. 
+    fullStars++; // we hebben 1 half star toegevoegd
+  }
+  // Rest opvullen met lege sterren
+  for (let i = fullStars; i < maxStars; i++) {
+    result += `<span class="star-empty">☆</span>`;
+  }
+  return result;
+}

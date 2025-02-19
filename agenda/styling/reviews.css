@@ -1,18 +1,18 @@
 /* reviews.css */
 
-/* Basisreset */
+/* Basis reset + body */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-
 body {
   font-family: Arial, sans-serif;
   background-color: #f9f9f9;
   color: #333;
 }
 
+/* Header */
 header {
   background: #4CAF50;
   color: white;
@@ -26,7 +26,7 @@ main {
   margin: 2rem auto;
 }
 
-/* Logo en nav-balk */
+/* Logo + nav-balk */
 .logo-container {
   text-align: center;
   margin: 0;
@@ -46,7 +46,7 @@ main {
   padding: 0.5rem 1.5rem;
 }
 .nav-toggle {
-  display: none; /* desktop */
+  display: none;  /* desktop: verborgen */
   font-size: 1.8rem;
   color: white;
   cursor: pointer;
@@ -54,7 +54,7 @@ main {
 }
 .nav-menu {
   list-style-type: none;
-  display: flex; /* horizontaal op desktop */
+  display: flex;   /* horizontaal op desktop */
   margin: 0;
   padding: 0;
 }
@@ -74,10 +74,10 @@ main {
   text-decoration: underline;
 }
 
-/* RESPONSIVE: op mobiel -> hamburger */
+/* Responsive hamburger */
 @media (max-width: 768px) {
   .nav-toggle {
-    display: block; 
+    display: block;
   }
   .nav-menu {
     display: none;
@@ -93,13 +93,12 @@ main {
   }
 }
 
-/* Container om de lijst van reviews te tonen */
+/* Container voor de reviews-tabel */
 #reviewsContainer {
   margin-top: 2rem;
 }
 
-/* We tonen de reviews in een tabel of card-stijl, keuze is aan jou */
-/* Voorbeeld: een eenvoudige tabel */
+/* Tabel-styling */
 .reviews-table {
   width: 100%;
   border-collapse: collapse;
@@ -115,4 +114,26 @@ main {
 }
 .reviews-table tr:nth-child(even) {
   background-color: #f2f2f2;
+}
+
+/* Optioneel: styling van ster-icoontjes */
+.star-full {
+  color: gold; /* volle ster */
+  font-size: 1.2rem;
+}
+.star-empty {
+  color: #ccc;
+  font-size: 1.2rem;
+}
+.star-half {
+  color: gold; 
+  font-size: 1.2rem;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  margin: 2rem 0;
+  font-size: 0.9rem;
+  color: #666;
 }
