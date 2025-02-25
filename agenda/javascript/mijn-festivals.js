@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     "Awakenings Upclose": "2025-05-17",
     "Soenda": "2025-05-31",
     "909": "2025-06-07",
+    "Diynamic": "2025-06-07",
     "Open Air": "2025-06-08",
     "Free Your Mind": "2025-06-08",
     "Mystic Garden Festival": "2025-06-14",
@@ -47,6 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     "Strafwerk": "2025-08-16",
     "Latin Village": "2025-08-17",
     "Parels van de stad": "2025-09-13",
+    "KeineMusik": "2025-07-05",
     "Vunzige Deuntjes": "2025-07-05",
     "Toffler": "2025-05-31",
     "Into the woods": "2025-09-19"

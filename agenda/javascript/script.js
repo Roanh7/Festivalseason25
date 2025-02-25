@@ -11,7 +11,7 @@ const festivals = [
   { name: "Verbond", date: "2025-05-05" },
   { name: "Awakenings Upclose", date: "2025-05-17" },
   { name: "Soenda", date: "2025-05-31" },
-  { name: "909", date: "2025-06-07" },
+  { name: "Diynamic", date: "2025-06-07" },
   { name: "Open Air", date: "2025-06-08" },
   { name: "Free Your Mind", date: "2025-06-08" },
   { name: "Mystic Garden Festival", date: "2025-06-14" },
@@ -24,7 +24,7 @@ const festivals = [
   { name: "Latin Village", date: "2025-08-17" },
   { name: "Parels van de stad", date: "2025-09-13" },
   { name: "Into the woods", date: "2025-09-19" },
-  { name: "Vunzige Deuntjes", date: "2025-07-05" },
+  { name: "KeineMusik", date: "2025-07-05" },
   { name: "Toffler", date: "2025-05-31" },
 ];
 
@@ -183,6 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "Soenda": "https://www.soenda.com",
     "909": "https://www.909festival.nl",
     "Open Air": "https://www.amsterdamopenair.nl",
+    "Diynamic": "https://www.amsterdamopenair.nl",
     "Free Your Mind": "https://www.freeyourmindfestival.nl",
     "Mystic Garden Festival": "https://www.mysticgardenfestival.nl",
     "Awakenings Festival": "https://www.awakenings.nl",
