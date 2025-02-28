@@ -1,133 +1,105 @@
-/* reviews.css */
-
-/* Basis reset + body */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* =============== extra-info.css =============== */
 body {
   font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
   background-color: #f9f9f9;
   color: #333;
 }
-
-/* Header */
 header {
   background: #4CAF50;
   color: white;
   text-align: center;
   padding: 1rem 0;
 }
-
 main {
   width: 90%;
   max-width: 600px;
   margin: 2rem auto;
 }
 
-/* Logo + nav-balk */
+/* Logo-container */
 .logo-container {
   text-align: center;
   margin: 0;
   background-color: #fff;
 }
 .logo-container img {
-  width: 100%;
-  height: auto;
-  display: block;
+  width: 100%; 
+  height: auto; 
+  display: block; 
 }
 
+/* Navigatiebalk */
 .nav-bar {
-  background-color: #4CAF50;
+  background-color: #4CAF50; 
+  width: 100%;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1.5rem;
+  padding: 1rem 1.5rem;
+  transition: background-color 0.3s ease;
 }
-.nav-toggle {
-  display: none;  /* desktop: verborgen */
-  font-size: 1.8rem;
-  color: white;
-  cursor: pointer;
-  user-select: none;
-}
-.nav-menu {
+.nav-bar ul {
   list-style-type: none;
-  display: flex;   /* horizontaal op desktop */
   margin: 0;
   padding: 0;
+  flex: 1;
+  display: flex;
+  justify-content: center;
 }
-.nav-menu li {
+.nav-bar li {
   margin: 0 1rem;
 }
-.nav-menu a {
+.nav-bar a {
+  display: block;
   color: white;
   text-decoration: none;
   font-weight: bold;
   padding: 0.5rem 1rem;
+  transition: background-color 0.3s ease;
 }
-.nav-menu a:hover {
+.nav-bar a:hover {
   background-color: #45a049;
 }
-.nav-menu .active {
+.nav-bar .active {
   text-decoration: underline;
 }
 
-/* Responsive hamburger */
-@media (max-width: 768px) {
-  .nav-toggle {
-    display: block;
-  }
-  .nav-menu {
-    display: none;
-    flex-direction: column;
-    width: 100%;
-    background-color: #4CAF50;
-  }
-  .nav-menu.open {
-    display: flex;
-  }
-  .nav-menu li {
-    margin: 0.5rem 1rem;
-  }
-}
-
-/* Container voor de reviews-tabel */
-#reviewsContainer {
-  margin-top: 2rem;
-}
-
-/* Tabel-styling */
-.reviews-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.reviews-table th, .reviews-table td {
+/* "uitleg"-hokjes */
+.uitleg {
+  margin-bottom: 2rem;
+  padding: 1rem;
   border: 1px solid #ddd;
-  padding: 0.8rem;
-  text-align: center;
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
-.reviews-table th {
+.uitleg-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.uitleg-text {
+  font-size: 1rem;
+  color: #555;
+}
+
+/* Eventuele back-button */
+.back-button-container {
+  text-align: center;
+  margin: 2rem 0;
+}
+.back-button {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
   background-color: #4CAF50;
   color: white;
+  font-size: 1rem;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
 }
-.reviews-table tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-/* Optioneel: styling van ster-icoontjes */
-.star-full {
-  color: gold; /* volle ster */
-  font-size: 1.2rem;
-}
-.star-empty {
-  color: #ccc;
-  font-size: 1.2rem;
-}
-.star-half {
-  color: gold; 
-  font-size: 1.2rem;
+.back-button:hover {
+  background-color: #45a049;
 }
 
 /* Footer */
@@ -136,4 +108,51 @@ footer {
   margin: 2rem 0;
   font-size: 0.9rem;
   color: #666;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  main {
+    width: 95%;
+    margin: 1rem auto;
+  }
+  .uitleg {
+    padding: 0.8rem;
+  }
+  .uitleg-title {
+    font-size: 1rem;
+  }
+  .uitleg-text {
+    font-size: 0.9rem;
+  }
+  .back-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+  .nav-bar {
+    display: block;
+    padding: 0.5rem;
+  }
+  .nav-bar ul {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .nav-bar li {
+    margin: 0.5rem 0;
+  }
+}
+@media (max-width: 480px) {
+  .uitleg {
+    padding: 0.6rem;
+  }
+  .uitleg-title {
+    font-size: 0.9rem;
+  }
+  .uitleg-text {
+    font-size: 0.8rem;
+  }
+  .back-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
 }

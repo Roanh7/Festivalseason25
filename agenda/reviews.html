@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Festival Reviews</title>
-  <!-- Link naar de aparte CSS -->
-  <link rel="stylesheet" href="/styling/reviews.css">
-  <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+  <meta charset="UTF-8" />
+  <title>Reviews</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Gebruik hetzelfde CSS-bestand als extra-info, zodat de stijl overeenkomt: -->
+  <link rel="stylesheet" href="styling/reviews.css" />
+
+  <!-- Of als je het liever kopieert naar reviews.css, kun je dat hier vervangen. -->
+  <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
 </head>
 <body>
-
   <header>
-    <h1>Festival Reviews</h1>
+    <h1>Reviews</h1>
   </header>
 
   <div class="logo-container">
-    <img src="/images/logo.png" alt="Festival Logo">
+    <img src="/images/logo.png" alt="Festival Logo" />
   </div>
 
-  <!-- Navigatiebalk met hamburger -->
   <nav class="nav-bar">
-    <div id="navToggle" class="nav-toggle">☰</div>
-    <ul class="nav-menu" id="navMenu">
+    <div id="navToggle" class="nav-toggle">≡</div>
+    <ul id="navMenu">
       <li><a href="agenda.html">Home</a></li>
       <li><a href="reviews.html" class="active">Reviews</a></li>
       <li><a href="extra-info.html">Extra Info</a></li>
@@ -33,16 +33,18 @@
   </nav>
 
   <main>
-    <h2>Gemiddelde Ratings per Festival</h2>
-    <div id="reviewsContainer"></div>
+    <!-- Hier bouwen we de dynamische lijst van festivals -->
+    <div id="reviewsContainer">
+      <!-- JavaScript zet hier festival-blokken neer -->
+    </div>
   </main>
 
   <footer>
-    <p>&copy; 2025 Festival Agenda - Gecreëerd door Roan Hassan, S-team vertegenwoordiger</p>
+    <p>&copy; 2025 Festival Agenda – door Roan Hassan, S-team</p>
   </footer>
 
-  <!-- Scripts: ons reviews.js + navstatus.js (optioneel) -->
-  <script src="/javascript/reviews.js"></script>
-  <script src="/javascript/navstatus.js"></script>
+  <!-- Scripts -->
+  <script src="javascript/reviews.js"></script>
+  <script src="javascript/navstatus.js"></script>
 </body>
 </html>
