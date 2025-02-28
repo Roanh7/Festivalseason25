@@ -27,14 +27,14 @@ const client = new Client({
 
 client.connect()
   .then(() => {
-    console.log('Connected to Postgres!');
+    console.log('Connected to Postgres');
   })
   .catch((err) => {
     console.error('Connection error', err.stack);
   });
 
 // ----------------------
-//  ROUTES
+//  Bestaande routes
 // ----------------------
 
 app.get('/', (req, res) => {
@@ -62,11 +62,7 @@ app.get('/mijn-festivals', (req, res) => {
   res.sendFile(__dirname + '/public/mijn-festivals.html');
 });
 
-
-// ----------------------
-//  LOGIN / REGISTER
-// ----------------------
-
+// Login
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -94,6 +90,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// Register
 app.post('/register', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -113,11 +110,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-
-// ----------------------
-// ATTENDANCES
-// ----------------------
-
+// Opvragen wie naar welke festivals gaat
 app.get('/attendances', async (req, res) => {
   try {
     const result = await client.query('SELECT * FROM attendances');
@@ -128,6 +121,7 @@ app.get('/attendances', async (req, res) => {
   }
 });
 
+// User attend festival
 app.post('/attend-festival', async (req, res) => {
   try {
     const { user_email, festival_name } = req.body;
@@ -155,6 +149,7 @@ app.post('/attend-festival', async (req, res) => {
   }
 });
 
+// Alle festivals van ingelogde user
 app.get('/myfestivals', async (req, res) => {
   if (!req.session.user) {
     return res.status(401).send({ message: 'Not logged in' });
@@ -177,13 +172,12 @@ app.get('/festival-details/:festivalName', async (req, res) => {
   res.send({ message: 'Not implemented' });
 });
 
-
 // ----------------------
-// CREATE-FESTIVAL (optioneel, als je festivals wilt toevoegen)
+// Route om nieuwe festivals te maken (met datum) - STAP 3
 // ----------------------
-
 app.post('/create-festival', async (req, res) => {
   try {
+    // evt. check of alleen ingelogde gebruikers dit mogen
     if (!req.session.user) {
       return res.status(401).send({ message: 'Not logged in' });
     }
@@ -204,9 +198,8 @@ app.post('/create-festival', async (req, res) => {
   }
 });
 
-
 // ----------------------
-// REVIEWS
+//  STAP 2: Reviews (met stap 3-filter)
 // ----------------------
 
 // POST: creeër of update een rating
@@ -251,11 +244,13 @@ app.post('/api/reviews', async (req, res) => {
   }
 });
 
-// GET: alle festivals die de user heeft (voorbije festivals) + eigen rating + gemiddelde
+// GET: alle festivals (die de user heeft) + eigen rating + gemiddelde
+// Filter: alleen festivals in het verleden
 app.get('/api/reviews/user', async (req, res) => {
   if (!req.session.user) {
     return res.status(401).send({ message: 'Not logged in' });
   }
+
   try {
     const userEmail = req.session.user;
     const query = `
@@ -287,7 +282,8 @@ app.get('/api/reviews/user', async (req, res) => {
   }
 });
 
-// GET: ranking van alle voorbije festivals op basis van gemiddelde rating
+// GET: ranking van alle festivals op basis van gemiddelde rating
+// STAP 4: filter = alleen festivals in het verleden
 app.get('/api/reviews/ranking', async (req, res) => {
   try {
     const rankingQuery = `
@@ -297,7 +293,7 @@ app.get('/api/reviews/ranking', async (req, res) => {
       FROM reviews r
       JOIN festivals f 
         ON r.festival_name = f.name
-      WHERE f.festival_date < CURRENT_DATE
+      WHERE f.festival_date < CURRENT_DATE   -- << Hier filteren we alleen al voorbij
       GROUP BY r.festival_name, f.festival_date
       ORDER BY average_rating DESC
     `;
@@ -310,7 +306,7 @@ app.get('/api/reviews/ranking', async (req, res) => {
 });
 
 // ----------------------
-//  SERVER START
+//  Server start
 // ----------------------
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
