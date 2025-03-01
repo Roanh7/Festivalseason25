@@ -1,42 +1,52 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mijn Festivals</title>
-  <link rel="stylesheet" href="/styling/agenda.css">
-  <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="/styling/mijn-festivals.css" />
+  <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
 </head>
 <body>
   <header>
     <h1>Mijn Festivals</h1>
   </header>
+
   <div class="logo-container">
-    <img src="images/logo.png" alt="Festival Logo">
+    <img src="/images/logo.png" alt="Festival Logo" />
   </div>
 
-   <!-- Navigatiebalk  -->
-   <nav class="nav-bar">
-    <ul>
-        <li><a href="agenda.html">Home</a></li>
-        <li><a href="reviews.html">Reviews</a></li>
-        <li><a href="extra-info.html">Extra Info</a></li>
-        <li><a href="register.html">Registreren</a></li>
-        <li><a href="login.html">Inloggen</a></li>
-        <li><a href="mijn-festivals.html" class="active">Mijn Festivals</a></li>
+  <!-- Navigatiebalk met hamburger -->
+  <nav class="nav-bar1">
+    <div id="navToggle" class="nav-toggle">=</div>
+    <ul class="nav-menu" id="navMenu">
+      <li><a href="agenda.html">Home</a></li>
+      <li><a href="reviews.html">Reviews</a></li>
+      <li><a href="extra-info.html">Extra Info</a></li>
+      <li><a href="registreren.html">Registreren</a></li>
+      <li><a href="login.html">Inloggen</a></li>
+      <li><a href="mijn-festivals.html" class="active">Mijn Festivals</a></li>
     </ul>
-
     <div id="userMenu" style="float:right;"></div>
-</nav>
-
+  </nav>
 
   <main>
-    <h2>Jouw aangemelde festivals:</h2>
-    <ul id="myFestList"></ul>
+    <!-- Sectie voor toekomstige festivals -->
+    <h2>Jouw aangemelde festivals</h2>
+    <p id="upcomingCount"></p>
+    <div id="upcomingFestContainer"></div>
 
-    <!-- Voor elk festival tonen we "Wie gaan er nog meer?" -->
-    <div id="festivalDetails"></div>
+    <!-- Sectie voor voorbije festivals (met Review-knop) -->
+    <h2>Festivals die zijn geweest</h2>
+    <p id="pastCount"></p>
+    <div id="pastFestContainer"></div>
   </main>
 
+  <footer>
+    <p>&copy; 2025 Festival Agenda – Gecreëerd door Roan Hassan, S-team vertegenwoordiger</p>
+  </footer>
+
+  <!-- Scripts -->
   <script src="/javascript/mijn-festivals.js"></script>
   <script src="/javascript/navstatus.js"></script>
 </body>
