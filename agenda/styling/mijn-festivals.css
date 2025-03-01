@@ -1,4 +1,5 @@
-/* =============== mijn-festivals.css =============== */
+/* ================ mijn-festivals.css ================ */
+
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -6,92 +7,85 @@ body {
   background-color: #f9f9f9;
   color: #333;
 }
+
 header {
   background: #4CAF50;
   color: white;
   text-align: center;
   padding: 1rem 0;
-}
-main {
-  width: 90%;
+  width: 95%;
   max-width: 600px;
-  margin: 2rem auto;
+  margin: 0 auto;
 }
 
-/* Logo + nav-balk */
+/* Logo + nav-blok */
 .logo-container {
   text-align: center;
-  margin: 0;
-  background-color: #fff; 
+  background-color: #fff;
 }
 .logo-container img {
-  width: 100%;
-  height: auto;
   display: block;
+  margin: 0 auto;
 }
-.nav-bar {
+
+/* Navigatiebalk */
+.nav-bar1 {
   background-color: #4CAF50;
-  display: flex;
   padding: 1rem 1.5rem;
   transition: background-color 0.3s ease;
 }
-.nav-bar ul {
+.nav-bar1 ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
-  flex: 1;
   display: flex;
   justify-content: center;
 }
-.nav-bar li {
-  margin: 0 1rem;
-}
-.nav-bar a {
+.nav-bar1 a {
   display: block;
   color: white;
   text-decoration: none;
   font-weight: bold;
-  padding: 0.5rem 1rem;
+  padding: 0.8rem;
   transition: background-color 0.3s ease;
 }
-.nav-bar a:hover {
+.nav-bar1 a:hover {
   background-color: #45a049;
 }
-.nav-bar .active {
+.nav-bar1 .active {
   text-decoration: underline;
 }
 
-/* Festival-hokjes */
+/* Festival-kaarten */
 .festival-card {
   margin-bottom: 2rem;
   padding: 1rem;
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #fff;
-  box-shadow: 0 10px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
 }
+
 .festival-title {
-  font-size: 1.1rem;
-  font-weight: bold;
+  font-size: 1.2rem;
   margin-bottom: 0.5rem;
 }
 .festival-text {
   font-size: 1rem;
-  margin: 0.5rem 0;
+  margin-bottom: 0.5rem;
 }
 
 /* Knoppen */
-.festival-text button {
-  background-color: #45a049;
-  color: #fff;
+.festival-card button {
+  background-color: #4A5a99;
   border: none;
-  border-radius: 4px;
-  padding: 6px 12px;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
   cursor: pointer;
-  margin-top: 0.5rem;
+  color: #fff;
 }
-.festival-text button:hover {
-  background-color: #317234;
+.festival-card button:hover {
+  background-color: #31327a;
 }
 
 /* Collapsible animatie (optioneel) */
@@ -108,11 +102,11 @@ main {
 footer {
   text-align: center;
   margin: 2rem 0;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #666;
 }
 
-/* Responsiveness */
+/* Responsive */
 @media (max-width: 768px) {
   main {
     width: 95%;
@@ -127,26 +121,20 @@ footer {
   .festival-text {
     font-size: 0.9rem;
   }
-  .nav-bar {
+  .nav-bar1 ul {
     display: block;
-    padding: 0.5rem;
-  }
-  .nav-bar ul {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .nav-bar li {
-    margin: 0.5rem 0;
+    padding: 0;
   }
 }
+
 @media (max-width: 480px) {
   .festival-card {
-    padding: 0.6rem;
+    margin-bottom: 1rem;
   }
   .festival-title {
     font-size: 0.9rem;
   }
   .festival-text {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
   }
 }
