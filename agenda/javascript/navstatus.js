@@ -5,30 +5,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const navToggle = document.getElementById('navToggle');
   const navMenu = document.getElementById('navMenu');
 
-  // Fix for mobile menu: ensure it starts collapsed on mobile
-  function updateMenuState() {
-    if (window.innerWidth <= 768) {
-      // On mobile devices, ensure the menu starts collapsed
-      navMenu.classList.remove('open');
-    } else {
-      // On desktop, we want the menu to always be visible
-      navMenu.classList.remove('open'); // Reset any 'open' state 
-      navMenu.style.display = ''; // Let CSS handle the display 
-    }
-  }
-  
-  // Apply initial state
   if (navToggle && navMenu) {
-    // First ensure proper initial state
-    updateMenuState();
-    
     // Add toggle event handler
     navToggle.addEventListener('click', () => {
       navMenu.classList.toggle('open');
     });
     
-    // Update menu on resize
-    window.addEventListener('resize', updateMenuState);
+    // Reset menu state when window resizes to desktop view
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        navMenu.classList.remove('open'); // Remove open class on desktop
+      }
+    });
   }
 
   // B) Inlogstatus

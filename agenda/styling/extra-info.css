@@ -140,7 +140,28 @@ footer {
   .nav-bar li {
     margin: 0.5rem 0;
   }
+  
+  /* Hamburger toggle */
+  .nav-toggle {
+    display: block;
+    font-size: 1.8rem;
+    color: white;
+    cursor: pointer;
+  }
+  
+  /* Mobile menu fix */
+  .nav-menu {
+    display: none !important; /* Force hidden by default on mobile */
+    flex-direction: column;
+    width: 100%;
+    background-color: #4CAF50;
+  }
+  
+  .nav-menu.open {
+    display: flex !important; /* Force display when open class is applied */
+  }
 }
+
 @media (max-width: 480px) {
   .uitleg {
     padding: 0.6rem;

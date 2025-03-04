@@ -503,13 +503,13 @@ footer {
   }
   /* Verberg de .nav-menu tot de user klikt */
   .nav-menu {
-    display: none;            /* standaard verborgen op mobiel */
+    display: none !important;            /* standaard verborgen op mobiel, met !important */
     flex-direction: column;   /* verticaal als open */
     width: 100%;
     background-color: #4CAF50; /* Groene achtergrond doorlopend */
   }
   .nav-menu.open {
-    display: flex; /* alleen als .open is getoggled door JS */
+    display: flex !important; /* alleen als .open is getoggled door JS, met !important */
   }
   .nav-menu li {
     margin: 0.5rem 1rem;
