@@ -1,4 +1,4 @@
-// reviews.js with improved error handling
+// reviews.js with modal fix
 
 document.addEventListener('DOMContentLoaded', async () => {
   // DOM elements
@@ -111,13 +111,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateStars(0);
       ratingValue.textContent = '0/10';
       submitRatingBtn.disabled = true;
-      currentFestival = '';
+      // Do not reset currentFestival here, it will cause issues
+      // currentFestival = '';
     }
 
     // Open modal to rate a festival
     window.openRatingModal = function(festivalName) {
+      console.log('Opening modal for festival:', festivalName);
       modalFestivalName.textContent = festivalName;
-      currentFestival = festivalName;
+      currentFestival = festivalName; // Set the festival name
       resetModal();
       ratingModal.classList.add('show');
       ratingModal.classList.remove('hidden');
@@ -140,19 +142,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Submit rating
     submitRatingBtn.addEventListener('click', async () => {
+      console.log('Submitting rating data:', {
+        selectedRating,
+        currentFestival,
+        userEmail
+      });
+      
       if (selectedRating === 0 || !currentFestival || !userEmail) {
-        console.log('Validation failed:', { selectedRating, currentFestival, userEmail });
+        console.error('Validation failed:', { selectedRating, currentFestival, userEmail });
         alert('Please select a rating and ensure you are logged in.');
         return;
       }
 
       try {
-        console.log('Submitting rating:', {
-          email: userEmail,
-          festival: currentFestival,
-          rating: selectedRating
-        });
-
         const response = await fetch('/rating', {
           method: 'POST',
           headers: {
@@ -167,26 +169,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         console.log('Response status:', response.status);
         
-        // Try to get the response text first
-        const responseText = await response.text();
-        console.log('Response text:', responseText);
-        
-        // Parse JSON if possible
-        let data;
-        try {
-          data = JSON.parse(responseText);
-          console.log('Parsed JSON response:', data);
-        } catch (e) {
-          console.log('Could not parse response as JSON');
-        }
-
         if (response.ok) {
           alert('Rating submitted successfully!');
           closeModal();
           // Refresh data to show the new rating
           await loadData();
         } else {
-          alert(`Error: ${data?.message || responseText || 'Failed to submit rating'}`);
+          const responseText = await response.text();
+          console.error('Error response:', responseText);
+          
+          let errorMessage = 'Failed to submit rating';
+          try {
+            const errorData = JSON.parse(responseText);
+            errorMessage = errorData.message || errorMessage;
+          } catch (e) {
+            // If not JSON, use the response text
+            if (responseText) errorMessage = responseText;
+          }
+          
+          alert(`Error: ${errorMessage}`);
         }
       } catch (error) {
         console.error('Error submitting rating:', error);
@@ -213,13 +214,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           try {
             const response = await fetch(`/rating?festival=${encodeURIComponent(festival.name)}`);
             if (!response.ok) {
-              console.error(`Error fetching rating for ${festival.name}:`, response.status);
-              return {
-                ...festival,
-                avgRating: 0,
-                ratingCount: 0,
-                ratings: []
-              };
+              throw new Error(`Error fetching rating for ${festival.name}`);
             }
             const data = await response.json();
             return {
@@ -229,7 +224,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               ratings: data.ratings || []
             };
           } catch (error) {
-            console.error(`Error fetching rating for ${festival.name}:`, error);
+            console.error(error);
             return {
               ...festival,
               avgRating: 0,
@@ -250,52 +245,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // If user is logged in, fetch their attended festivals
       if (token && userEmail) {
-        try {
-          const response = await fetch(`/my-festivals?email=${encodeURIComponent(userEmail)}`);
-          if (!response.ok) {
-            console.error('Failed to fetch user festivals:', response.status);
-            throw new Error('Failed to fetch user festivals');
-          }
-          
-          const data = await response.json();
-          const userFestivals = data.festivals || [];
-          
-          // Filter to only past festivals that user attended
-          const userPastFestivals = pastFestivals.filter(festival => 
-            userFestivals.includes(festival.name)
-          );
-          
-          if (userPastFestivals.length > 0) {
-            // Get user ratings for these festivals
-            const userFestivalsWithRatings = userPastFestivals.map(festival => {
-              const festWithRating = festivalRatings.find(f => f.name === festival.name);
-              const userRating = festWithRating?.ratings?.find(r => r.user_email === userEmail)?.rating || null;
-              
-              return {
-                ...festival,
-                userRating
-              };
-            });
+        const response = await fetch(`/my-festivals?email=${encodeURIComponent(userEmail)}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch user festivals');
+        }
+        
+        const data = await response.json();
+        const userFestivals = data.festivals || [];
+        
+        // Filter to only past festivals that user attended
+        const userPastFestivals = pastFestivals.filter(festival => 
+          userFestivals.includes(festival.name)
+        );
+        
+        if (userPastFestivals.length > 0) {
+          // Get user ratings for these festivals
+          const userFestivalsWithRatings = userPastFestivals.map(festival => {
+            const festWithRating = festivalRatings.find(f => f.name === festival.name);
+            const userRating = festWithRating?.ratings?.find(r => r.user_email === userEmail)?.rating || null;
             
-            // Display user's festivals to review
-            displayUserFestivals(userFestivalsWithRatings);
-            yourReviewsSection.classList.remove('hidden');
-            noFestivalsSection.classList.add('hidden');
-          } else {
-            // User hasn't attended any past festivals
-            noFestivalsSection.classList.remove('hidden');
-            yourReviewsSection.classList.add('hidden');
-          }
-        } catch (error) {
-          console.error('Error fetching user festivals:', error);
+            return {
+              ...festival,
+              userRating
+            };
+          });
+          
+          // Display user's festivals to review
+          displayUserFestivals(userFestivalsWithRatings);
+          yourReviewsSection.classList.remove('hidden');
+        } else {
+          // User hasn't attended any past festivals
           noFestivalsSection.classList.remove('hidden');
-          yourReviewsSection.classList.add('hidden');
         }
       } else {
         // User is not logged in
         notLoggedInSection.classList.remove('hidden');
-        yourReviewsSection.classList.add('hidden');
-        noFestivalsSection.classList.add('hidden');
       }
       
     } catch (error) {
