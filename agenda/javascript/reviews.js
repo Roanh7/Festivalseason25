@@ -1,4 +1,4 @@
-// reviews.js with modal fix
+// reviews.js with avgRating fix
 
 document.addEventListener('DOMContentLoaded', async () => {
   // DOM elements
@@ -111,8 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateStars(0);
       ratingValue.textContent = '0/10';
       submitRatingBtn.disabled = true;
-      // Do not reset currentFestival here, it will cause issues
-      // currentFestival = '';
+      // Do not reset currentFestival here
     }
 
     // Open modal to rate a festival
@@ -217,9 +216,15 @@ document.addEventListener('DOMContentLoaded', async () => {
               throw new Error(`Error fetching rating for ${festival.name}`);
             }
             const data = await response.json();
+            
+            // Ensure avgRating is a number (not null or undefined)
+            const avgRating = data.averageRating !== null && data.averageRating !== undefined 
+                              ? parseFloat(data.averageRating) 
+                              : 0;
+            
             return {
               ...festival,
-              avgRating: data.averageRating || 0,
+              avgRating,
               ratingCount: (data.ratings && data.ratings.length) || 0,
               ratings: data.ratings || []
             };
@@ -273,13 +278,17 @@ document.addEventListener('DOMContentLoaded', async () => {
           // Display user's festivals to review
           displayUserFestivals(userFestivalsWithRatings);
           yourReviewsSection.classList.remove('hidden');
+          noFestivalsSection.classList.add('hidden');
         } else {
           // User hasn't attended any past festivals
           noFestivalsSection.classList.remove('hidden');
+          yourReviewsSection.classList.add('hidden');
         }
       } else {
         // User is not logged in
         notLoggedInSection.classList.remove('hidden');
+        yourReviewsSection.classList.add('hidden');
+        noFestivalsSection.classList.add('hidden');
       }
       
     } catch (error) {
@@ -302,7 +311,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     let html = '';
     rankedFestivals.forEach((festival, index) => {
       const rankClass = index < 3 ? `rank-${index + 1}` : '';
-      const formattedRating = festival.avgRating.toFixed(1);
+      
+      // Ensure avgRating is a number before calling toFixed
+      const avgRating = typeof festival.avgRating === 'number' ? festival.avgRating : 0;
+      const formattedRating = avgRating.toFixed(1);
       
       html += `
         <div class="festival-rank-card ${rankClass}">

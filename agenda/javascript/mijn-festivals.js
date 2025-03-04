@@ -7,15 +7,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const pastContainer = document.getElementById('pastFestContainer');
   const pastCountEl = document.getElementById('pastCount');
 
-  // A) Hamburger toggle
-  const navToggle = document.getElementById('navToggle');
-  const navMenu = document.getElementById('navMenu');
-  if (navToggle && navMenu) {
-    navToggle.addEventListener('click', () => {
-      navMenu.classList.toggle('open');
-    });
-  }
-
   // 1) Check of ingelogd
   const token = localStorage.getItem('token');
   const email = localStorage.getItem('email');
@@ -109,9 +100,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       upcomingContainer.appendChild(card);
     });
 
-    // 5) Voor past: maak cards mét ratingknop
+    // 5) Voor past: maak cards zonder ratingknop (previously we passed true here)
     pastFests.forEach(fest => {
-      const card = createFestivalCard(fest.name, fest.date, email, true); // true => wel ratingknop
+      const card = createFestivalCard(fest.name, fest.date, email, false); // Changed to false - no rating button
       pastContainer.appendChild(card);
     });
 
@@ -184,43 +175,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
-    // Als allowRating=true (festival is voorbij), maken we ook een "Geef rating"-knop
-    if (allowRating) {
-      const ratingRow = document.createElement('div');
-      ratingRow.classList.add('festival-text');
-
-      const rateBtn = document.createElement('button');
-      rateBtn.textContent = "Geef rating (1-10)";
-      ratingRow.appendChild(rateBtn);
-      card.appendChild(ratingRow);
-
-      rateBtn.addEventListener('click', async () => {
-        // Simpel prompt om rating te vragen
-        const input = prompt(`Geef jouw rating (1-10) voor ${festName}:`);
-        if (input === null) return; // user canceled
-        const ratingValue = parseInt(input, 10);
-        if (isNaN(ratingValue) || ratingValue < 1 || ratingValue > 10) {
-          alert('Ongeldige rating! (1-10)');
-          return;
-        }
-        // Verstuur POST /rating
-        try {
-          const resp = await fetch('/rating', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: currentUserEmail, festival: festName, rating: ratingValue })
-          });
-          const rjson = await resp.json();
-          if (resp.ok) {
-            alert(`Rating opgeslagen! ${rjson.message || ''}`);
-          } else {
-            alert(`Kon rating niet opslaan: ${rjson.message}`);
-          }
-        } catch (err) {
-          alert(`Er ging iets mis bij het versturen van je rating: ${err}`);
-        }
-      });
-    }
+    // REMOVED: Rating button functionality - we no longer add the rating button
+    // even if allowRating is true
 
     return card;
   }
