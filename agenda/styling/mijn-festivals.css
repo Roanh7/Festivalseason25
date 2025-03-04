@@ -62,6 +62,27 @@ main {
   text-decoration: underline;
 }
 
+/* Desktop logout button style */
+#desktopUserSpan {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+#desktopUserSpan:hover {
+  background-color: #45a049;
+}
+
+/* Ensure userMenu is properly positioned */
+#userMenu {
+  display: inline-block;
+  margin-left: auto;
+}
+
 /* Mobile nav toggle - hidden by default on desktop */
 .nav-toggle {
   display: none;
@@ -173,6 +194,11 @@ footer {
     padding: 0.8rem 1rem;
     width: 100%;
     display: block;
+  }
+
+  /* Hide userMenu on mobile */
+  #userMenu {
+    display: none !important;
   }
 }
 

@@ -3,6 +3,27 @@
 /* Import base styles from agenda.css */
 @import url('/styling/agenda.css');
 
+/* Desktop logout button style - repeat for completeness */
+#desktopUserSpan {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+#desktopUserSpan:hover {
+  background-color: #45a049;
+}
+
+/* Ensure userMenu is properly positioned */
+#userMenu {
+  display: inline-block;
+  margin-left: auto;
+}
+
 /* Override nav-menu styles to ensure proper mobile behavior */
 @media (max-width: 768px) {
   .nav-menu {

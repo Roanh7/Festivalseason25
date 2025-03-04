@@ -46,8 +46,11 @@ document.addEventListener('DOMContentLoaded', () => {
       userMenu.innerHTML = '';
     } else {
       // Voor desktop: gebruiken we de normale rechter userMenu
-      userMenu.innerHTML = `<span id="desktopUserSpan" style="cursor:pointer;">Hallo, ${email}</span>`;
-      document.getElementById('desktopUserSpan').addEventListener('click', () => {
+      // Changed styling to match navbar
+      userMenu.innerHTML = `<a href="#" id="desktopUserSpan" style="color: white; text-decoration: none; font-weight: bold; padding: 0.5rem 1rem; cursor: pointer;">Uitloggen (${email})</a>`;
+      
+      document.getElementById('desktopUserSpan').addEventListener('click', (e) => {
+        e.preventDefault();
         if (confirm('Wil je uitloggen?')) {
           localStorage.removeItem('token');
           localStorage.removeItem('email');
@@ -82,8 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
       userMenu.innerHTML = '';
     } else {
       // Voor desktop
-      userMenu.innerHTML = `<span id="desktopUserSpan" style="cursor:pointer;">Hallo, ${email}</span>`;
-      document.getElementById('desktopUserSpan').addEventListener('click', () => {
+      userMenu.innerHTML = `<a href="#" id="desktopUserSpan" style="color: white; text-decoration: none; font-weight: bold; padding: 0.5rem 1rem; cursor: pointer;">Uitloggen (${email})</a>`;
+      
+      document.getElementById('desktopUserSpan').addEventListener('click', (e) => {
+        e.preventDefault();
         if (confirm('Wil je uitloggen?')) {
           localStorage.removeItem('token');
           localStorage.removeItem('email');

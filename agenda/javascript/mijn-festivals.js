@@ -1,7 +1,6 @@
-// mijn-festivals.js
+// mijn-festivals.js - Remove all custom user menu code as it's handled by navstatus.js
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const userMenu = document.getElementById('userMenu');
   const upcomingContainer = document.getElementById('upcomingFestContainer');
   const upcomingCountEl = document.getElementById('upcomingCount');
   const pastContainer = document.getElementById('pastFestContainer');
@@ -100,9 +99,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       upcomingContainer.appendChild(card);
     });
 
-    // 5) Voor past: maak cards zonder ratingknop (previously we passed true here)
+    // 5) Voor past: maak cards zonder ratingknop
     pastFests.forEach(fest => {
-      const card = createFestivalCard(fest.name, fest.date, email, false); // Changed to false - no rating button
+      const card = createFestivalCard(fest.name, fest.date, email, false); // No rating button
       pastContainer.appendChild(card);
     });
 
@@ -174,9 +173,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         attendeesDiv.classList.remove('expanded');
       }
     });
-
-    // REMOVED: Rating button functionality - we no longer add the rating button
-    // even if allowRating is true
 
     return card;
   }

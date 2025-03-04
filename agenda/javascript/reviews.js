@@ -1,4 +1,4 @@
-// reviews.js with mobile user menu fix
+// reviews.js - Remove all custom user menu code as it's handled by navstatus.js
 
 document.addEventListener('DOMContentLoaded', async () => {
   // DOM elements
@@ -365,63 +365,4 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize
   setupModal();
   await loadData();
-  
-  // User menu handling - Fixed for mobile
-  const userMenu = document.getElementById('userMenu');
-  
-  if (token && userEmail) {
-    // Only show user menu on desktop (not on mobile)
-    // Check if we're on a mobile device
-    const isMobile = window.innerWidth <= 768;
-    
-    if (!isMobile) {
-      // Desktop view - show the userMenu
-      userMenu.innerHTML = `
-        <span style="cursor:pointer;" id="userNameSpan">Hallo, ${userEmail}</span>
-      `;
-      
-      const userNameSpan = document.getElementById('userNameSpan');
-      if (userNameSpan) {
-        userNameSpan.addEventListener('click', () => {
-          const confirmLogout = confirm('Wil je uitloggen?');
-          if (confirmLogout) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('email');
-            window.location.reload();
-          }
-        });
-      }
-    } else {
-      // Mobile view - don't show the userMenu as it's already in the nav
-      userMenu.innerHTML = '';
-    }
-    
-    // Add resize listener to handle responsive changes
-    window.addEventListener('resize', () => {
-      const isMobileNow = window.innerWidth <= 768;
-      if (isMobileNow && userMenu.innerHTML.trim() !== '') {
-        // Changed to mobile - remove userMenu
-        userMenu.innerHTML = '';
-      } else if (!isMobileNow && userMenu.innerHTML.trim() === '') {
-        // Changed to desktop - add userMenu
-        userMenu.innerHTML = `
-          <span style="cursor:pointer;" id="userNameSpan">Hallo, ${userEmail}</span>
-        `;
-        
-        const userNameSpan = document.getElementById('userNameSpan');
-        if (userNameSpan) {
-          userNameSpan.addEventListener('click', () => {
-            const confirmLogout = confirm('Wil je uitloggen?');
-            if (confirmLogout) {
-              localStorage.removeItem('token');
-              localStorage.removeItem('email');
-              window.location.reload();
-            }
-          });
-        }
-      }
-    });
-  } else {
-    userMenu.textContent = '';
-  }
 });

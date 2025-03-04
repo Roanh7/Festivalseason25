@@ -67,6 +67,27 @@ header {
   text-decoration: underline;
 }
 
+/* Desktop logout button style */
+#desktopUserSpan {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+#desktopUserSpan:hover {
+  background-color: #45a049;
+}
+
+/* Ensure userMenu is properly positioned */
+#userMenu {
+  display: inline-block;
+  margin-left: auto;
+}
+
 /* Hamburger-knop */
 .nav-toggle {
   /* Standaard op desktop niet zichtbaar */
@@ -480,7 +501,13 @@ footer {
   .field-container {
     width: 95%;
   }
+
+  /* Hide userMenu on mobile */
+  #userMenu {
+    display: none !important;
+  }
 }
+
 @media (max-width: 480px) {
   #countdown-container {
     font-size: 0.9rem;
