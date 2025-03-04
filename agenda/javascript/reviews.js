@@ -1,4 +1,4 @@
-// reviews.js with avgRating fix
+// reviews.js with mobile user menu fix
 
 document.addEventListener('DOMContentLoaded', async () => {
   // DOM elements
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateStars(0);
       ratingValue.textContent = '0/10';
       submitRatingBtn.disabled = true;
-      // Do not reset currentFestival here
+      // Do not reset currentFestival here, it will cause issues
     }
 
     // Open modal to rate a festival
@@ -366,21 +366,59 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupModal();
   await loadData();
   
-  // User menu (copied from other pages)
+  // User menu handling - Fixed for mobile
   const userMenu = document.getElementById('userMenu');
   
   if (token && userEmail) {
-    userMenu.innerHTML = `
-      <span style="cursor:pointer;" id="userNameSpan">Hallo, ${userEmail}</span>
-    `;
+    // Only show user menu on desktop (not on mobile)
+    // Check if we're on a mobile device
+    const isMobile = window.innerWidth <= 768;
     
-    const userNameSpan = document.getElementById('userNameSpan');
-    userNameSpan.addEventListener('click', () => {
-      const confirmLogout = confirm('Wil je uitloggen?');
-      if (confirmLogout) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('email');
-        window.location.reload();
+    if (!isMobile) {
+      // Desktop view - show the userMenu
+      userMenu.innerHTML = `
+        <span style="cursor:pointer;" id="userNameSpan">Hallo, ${userEmail}</span>
+      `;
+      
+      const userNameSpan = document.getElementById('userNameSpan');
+      if (userNameSpan) {
+        userNameSpan.addEventListener('click', () => {
+          const confirmLogout = confirm('Wil je uitloggen?');
+          if (confirmLogout) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('email');
+            window.location.reload();
+          }
+        });
+      }
+    } else {
+      // Mobile view - don't show the userMenu as it's already in the nav
+      userMenu.innerHTML = '';
+    }
+    
+    // Add resize listener to handle responsive changes
+    window.addEventListener('resize', () => {
+      const isMobileNow = window.innerWidth <= 768;
+      if (isMobileNow && userMenu.innerHTML.trim() !== '') {
+        // Changed to mobile - remove userMenu
+        userMenu.innerHTML = '';
+      } else if (!isMobileNow && userMenu.innerHTML.trim() === '') {
+        // Changed to desktop - add userMenu
+        userMenu.innerHTML = `
+          <span style="cursor:pointer;" id="userNameSpan">Hallo, ${userEmail}</span>
+        `;
+        
+        const userNameSpan = document.getElementById('userNameSpan');
+        if (userNameSpan) {
+          userNameSpan.addEventListener('click', () => {
+            const confirmLogout = confirm('Wil je uitloggen?');
+            if (confirmLogout) {
+              localStorage.removeItem('token');
+              localStorage.removeItem('email');
+              window.location.reload();
+            }
+          });
+        }
       }
     });
   } else {

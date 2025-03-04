@@ -12,6 +12,19 @@
   .nav-menu.open {
     display: flex !important; /* Force display when open class is applied */
   }
+  
+  /* Make sure the hamburger toggle is displayed on mobile */
+  .nav-toggle {
+    display: block !important;
+    font-size: 1.8rem;
+    color: white;
+    cursor: pointer;
+  }
+  
+  /* Hide the userMenu completely on mobile */
+  #userMenu {
+    display: none !important;
+  }
 }
 
 /* Specific styles for reviews page */
