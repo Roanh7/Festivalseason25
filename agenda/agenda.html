@@ -53,7 +53,7 @@
       </div>
     </div>
 
-    <!-- Optional Filter Bar for Mobile -->
+    <!-- Mobile Filter Bar -->
     <div class="mobile-filter-bar">
       <button class="filter-button" id="filterUpcoming">Aankomende</button>
       <button class="filter-button" id="filterAll">Alle</button>
@@ -76,6 +76,7 @@
                     </tr>
                 </thead>
                 <tbody id="festivalTbody">
+                  
                   <tr class="highlight-green">
                     <td>1.</td>
                     <td>
@@ -608,6 +609,7 @@
                     <td>END OF SEASON</td>
                     <td>4</td>
                 </tr>
+     
                 </tbody>
             </table>
         </div>
@@ -717,6 +719,8 @@
           // Show only upcoming festivals
           filterUpcoming.addEventListener('click', function() {
             const cards = document.querySelectorAll('.festival-card');
+            let visibleCount = 0;
+            
             cards.forEach(card => {
               const dateText = card.querySelector('.festival-detail:nth-child(1)').textContent;
               const dateMatch = dateText.match(/Datum:\s*(.+)/);
@@ -724,58 +728,117 @@
                 const festDate = parseDate(dateMatch[1]);
                 if (festDate && festDate > now) {
                   card.style.display = '';
+                  visibleCount++;
                 } else {
                   card.style.display = 'none';
                 }
               }
             });
+            
+            // Show message if no results
+            showNoResultsMessageIfNeeded(visibleCount, 'Er zijn geen aankomende festivals.');
+            
+            // Highlight the active filter
+            setActiveFilter(filterUpcoming);
           });
           
           // Show all festivals
           filterAll.addEventListener('click', function() {
             const cards = document.querySelectorAll('.festival-card');
+            let visibleCount = 0;
+            
             cards.forEach(card => {
               card.style.display = '';
+              visibleCount++;
             });
+            
+            // Remove no results message if it exists
+            const noResultsMsg = document.getElementById('no-filter-results');
+            if (noResultsMsg) noResultsMsg.remove();
+            
+            // Highlight the active filter
+            setActiveFilter(filterAll);
           });
           
-          // Show only festivals you're attending
+          // Show only festivals you're attending - FIXED VERSION
           filterAttending.addEventListener('click', function() {
             const cards = document.querySelectorAll('.festival-card');
+            let visibleCount = 0;
+            
             cards.forEach(card => {
-              const checkbox = card.querySelector('input[type="checkbox"]');
+              // Look specifically for the mobile checkbox
+              const checkbox = card.querySelector('.attend-checkbox-mobile');
               if (checkbox && checkbox.checked) {
                 card.style.display = '';
+                visibleCount++;
               } else {
                 card.style.display = 'none';
               }
             });
-          });
-        }
-        
-        // Helper to parse dates like "21 december 2024"
-        function parseDate(dateStr) {
-          const months = {
-            'januari': 0, 'februari': 1, 'maart': 2, 'april': 3, 'mei': 4, 'juni': 5,
-            'juli': 6, 'augustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'december': 11
-          };
-          
-          // Handle date ranges like "18-20 april 2025"
-          if (dateStr.includes('-')) {
-            dateStr = dateStr.split('-')[1];
-          }
-          
-          const parts = dateStr.trim().split(' ');
-          if (parts.length >= 3) {
-            const day = parseInt(parts[0], 10);
-            const month = months[parts[1].toLowerCase()];
-            const year = parseInt(parts[2], 10);
             
-            if (!isNaN(day) && month !== undefined && !isNaN(year)) {
-              return new Date(year, month, day);
+            // Show message if no results
+            showNoResultsMessageIfNeeded(visibleCount, 'Je hebt nog geen festivals geselecteerd.');
+            
+            // Highlight the active filter
+            setActiveFilter(filterAttending);
+          });
+          
+          // Helper function to show "no results" message when needed
+          function showNoResultsMessageIfNeeded(visibleCount, message) {
+            // Add a message if no festivals match the filter
+            const noResultsMsg = document.getElementById('no-filter-results');
+            if (visibleCount === 0) {
+              if (!noResultsMsg) {
+                const msg = document.createElement('div');
+                msg.id = 'no-filter-results';
+                msg.className = 'no-results-message';
+                msg.textContent = message;
+                
+                const mobileView = document.getElementById('mobile-festival-list');
+                if (mobileView) {
+                  mobileView.appendChild(msg);
+                }
+              }
+            } else if (noResultsMsg) {
+              noResultsMsg.remove();
             }
           }
-          return null;
+          
+          // Helper function to highlight the active filter
+          function setActiveFilter(activeButton) {
+            [filterUpcoming, filterAll, filterAttending].forEach(btn => {
+              btn.classList.remove('active-filter');
+            });
+            activeButton.classList.add('active-filter');
+          }
+          
+          // Set 'All' as the default active filter
+          setActiveFilter(filterAll);
+          
+          // Helper to parse dates like "21 december 2024"
+          function parseDate(dateStr) {
+            const months = {
+              'januari': 0, 'februari': 1, 'maart': 2, 'april': 3, 'mei': 4, 'juni': 5,
+              'juli': 6, 'augustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'december': 11
+            };
+            
+            // Handle date ranges like "18-20 april 2025"
+            if (dateStr.includes('-')) {
+              dateStr = dateStr.split('-')[1];
+            }
+            
+            const parts = dateStr.trim().split(' ');
+            if (parts.length >= 3) {
+              const day = parseInt(parts[0], 10);
+              const month = months[parts[1].toLowerCase()];
+              const year = parseInt(parts[2], 10);
+              
+              if (!isNaN(day) && month !== undefined && !isNaN(year)) {
+                return new Date(year, month, day);
+              }
+            }
+            return null;
+          }
         }
       }
     });
