@@ -1,4 +1,4 @@
-// script.js
+// script.js with improved error handling
 
 // ================================
 // 1. COUNTDOWN-DEEL
@@ -227,39 +227,109 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Wel ingelogd:
   // 1) Haal eerst festivals op die de gebruiker al in DB heeft
   try {
+    // Show loading state
+    console.log("Fetching user festivals for:", userEmail);
+    
     const resp = await fetch(`/my-festivals?email=${encodeURIComponent(userEmail)}`);
-    const data = await resp.json();
+    
+    // Check if response is ok (status code 200-299)
+    if (!resp.ok) {
+      // Try to get error text
+      const errorText = await resp.text();
+      throw new Error(`Server returned ${resp.status}: ${errorText}`);
+    }
+    
+    // Try to parse JSON response
+    let data;
+    try {
+      data = await resp.json();
+    } catch (jsonError) {
+      throw new Error(`Failed to parse JSON response: ${jsonError.message}`);
+    }
+    
+    // Get user festivals or default to empty array
     const userFestivals = data.festivals || [];
+    console.log("User festivals loaded:", userFestivals);
 
     // 2) Markeer checkboxes die user al heeft
     checkboxes.forEach(cb => {
       const festName = cb.dataset.festival;
       if (userFestivals.includes(festName)) {
         cb.checked = true;
+        console.log(`Festival "${festName}" is checked`);
       }
 
       // 3) Bij (un)check roep /attend (POST) of /attend (DELETE) aan
       cb.addEventListener('change', async () => {
-        if (cb.checked) {
-          // POST /attend
-          await fetch('/attend', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: userEmail, festival: festName })
-          });
-        } else {
-          // DELETE /attend
-          await fetch('/attend', {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: userEmail, festival: festName })
-          });
+        try {
+          if (cb.checked) {
+            console.log(`Marking festival "${festName}" as attending`);
+            // POST /attend
+            const response = await fetch('/attend', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: userEmail, festival: festName })
+            });
+            
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error(`Error attending festival: ${errorText}`);
+              return;
+            }
+            
+            console.log(`Successfully marked "${festName}" as attending`);
+          } else {
+            console.log(`Unmarking festival "${festName}" as attending`);
+            // DELETE /attend
+            const response = await fetch('/attend', {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: userEmail, festival: festName })
+            });
+            
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error(`Error unattending festival: ${errorText}`);
+              return;
+            }
+            
+            console.log(`Successfully unmarked "${festName}" as attending`);
+          }
+          
+          // Sync the state with mobile view if it exists
+          const mobileCheckbox = document.querySelector(`.attend-checkbox-mobile[data-festival="${festName}"]`);
+          if (mobileCheckbox) {
+            mobileCheckbox.checked = cb.checked;
+          }
+        } catch (err) {
+          console.error(`Failed to update attendance for "${festName}":`, err);
+          alert(`Er ging iets mis bij het bijwerken van je festivalstatus. Probeer het later opnieuw.`);
         }
       });
     });
 
   } catch (err) {
     console.error('Fout bij ophalen festivals uit DB:', err);
+    
+    // Create a user-friendly error message
+    const errorMessage = document.createElement('div');
+    errorMessage.className = 'error-message';
+    errorMessage.style.color = 'red';
+    errorMessage.style.padding = '10px';
+    errorMessage.style.margin = '10px 0';
+    errorMessage.style.backgroundColor = '#ffeeee';
+    errorMessage.style.borderRadius = '5px';
+    errorMessage.style.textAlign = 'center';
+    errorMessage.innerHTML = `
+      <p>Er is een probleem opgetreden bij het laden van je festivalgegevens.</p>
+      <p>Probeer de pagina te vernieuwen of later opnieuw in te loggen.</p>
+    `;
+    
+    // Insert error message at the top of the table container
+    const tableContainer = document.querySelector('.table-container');
+    if (tableContainer) {
+      tableContainer.insertBefore(errorMessage, tableContainer.firstChild);
+    }
   }
 });
 
@@ -272,17 +342,28 @@ document.addEventListener('DOMContentLoaded', () => {
       const festName = btn.dataset.festival; // "Wavy", "DGTL", etc.
 
       try {
+        console.log(`Fetching attendees for festival "${festName}"`);
+        
         // 1) Haal de andere gebruikers op
         const resp = await fetch(`/festival-attendees?festival=${encodeURIComponent(festName)}`);
         if (!resp.ok) {
-          throw new Error(`Server returned ${resp.status}`);
+          const errorText = await resp.text();
+          throw new Error(`Server returned ${resp.status}: ${errorText}`);
         }
-        const result = await resp.json(); 
-        // result.attendees = ["jouw@vriend.com", "andere@user.nl", ...]
+        
+        let result;
+        try {
+          result = await resp.json(); 
+          // result.attendees = ["jouw@vriend.com", "andere@user.nl", ...]
+        } catch (jsonError) {
+          throw new Error(`Failed to parse JSON response: ${jsonError.message}`);
+        }
 
         // 2) Verwijder jouw eigen email als je dat wilt
         const userEmail = localStorage.getItem('email') || '';
         const others = result.attendees.filter(u => u !== userEmail);
+
+        console.log(`Found ${others.length} other attendees for "${festName}"`);
 
         // 3) Toon in pop-up of alert, of in DOM
         if (others.length === 0) {
@@ -293,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       } catch (err) {
         console.error('Fout bij ophalen andere gebruikers:', err);
-        alert('Er ging iets mis bij het ophalen van de aanwezigen.');
+        alert(`Er ging iets mis bij het ophalen van de aanwezigen: ${err.message}`);
       }
     });
   });
