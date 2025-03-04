@@ -159,55 +159,49 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("player-stats-popup").classList.add("hidden");
   });
 
-   // A) Hamburger-klik
-   const navToggle = document.getElementById('navToggle');
-   const navMenu = document.getElementById('navMenu');
-   if (navToggle && navMenu) {
-     navToggle.addEventListener('click', () => {
-       navMenu.classList.toggle('open');
-     });
-   }
- 
+  // REMOVED: Hamburger-klik code - this is now handled in navstatus.js
 });
 
 // ================================
 // 3. FESTIVAL-LINKS
 // ================================
-   const festivalLinks = {
-    "Wavy": "https://www.wavyfestival.nl",
-    "DGTL": "https://www.dgtl.nl",
-    "Free your mind Kingsday": "https://www.freeyourmindfestival.nl",
-    "Loveland Kingsday": "https://www.loveland.nl",
-    "Verbond": "https://hetamsterdamsverbond.nl",
-    "Awakenings Upclose": "https://www.awakenings.nl",
-    "Soenda": "https://www.soenda.com",
-    "909": "https://www.909festival.nl",
-    "Open Air": "https://www.amsterdamopenair.nl",
-    "Diynamic": "https://www.amsterdamopenair.nl",
-    "Free Your Mind": "https://www.freeyourmindfestival.nl",
-    "Mystic Garden Festival": "https://www.mysticgardenfestival.nl",
-    "Awakenings Festival": "https://www.awakenings.nl",
-    "Tomorrowland": "https://www.tomorrowland.com",
-    "Mysteryland": "https://www.mysteryland.com",
-    "No Art": "https://www.noartfestival.com",
-    "Loveland": "https://www.loveland.nl",
-    "Vunzige Deuntjes": "https://www.vunzigedeuntjes.nl",
-    "Latin Village": "https://www.latinvillage.nl",
-    "Strafwerk": "https://www.strafwerkfestival.nl",
-    "Parels van de stad": "https://www.parelsvandestad.nl",
-    "Toffler": "https://tofflerfestival.nl",
-    "Into the woods": "https://www.intothewoodsfestival.nl"
+const festivalLinks = {
+  "Wavy": "https://www.wavyfestival.nl",
+  "DGTL": "https://www.dgtl.nl",
+  "Free your mind Kingsday": "https://www.freeyourmindfestival.nl",
+  "Loveland Kingsday": "https://www.loveland.nl",
+  "Verbond": "https://hetamsterdamsverbond.nl",
+  "Awakenings Upclose": "https://www.awakenings.nl",
+  "Soenda": "https://www.soenda.com",
+  "909": "https://www.909festival.nl",
+  "Open Air": "https://www.amsterdamopenair.nl",
+  "Diynamic": "https://www.amsterdamopenair.nl",
+  "Free Your Mind": "https://www.freeyourmindfestival.nl",
+  "Mystic Garden Festival": "https://www.mysticgardenfestival.nl",
+  "Awakenings Festival": "https://www.awakenings.nl",
+  "Tomorrowland": "https://www.tomorrowland.com",
+  "Mysteryland": "https://www.mysteryland.com",
+  "No Art": "https://www.noartfestival.com",
+  "Loveland": "https://www.loveland.nl",
+  "Vunzige Deuntjes": "https://www.vunzigedeuntjes.nl",
+  "Latin Village": "https://www.latinvillage.nl",
+  "Strafwerk": "https://www.strafwerkfestival.nl",
+  "Parels van de stad": "https://www.parelsvandestad.nl",
+  "Toffler": "https://tofflerfestival.nl",
+  "Into the woods": "https://www.intothewoodsfestival.nl"
 };
 
-document.querySelectorAll(".festival-link").forEach(link => {
-  link.addEventListener("click", event => {
-    event.preventDefault();
-    const festivalName = event.target.dataset.name;
-    if (festivalLinks[festivalName]) {
-      window.open(festivalLinks[festivalName], "_blank");
-    } else {
-      alert("Website niet gevonden voor " + festivalName);
-    }
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll(".festival-link").forEach(link => {
+    link.addEventListener("click", event => {
+      event.preventDefault();
+      const festivalName = event.target.dataset.name;
+      if (festivalLinks[festivalName]) {
+        window.open(festivalLinks[festivalName], "_blank");
+      } else {
+        alert("Website niet gevonden voor " + festivalName);
+      }
+    });
   });
 });
 
