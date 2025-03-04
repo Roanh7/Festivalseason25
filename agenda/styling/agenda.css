@@ -481,6 +481,125 @@ footer {
   transform: scale(0.98);     
 }
 
+/* Mobile Festival Cards */
+.mobile-festival-list {
+  width: 95%;
+  margin: 2rem auto;
+  display: none; /* Hidden by default, will be shown via JS on mobile */
+}
+
+.festival-card {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  background-color: #fff;
+}
+
+.festival-card.highlight-green {
+  background-color: #d4edda;
+}
+
+.festival-card.highlight-yellow {
+  background-color: #fff3cd;
+}
+
+.festival-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.8rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.8rem;
+}
+
+.festival-number {
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-right: 1rem;
+  background-color: #4CAF50;
+  color: white;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.festival-name {
+  font-weight: bold;
+  font-size: 1.2rem;
+  flex-grow: 1;
+}
+
+.festival-name a {
+  color: #333;
+  text-decoration: underline;
+}
+
+.festival-details {
+  margin-bottom: 1rem;
+}
+
+.festival-detail {
+  padding: 0.3rem 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.festival-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid #eee;
+}
+
+.action-attend {
+  display: flex;
+  align-items: center;
+}
+
+.action-attend label {
+  display: flex;
+  align-items: center;
+}
+
+.action-attend span {
+  margin-right: 0.5rem;
+  font-weight: bold;
+}
+
+/* Make the "Wie gaan er nog meer?" button look better on mobile */
+.attendees-btn {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
+/* Optionally add a filter bar for mobile */
+.mobile-filter-bar {
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem auto;
+  width: 95%;
+  padding: 0.5rem;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.filter-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.filter-button:hover {
+  background-color: #45a049;
+}
+
 /* Responsiveness: nav in kolom bij small screens */
 @media (max-width: 768px) {
   .nav-bar {
@@ -505,6 +624,16 @@ footer {
   /* Hide userMenu on mobile */
   #userMenu {
     display: none !important;
+  }
+  
+  /* Show mobile festival list */
+  .mobile-festival-list {
+    display: block;
+  }
+  
+  /* Hide table on mobile */
+  .table-container {
+    display: none;
   }
 }
 

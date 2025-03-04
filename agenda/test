@@ -1,0 +1,534 @@
+ <tbody id="festivalTbody">
+                    <tr class="highlight-green">
+                        <td>1.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Wavy" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Wavy">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>21 december 2024</td>
+                        <td><a href="#" class="festival-link" data-name="Wavy">Wavy</a></td>
+                        <td>Thuisaven, Amsterdam</td>
+                        <td>€ 26,04</td>
+                        <td>119 dagen</td>
+                        <td>5</td>
+                       
+                    </tr>
+                    <tr class="highlight-yellow">
+                        <td>2.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="DGTL" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="DGTL">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>18-20 april 2025</td>
+                        <td><a href="#" class="festival-link" data-name="DGTL">DGTL</a></td>
+                        <td>NDSM, Amsterdam</td>
+                        <td>€ 90,00</td>
+                        <td>6 dagen</td>
+                        <td>3</td>
+                    </tr>
+                    <tr class="highlight-green">
+                        <td>3.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Free your mind Kingsday" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Free your mind Kingsday">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>26 april 2025</td> 
+                        <td><a href="#" class="festival-link" data-name="Free your mind Kingsday">Free your mind Kingsday</a></td>
+                        <td>Breda International Airport, Bosschenhoofd</td>
+                        <td>€ 33,33</td>
+                        <td>9 dagen</td>
+                        <td>2</td>
+                    </tr>
+                    <tr class="highlight-yellow">
+                        <td>4.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Loveland Kingsday" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Loveland Kingsday">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>26 april 2025</td>
+                        <td><a href="#" class="festival-link" data-name="Loveland Kingsday">Loveland Kingsday</a></td>
+                        <td>Meerpark, Amsterdam</td>
+                        <td>€ 51,00</td>
+                        <td>9 dagen</td>
+                        <td>4</td>
+                    </tr>
+                    <tr class="highlight-green">
+                        <td>5.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Verbond" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Verbond">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>5 mei 2025</td>
+                        <td><a href="#" class="festival-link" data-name="Verbond">Verbond</a></td>
+                        <td>Olympisch stadion, Amsterdam</td>
+                        <td>€ 60,00</td>
+                        <td>12 dag</td>
+                        <td>3</td>
+                    </tr>
+                    <tr class="highlight-yellow">
+                        <td>6.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Awakenings Upclose" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Awakenings Upclose">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>17-18 mei 2025</td>
+                        <td><a href="#" class="festival-link" data-name="Awakenings Upclose">Awakenings Upclose</a></td>
+                        <td>Spaarnwoude, Amsterdam</td>
+                        <td>€ 79,95</td>
+                        <td>13 dagen</td>
+                        <td>3</td>
+                    </tr>
+                        <!-- NIEUW 2: Toffler -->
+                        <tr class="highlight-green">
+                          <td>7.</td>
+                          <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Toffler"
+                            />
+                          </td>
+                          <td>
+                            <button class="attendees-btn" data-festival="Toffler">
+                              Wie gaan er nog meer?
+                            </button>
+                          </td>
+                          <td>31 mei 2025</td>
+                          <td><a href="#" class="festival-link" data-name="Toffler">
+                            Toffler
+                          </a></td>
+                          <td>Roel Langerakpark, Rotterdam</td>
+                          <td>€ 50,00</td>
+                          <td>14 dagen</td>
+                          <td>3</td>
+                        </tr>
+                    <tr class="highlight-yellow">
+                        <td>8.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Soenda" 
+                            />
+                          </td>
+                        <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Soenda">Wie gaan er nog meer?</button>
+                        </td>
+                        <td>31 mei 2025</td>
+                        <td><a href="#" class="festival-link" data-name="Soenda">Soenda</a></td>
+                        <td>Ruigenhoekse polder, Utrecht</td>
+                        <td>€ 69,95</td>
+                        <td>7 dagen</td>
+                        <td>4</td>
+                    </tr>
+                    <tr class="highlight-green">
+                      <td>9.</td>
+                      <td>
+                          <input 
+                            type="checkbox" 
+                            class="attend-checkbox" 
+                            data-festival="Diynamic" 
+                          />
+                        </td>
+                        <td>
+                          <!-- nieuw knoppie -->
+                          <button class="attendees-btn" data-festival="Diynamic">Wie gaan er nog meer?</button>
+                        </td>
+                      <td>7 juni 2025</td>
+                      <td><a href="#" class="festival-link" data-name="Diynamic">Diynamic</a></td>
+                      <td>Gaasperpark, Amsterdam</td>
+                      <td>€ 33,00</td>
+                      <td>1 dagen</td>
+                      <td>4</td>
+                  </tr>
+                    <tr class="highlight-yellow">
+                        <td>10.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="909" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="909">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>7 juni 2025</td>
+                        <td><a href="#" class="festival-link" data-name="909">909</a></td>
+                        <td>Amsterdamse bos, Amsterdam</td>
+                        <td>€ 52,50</td>
+                        <td>1 dagen</td>
+                        <td>3</td>
+                    </tr>
+                    <tr class="highlight-green">
+                        <td>11.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Open Air" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Open Air">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>8 juni 2025</td>
+                        <td><a href="#" class="festival-link" data-name="Open Air">Open Air</a></td>
+                        <td>Gaasperpark, Amsterdam</td>
+                        <td>€ 63,00</td>
+                        <td>6 dagen</td>
+                        <td>5</td>
+                    </tr>
+                    <tr class="highlight-yellow">
+                        <td>12.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Free Your Mind" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Free Your Mind">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>7-8 juni 2025</td>
+                        <td><a href="#" class="festival-link" data-name="Free Your Mind">Free Your Mind</a></td>
+                        <td>Stadsblokken, Arnhem</td>
+                        <td>€ 54,75</td>
+                        <td>6 dagen</td>
+                        <td>3</td>
+                    </tr>
+                    <tr class="highlight-green">
+                        <td>13.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Mystic Garden Festival" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Mystic Garden Festival">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>14 juni 2025</td>
+                        <td><a href="#" class="festival-link" data-name="Mystic Garden Festival">Mystic Garden Festival</a></td>
+                        <td>Sloterpark, Amsterdam</td>
+                        <td>€ 85,00</td>
+                        <td>27 dagen</td>
+                        <td>4</td>
+                    </tr>
+                              <!-- NIEUW 1: Vunzige Deuntjes -->
+                        <tr class="highlight-yellow">
+                          <td>14.</td>
+                          <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Vunzige Deuntjes"
+                            />
+                          </td>
+                          <td>
+                            <button class="attendees-btn" data-festival="Vunzige Deuntjes">
+                              Wie gaan er nog meer?
+                            </button>
+                          </td>
+                          <td>05 juli 2025</td>
+                          <td><a href="#" class="festival-link" data-name="Vunzige Deuntjes">
+                            Vunzige Deuntjes
+                          </a></td>
+                          <td>Amsterdamse Bos, Amsterdam</td>
+                          <td>€ 69,00</td>
+                          <td>8 dagen</td>
+                          <td>4</td>
+                        </tr>
+                        <tr class="highlight-green">
+                          <td>15.</td>
+                          <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="KeineMusik"
+                            />
+                          </td>
+                          <td>
+                            <button class="attendees-btn" data-festival="KeineMusik">
+                              Wie gaan er nog meer?
+                            </button>
+                          </td>
+                          <td>05 juli 2025</td>
+                          <td><a href="#" class="festival-link" data-name="KeineMusik">
+                            KeineMusik
+                          </a></td>
+                          <td>Tuinen van west, Amsterdam</td>
+                          <td>€ 100,00</td>
+                          <td>8 dagen</td>
+                          <td>5</td>
+                        </tr>
+                    <tr class="highlight-yellow">
+                        <td>16.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Boothstock Festival" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Boothstock Festival">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>12 juli 2025</td>
+                        <td>Boothstock Festival</td>
+                        <td>Kralingse Bos, Rotterdam</td>
+                        <td>€ 70,00</td>
+                        <td>1 dagen</td>
+                        <td>4</td>
+                    </tr>
+                    <tr class="highlight-green">
+                        <td>17.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Awakenings Festival" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Awakenings Festival">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>11-13 juli 2025</td>
+                        <td><a href="#" class="festival-link" data-name="Awakenings Festival">Awakenings Festival</a></td>
+                        <td>Beekse Bergen, Hilvarenbeek</td>
+                        <td>€ 109,00</td>
+                        <td>5 dagen</td>
+                        <td>4</td>
+                    </tr>
+                    <tr class="highlight-yellow">
+                        <td>18.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Tomorrowland" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Tomorrowland">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>18-27 juli 2025</td>
+                        <td><a href="#" class="festival-link" data-name="Tomorrowland">Tomorrowland</a></td>
+                        <td>Boom, België</td>
+                        <td>€ 105,00</td>
+                        <td>4 dagen</td>
+                        <td>5</td>
+                    </tr>
+                    <tr class="highlight-green">
+                        <td>19.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Mysteryland" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Mysteryland">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>22-24 juli 2025</td>
+                        <td><a href="#" class="festival-link" data-name="Mysteryland">Mysteryland</a></td>
+                        <td>Floriadeterrein, Haarlemmermeer</td>
+                        <td>€ 119,95</td>
+                        <td>2 dagen</td>
+                        <td>3</td>
+                    </tr>
+                    <tr class="highlight-yellow">
+                        <td>20.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="No Art" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="No Art">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>26 juli 2025</td>
+                        <td><a href="#" class="festival-link" data-name="No Art">No Art</a></td>
+                        <td>Flevopark, Amsterdam</td>
+                        <td>€ 70,00</td>
+                        <td>15 dagen</td>
+                        <td>5</td>
+                    </tr>
+                    <tr class="highlight-green">
+                        <td>21.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Loveland" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Loveland">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>9 augustus 2025</td>
+                        <td><a href="#" class="festival-link" data-name="Loveland">Loveland</a></td>
+                        <td>Sloterpark, Amsterdam</td>
+                        <td>€ 82,50</td>
+                        <td>7 dagen</td>
+                        <td>5</td>
+                    </tr>
+                    <tr class="highlight-yellow">
+                        <td>22.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Latin Village" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Latin Village">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>17 augustus 2025</td>
+                        <td><a href="#" class="festival-link" data-name="Latin Village">Latin Village</a></td>
+                        <td>Spaarnwoude, Amsterdam</td>
+                        <td>€ 50,00</td>
+                        <td>x dagen</td>
+                        <td>5</td>
+                    </tr>
+                    <tr class="highlight-green">
+                        <td>23.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Strafwerk" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Strafwerk">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>To be announced</td>
+                        <td><a href="#" class="festival-link" data-name="Strafwerk">Strafwerk</a></td>
+                        <td>Havenpark, Amsterdam</td>
+                        <td>€ ?</td>
+                        <td>27 dagen</td>
+                        <td>5</td>
+                    </tr>
+                    <tr class="highlight-yellow">
+                        <td>24.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Parels van de stad" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Parels van de stad">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>13-14 september 2025</td>
+                        <td><a href="#" class="festival-link" data-name="Parels van de stad">Parels van de stad</a></td>
+                        <td>Riekerhaven, Amsterdam</td>
+                        <td>€ 36,00</td>
+                        <td>5 dagen</td>
+                        <td>5</td>
+                    </tr>
+                    <tr class="highlight-green">
+                        <td>25.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="PIV" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="PIV">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>To be announced</td>
+                        <td><a href="#" class="festival-link" data-name="PIV">PIV</a></td>
+                        <td>Amsterdam</td>
+                        <td>€ ?</td>
+                        <td>? dagen</td>
+                        <td>5</td>
+                    </tr>
+                    <tr class="highlight-yellow">
+                        <td>26.</td>
+                        <td>
+                            <input 
+                              type="checkbox" 
+                              class="attend-checkbox" 
+                              data-festival="Into the woods" 
+                            />
+                          </td>
+                          <td>
+                            <!-- nieuw knoppie -->
+                            <button class="attendees-btn" data-festival="Into the woods">Wie gaan er nog meer?</button>
+                          </td>
+                        <td>19-20 september</td>
+                        <td><a href="#" class="festival-link" data-name="Into the woods">Into the woods</a></td>               
+                        <td>Openluchttheater, Amersfoort</td>
+                        <td>€ 53,00</td>
+                        <td>END OF SEASON</td>
+                        <td>4</td>
+                    </tr>
+                </tbody>
