@@ -1,0 +1,303 @@
+/* =============== reviews.css =============== */
+
+/* Import base styles from agenda.css */
+@import url('/styling/agenda.css');
+
+/* Override nav-menu styles to ensure proper mobile behavior */
+@media (max-width: 768px) {
+  .nav-menu {
+    display: none !important; /* Force hidden by default on mobile */
+  }
+  
+  .nav-menu.open {
+    display: flex !important; /* Force display when open class is applied */
+  }
+}
+
+/* Specific styles for reviews page */
+.section-description {
+  text-align: center;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+/* Rankings container */
+.rankings-container {
+  width: 90%;
+  max-width: 800px;
+  margin: 0 auto 3rem;
+}
+
+/* User reviews container */
+.user-reviews-container {
+  width: 90%;
+  max-width: 800px;
+  margin: 0 auto 3rem;
+}
+
+/* Loading and message styles */
+.loading, .message-box {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin: 1rem 0;
+}
+
+/* Festival card in rankings */
+.festival-rank-card {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+/* Top 3 festival cards with special colors */
+.festival-rank-card.rank-1 {
+  background-color: #FFD700;
+  border: 2px solid #DAA520;
+}
+
+.festival-rank-card.rank-2 {
+  background-color: #C0C0C0;
+  border: 2px solid #A9A9A9;
+}
+
+.festival-rank-card.rank-3 {
+  background-color: #CD7F32;
+  border: 2px solid #8B4513;
+}
+
+/* Rank number */
+.rank-number {
+  font-size: 1.8rem;
+  font-weight: bold;
+  min-width: 50px;
+  text-align: center;
+}
+
+.rank-1 .rank-number, .rank-2 .rank-number, .rank-3 .rank-number {
+  color: #333;
+}
+
+/* Festival info */
+.festival-info {
+  flex-grow: 1;
+  padding: 0 1rem;
+}
+
+.festival-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.2rem;
+}
+
+.festival-date {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Rating display */
+.rating-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+}
+
+.rating-value {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #4CAF50;
+}
+
+.rating-count {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* User festival cards */
+.user-festival-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.user-festival-info {
+  flex-grow: 1;
+}
+
+.user-festival-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.2rem;
+}
+
+.user-festival-date {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.user-rating-info {
+  display: flex;
+  align-items: center;
+}
+
+.current-rating {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #4CAF50;
+  margin-right: 1rem;
+}
+
+.rating-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.rating-btn:hover {
+  background-color: #45a049;
+}
+
+/* Modal styling */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #aaa;
+}
+
+.close-modal:hover {
+  color: #333;
+}
+
+/* Star rating styling */
+.rating-stars {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.stars-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.star {
+  font-size: 2rem;
+  color: #ddd;
+  cursor: pointer;
+  transition: color 0.2s;
+  margin: 0 0.2rem;
+}
+
+.star:hover, .star.active {
+  color: #FFD700;
+}
+
+.submit-btn {
+  display: block;
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.submit-btn:not(:disabled):hover {
+  background-color: #45a049;
+}
+
+/* Helper class */
+.hidden {
+  display: none !important;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .festival-rank-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 1rem 0.5rem;
+  }
+  
+  .rank-number {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .festival-info {
+    margin-bottom: 0.5rem;
+    padding: 0;
+  }
+  
+  .user-festival-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .user-rating-info {
+    margin-top: 1rem;
+  }
+  
+  .stars-container {
+    flex-wrap: wrap;
+  }
+}

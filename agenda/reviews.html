@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Festival Reviews</title>
+  <link rel="stylesheet" href="/styling/reviews.css" />
+  <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+</head>
+<body>
+  <header>
+    <h1>Festival Reviews</h1>
+  </header>
+
+  <div class="logo-container">
+    <img src="/images/logo.png" alt="Festival Logo" />
+  </div>
+
+  <!-- Navigatiebalk met hamburger -->
+  <nav class="nav-bar">
+    <div id="navToggle" class="nav-toggle">☰</div>
+    <ul class="nav-menu" id="navMenu">
+      <li><a href="agenda.html">Home</a></li>
+      <li><a href="reviews.html" class="active">Reviews</a></li>
+      <li><a href="extra-info.html">Extra Info</a></li>
+      <li><a href="register.html">Registreren</a></li>
+      <li><a href="login.html">Inloggen</a></li>
+      <li><a href="mijn-festivals.html">Mijn Festivals</a></li>
+    </ul>
+    <div id="userMenu" style="float:right;"></div>
+  </nav>
+
+  <main>
+    <!-- Festival Rankings Section -->
+    <section id="rankings-section">
+      <h2>Festival Rankings</h2>
+      <p class="section-description">Hier zie je de ranglijst van alle festivals op basis van gebruikersbeoordelingen.</p>
+      <div id="rankingsContainer" class="rankings-container">
+        <div class="loading">Laden van festival rankings...</div>
+      </div>
+    </section>
+
+    <!-- User's Festivals to Review Section -->
+    <section id="your-reviews-section" class="hidden">
+      <h2>Jouw Festival Reviews</h2>
+      <p class="section-description">Hier kun je de festivals beoordelen waar je naartoe bent geweest.</p>
+      <div id="userReviewsContainer" class="user-reviews-container">
+        <!-- Content will be populated by JavaScript -->
+      </div>
+    </section>
+
+    <!-- Not Logged In Message -->
+    <section id="not-logged-in" class="hidden">
+      <div class="message-box">
+        <p>Je bent niet ingelogd. <a href="login.html">Log in</a> om festivals te kunnen beoordelen.</p>
+      </div>
+    </section>
+
+    <!-- No Past Festivals Message -->
+    <section id="no-festivals" class="hidden">
+      <div class="message-box">
+        <p>Je hebt je nog niet aangemeld voor festivals die al geweest zijn.</p>
+      </div>
+    </section>
+    
+    <!-- Rating Modal -->
+    <div id="ratingModal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h3 id="modalFestivalName">Festival Name</h3>
+        <div class="rating-stars">
+          <div class="stars-container">
+            <span class="star" data-rating="1">★</span>
+            <span class="star" data-rating="2">★</span>
+            <span class="star" data-rating="3">★</span>
+            <span class="star" data-rating="4">★</span>
+            <span class="star" data-rating="5">★</span>
+            <span class="star" data-rating="6">★</span>
+            <span class="star" data-rating="7">★</span>
+            <span class="star" data-rating="8">★</span>
+            <span class="star" data-rating="9">★</span>
+            <span class="star" data-rating="10">★</span>
+          </div>
+          <p class="rating-value">0/10</p>
+        </div>
+        <button id="submitRating" class="submit-btn" disabled>Beoordeling opslaan</button>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Festival Agenda - Gecreëerd door Roan Hassan, S-team vertegenwoordiger</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/javascript/reviews.js"></script>
+  <script src="/javascript/navstatus.js"></script>
+</body>
+</html>
