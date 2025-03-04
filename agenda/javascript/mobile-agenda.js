@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function createMobileView() {
     // Check if mobile view already exists
     if (document.getElementById('mobile-festival-list')) {
-      // Instead of returning, let's update the existing checkboxes
+      // Update the existing mobile checkboxes to match desktop
       updateMobileCheckboxes();
       return;
     }
@@ -151,9 +151,12 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       originalTable.style.display = 'none';
     }
+    
+    // Make sure mobile checkboxes match desktop checkboxes initially
+    updateMobileCheckboxes();
   }
   
-  // Function to update mobile checkboxes from table view (for existing mobile view)
+  // Function to update mobile checkboxes from table view
   function updateMobileCheckboxes() {
     const tableCheckboxes = document.querySelectorAll('.attend-checkbox');
     tableCheckboxes.forEach(tableCheckbox => {
