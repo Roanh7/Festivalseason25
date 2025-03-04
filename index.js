@@ -24,9 +24,30 @@ const client = new Client({
   }
   */
 });
-client
-  .connect()
-  .then(() => console.log('Connected to Postgres!'))
+
+// Connect to database and create tables if needed
+client.connect()
+  .then(async () => {
+    console.log('Connected to Postgres!');
+    
+    // Create tables if they don't exist
+    try {
+      // Create ratings table
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS ratings (
+          id SERIAL PRIMARY KEY,
+          user_email VARCHAR(255) NOT NULL,
+          festival_name VARCHAR(255) NOT NULL,
+          rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 10),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(user_email, festival_name)
+        );
+      `);
+      console.log('Tables checked/created successfully');
+    } catch (err) {
+      console.error('Error creating tables:', err);
+    }
+  })
   .catch(err => console.error('Connection error', err.stack));
 
 // 4) Statische bestanden uit ./agenda map
@@ -173,17 +194,9 @@ app.get('/festival-attendees', async (req, res) => {
   }
 });
 
-// 12) Server starten
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-});
-
-
-// ============== NIEUWE AANPASSINGEN: RATING FUNCTIONALITEIT ==============
+// ============== RATING FUNCTIONALITEIT ==============
 
 // 13) POST /rating => gebruiker geeft cijfer (1–10) aan een festival
-// 
-
 app.post('/rating', async (req, res) => {
   try {
     const { email, festival, rating } = req.body;
@@ -194,6 +207,31 @@ app.post('/rating', async (req, res) => {
     // Check dat rating tussen 1 en 10 ligt (optioneel)
     if (rating < 1 || rating > 10) {
       return res.status(400).json({ message: 'Rating must be between 1 and 10' });
+    }
+
+    // Check if the ratings table exists
+    const tableCheck = await client.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'ratings'
+      );
+    `);
+    
+    const tableExists = tableCheck.rows[0].exists;
+    if (!tableExists) {
+      console.log('Ratings table does not exist. Creating it now...');
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS ratings (
+          id SERIAL PRIMARY KEY,
+          user_email VARCHAR(255) NOT NULL,
+          festival_name VARCHAR(255) NOT NULL,
+          rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 10),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(user_email, festival_name)
+        );
+      `);
+      console.log('Ratings table created successfully');
     }
 
     // Upsert in de tabel 'ratings'
@@ -208,7 +246,10 @@ app.post('/rating', async (req, res) => {
     res.json({ message: `Rating ${rating} saved for festival ${festival}` });
   } catch (err) {
     console.error('Error in POST /rating:', err);
-    res.status(500).json({ message: 'Could not save rating' });
+    res.status(500).json({ 
+      message: 'Could not save rating',
+      error: err.message
+    });
   }
 });
 
@@ -221,12 +262,47 @@ app.get('/rating', async (req, res) => {
       return res.status(400).json({ message: 'No festival provided' });
     }
 
+    console.log(`Processing rating request for festival: ${fest}`);
+
+    // Check if the ratings table exists
+    const tableCheck = await client.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'ratings'
+      );
+    `);
+    
+    const tableExists = tableCheck.rows[0].exists;
+    if (!tableExists) {
+      console.log('Ratings table does not exist. Creating it now...');
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS ratings (
+          id SERIAL PRIMARY KEY,
+          user_email VARCHAR(255) NOT NULL,
+          festival_name VARCHAR(255) NOT NULL,
+          rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 10),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(user_email, festival_name)
+        );
+      `);
+      console.log('Ratings table created successfully');
+      
+      // If table was just created, return empty ratings
+      return res.json({
+        festival: fest,
+        averageRating: null,
+        ratings: []
+      });
+    }
+
     // Haal gemiddelde op
     const avgResult = await client.query(
       'SELECT AVG(rating) as avg_rating FROM ratings WHERE festival_name=$1',
       [fest]
     );
     const average = avgResult.rows[0].avg_rating;
+    console.log(`Average rating for ${fest}: ${average}`);
 
     // Eventueel ook alle individuele ratings ophalen:
     const allResult = await client.query(
@@ -234,6 +310,7 @@ app.get('/rating', async (req, res) => {
       [fest]
     );
     const allRatings = allResult.rows; // [{ user_email, rating }, ...]
+    console.log(`Found ${allRatings.length} ratings for ${fest}`);
 
     res.json({
       festival: fest,
@@ -242,8 +319,14 @@ app.get('/rating', async (req, res) => {
     });
   } catch (err) {
     console.error('Error in GET /rating:', err);
-    res.status(500).json({ message: 'Could not get rating' });
+    res.status(500).json({ 
+      message: 'Could not get rating',
+      error: err.message 
+    });
   }
-  
 });
 
+// 12) Server starten
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
