@@ -1,4 +1,4 @@
-// index.js
+// index.js with improved error handling for the rating endpoint
 
 require('dotenv').config(); // Als je .env-variabelen wilt gebruiken
 const express = require('express');
@@ -13,6 +13,12 @@ const port = process.env.PORT || 3000;
 // 2) Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Log all incoming requests
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
 
 // 3) Connectie met Neon (Postgres)
 const client = new Client({
@@ -32,7 +38,28 @@ client.connect()
     
     // Create tables if they don't exist
     try {
-      // Create ratings table
+      // Create users table if it doesn't exist
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS users (
+          id SERIAL PRIMARY KEY,
+          email VARCHAR(255) UNIQUE NOT NULL,
+          password VARCHAR(255) NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+      
+      // Create attendances table if it doesn't exist
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS attendances (
+          id SERIAL PRIMARY KEY,
+          user_email VARCHAR(255) NOT NULL,
+          festival_name VARCHAR(255) NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(user_email, festival_name)
+        );
+      `);
+
+      // Create ratings table if it doesn't exist
       await client.query(`
         CREATE TABLE IF NOT EXISTS ratings (
           id SERIAL PRIMARY KEY,
@@ -43,6 +70,7 @@ client.connect()
           UNIQUE(user_email, festival_name)
         );
       `);
+      
       console.log('Tables checked/created successfully');
     } catch (err) {
       console.error('Error creating tables:', err);
@@ -77,6 +105,11 @@ app.get('/login.html', (req, res) => {
 app.post('/register', async (req, res) => {
   try {
     const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+    
     const hashed = await bcrypt.hash(password, 10);
     await client.query(
       'INSERT INTO users (email, password) VALUES ($1, $2)',
@@ -199,51 +232,69 @@ app.get('/festival-attendees', async (req, res) => {
 // 13) POST /rating => gebruiker geeft cijfer (1–10) aan een festival
 app.post('/rating', async (req, res) => {
   try {
+    console.log('Received rating request:', req.body);
+    
     const { email, festival, rating } = req.body;
+    
     if (!email || !festival || rating == null) {
       return res.status(400).json({ message: 'Missing rating data' });
     }
 
-    // Check dat rating tussen 1 en 10 ligt (optioneel)
+    // Check dat rating tussen 1 en 10 ligt
     if (rating < 1 || rating > 10) {
       return res.status(400).json({ message: 'Rating must be between 1 and 10' });
     }
 
-    // Check if the ratings table exists
-    const tableCheck = await client.query(`
-      SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' 
-        AND table_name = 'ratings'
-      );
-    `);
-    
-    const tableExists = tableCheck.rows[0].exists;
-    if (!tableExists) {
-      console.log('Ratings table does not exist. Creating it now...');
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS ratings (
-          id SERIAL PRIMARY KEY,
-          user_email VARCHAR(255) NOT NULL,
-          festival_name VARCHAR(255) NOT NULL,
-          rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 10),
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          UNIQUE(user_email, festival_name)
+    try {
+      // Verify the ratings table exists
+      const tableCheck = await client.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.tables 
+          WHERE table_schema = 'public' 
+          AND table_name = 'ratings'
         );
       `);
-      console.log('Ratings table created successfully');
+      
+      const tableExists = tableCheck.rows[0].exists;
+      
+      if (!tableExists) {
+        console.log('Ratings table does not exist. Creating it now...');
+        await client.query(`
+          CREATE TABLE IF NOT EXISTS ratings (
+            id SERIAL PRIMARY KEY,
+            user_email VARCHAR(255) NOT NULL,
+            festival_name VARCHAR(255) NOT NULL,
+            rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 10),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_email, festival_name)
+          );
+        `);
+        console.log('Ratings table created successfully');
+      }
+
+      // Upsert in the ratings table
+      const result = await client.query(
+        `INSERT INTO ratings (user_email, festival_name, rating)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (user_email, festival_name)
+         DO UPDATE SET rating = EXCLUDED.rating
+         RETURNING *`,
+        [email, festival, rating]
+      );
+      
+      console.log('Rating saved successfully:', result.rows[0]);
+      
+      res.status(200).json({ 
+        message: `Rating ${rating} saved for festival ${festival}`,
+        data: result.rows[0]
+      });
+    } catch (dbError) {
+      console.error('Database error in POST /rating:', dbError);
+      res.status(500).json({ 
+        message: 'Database error while saving rating',
+        error: dbError.message 
+      });
     }
-
-    // Upsert in de tabel 'ratings'
-    await client.query(
-      `INSERT INTO ratings (user_email, festival_name, rating)
-       VALUES ($1, $2, $3)
-       ON CONFLICT (user_email, festival_name)
-       DO UPDATE SET rating = EXCLUDED.rating`,
-      [email, festival, rating]
-    );
-
-    res.json({ message: `Rating ${rating} saved for festival ${festival}` });
   } catch (err) {
     console.error('Error in POST /rating:', err);
     res.status(500).json({ 
