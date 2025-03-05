@@ -1,12 +1,14 @@
-// index.js with improved error handling for the rating endpoint
+// index.js with email notification system added
 
-require('dotenv').config(); // Als je .env-variabelen wilt gebruiken
+require('dotenv').config(); // For loading .env variables
 const express = require('express');
 const path = require('path');
 const { Client } = require('pg');
 const bcrypt = require('bcrypt');
+const emailService = require('./email-service');
+const notificationScheduler = require('./notification-scheduler');
 
-// 1) Maak de Express-app
+// 1) Create the Express app
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -20,11 +22,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// 3) Connectie met Neon (Postgres)
+// 3) Connect to Neon (Postgres)
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
   /*
-  // Als je SSL nodig hebt:
+  // If you need SSL:
   ssl: {
     rejectUnauthorized: false
   }
@@ -72,16 +74,19 @@ client.connect()
       `);
       
       console.log('Tables checked/created successfully');
+      
+      // Initialize notification scheduler
+      notificationScheduler.initNotificationScheduler();
     } catch (err) {
       console.error('Error creating tables:', err);
     }
   })
   .catch(err => console.error('Connection error', err.stack));
 
-// 4) Statische bestanden uit ./agenda map
+// 4) Static files from ./agenda folder
 app.use(express.static(path.join(__dirname, 'agenda')));
 
-// 5) HTML-routes (optioneel)
+// 5) HTML routes (optional)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'agenda', 'agenda.html'));
 });
@@ -101,7 +106,7 @@ app.get('/login.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'agenda', 'login.html'));
 });
 
-// 6) POST /register => gebruiker registreren
+// 6) POST /register => register user
 app.post('/register', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -122,7 +127,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// 7) POST /login => gebruiker inloggen
+// 7) POST /login => user login
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -141,7 +146,7 @@ app.post('/login', async (req, res) => {
       return res.status(401).send('Invalid email or password');
     }
 
-    // Gelukt
+    // Success
     res.send(`Welcome ${email}, you are logged in!`);
   } catch (err) {
     console.error('Error during login:', err);
@@ -149,19 +154,83 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// 8) POST /attend => gebruiker meldt zich aan voor festival
+// 8) POST /attend => user signs up for festival
 app.post('/attend', async (req, res) => {
   try {
     const { email, festival } = req.body;
     if (!email || !festival) {
       return res.status(400).json({ message: 'Missing email or festival' });
     }
+    
+    // Add the attendance record
     await client.query(
       `INSERT INTO attendances (user_email, festival_name)
        VALUES ($1, $2)
        ON CONFLICT (user_email, festival_name) DO NOTHING`,
       [email, festival]
     );
+    
+    // Get the festival date for the notification
+    const festivals = [
+      { name: "Wavy", date: "2024-12-21" },
+      { name: "DGTL", date: "2025-04-18" },
+      { name: "Free your mind Kingsday", date: "2025-04-26" },
+      { name: "Loveland Kingsday", date: "2025-04-26" },
+      { name: "Verbond", date: "2025-05-05" },
+      { name: "Awakenings Upclose", date: "2025-05-17" },
+      { name: "Soenda", date: "2025-05-31" },
+      { name: "909", date: "2025-06-07" },
+      { name: "Diynamic", date: "2025-06-07" },
+      { name: "Open Air", date: "2025-06-08" },
+      { name: "Free Your Mind", date: "2025-06-08" },
+      { name: "Mystic Garden Festival", date: "2025-06-14" },
+      { name: "Awakenings Festival", date: "2025-07-11" },
+      { name: "Tomorrowland", date: "2025-07-18" },
+      { name: "Mysteryland", date: "2025-07-22" },
+      { name: "No Art", date: "2025-07-26" },
+      { name: "Loveland", date: "2025-08-09" },
+      { name: "Strafwerk", date: "2025-08-16" },
+      { name: "Latin Village", date: "2025-08-17" },
+      { name: "Parels van de stad", date: "2025-09-13" },
+      { name: "KeineMusik", date: "2025-07-05" },
+      { name: "Vunzige Deuntjes", date: "2025-07-05" },
+      { name: "Toffler", date: "2025-05-31" },
+      { name: "Into the woods", date: "2025-09-19" }
+    ];
+    
+    const festivalData = festivals.find(f => f.name === festival);
+    const festivalDate = festivalData ? festivalData.date : 'Unknown date';
+    
+    // Format the date for display
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    };
+    
+    // Get other users attending this festival (excluding the current user)
+    const otherAttendeesResult = await client.query(
+      'SELECT user_email FROM attendances WHERE festival_name = $1 AND user_email != $2',
+      [festival, email]
+    );
+    
+    // Notify other attendees about this new person joining
+    for (const row of otherAttendeesResult.rows) {
+      try {
+        await emailService.sendAttendanceNotification(
+          row.user_email,  // recipient
+          email,           // new attendee
+          festival,
+          formatDate(festivalDate)
+        );
+        console.log(`Sent notification to ${row.user_email} about ${email} attending ${festival}`);
+      } catch (emailError) {
+        console.error(`Failed to send attendance notification to ${row.user_email}:`, emailError);
+      }
+    }
+    
     res.json({ message: `You are attending ${festival}!` });
   } catch (err) {
     console.error('Error in /attend:', err);
@@ -169,7 +238,7 @@ app.post('/attend', async (req, res) => {
   }
 });
 
-// 9) DELETE /attend => gebruiker meldt zich af voor festival
+// 9) DELETE /attend => user unregisters from festival
 app.delete('/attend', async (req, res) => {
   try {
     const { email, festival } = req.body;
@@ -187,7 +256,7 @@ app.delete('/attend', async (req, res) => {
   }
 });
 
-// 10) GET /my-festivals => lijst van festivals voor deze gebruiker
+// 10) GET /my-festivals => list of festivals for this user
 app.get('/my-festivals', async (req, res) => {
   try {
     const userEmail = req.query.email;
@@ -207,7 +276,7 @@ app.get('/my-festivals', async (req, res) => {
   }
 });
 
-// 11) GET /festival-attendees => lijst van users bij een festival
+// 11) GET /festival-attendees => list of users for a festival
 app.get('/festival-attendees', async (req, res) => {
   try {
     const festival = req.query.festival;
@@ -227,9 +296,9 @@ app.get('/festival-attendees', async (req, res) => {
   }
 });
 
-// ============== RATING FUNCTIONALITEIT ==============
+// ============== RATING FUNCTIONALITY ==============
 
-// 13) POST /rating => gebruiker geeft cijfer (1–10) aan een festival
+// 12) POST /rating => user gives rating (1–10) to a festival
 app.post('/rating', async (req, res) => {
   try {
     console.log('Received rating request:', req.body);
@@ -240,7 +309,7 @@ app.post('/rating', async (req, res) => {
       return res.status(400).json({ message: 'Missing rating data' });
     }
 
-    // Check dat rating tussen 1 en 10 ligt
+    // Check that rating is between 1 and 10
     if (rating < 1 || rating > 10) {
       return res.status(400).json({ message: 'Rating must be between 1 and 10' });
     }
@@ -304,8 +373,8 @@ app.post('/rating', async (req, res) => {
   }
 });
 
-// 14) GET /rating => haal gemiddelde rating (en evt. alle ratings) op
-// Voorbeeld: GET /rating?festival=DGTL
+// 13) GET /rating => get average rating (and optionally all ratings)
+// Example: GET /rating?festival=DGTL
 app.get('/rating', async (req, res) => {
   try {
     const fest = req.query.festival;
@@ -347,7 +416,7 @@ app.get('/rating', async (req, res) => {
       });
     }
 
-    // Haal gemiddelde op
+    // Get average
     const avgResult = await client.query(
       'SELECT AVG(rating) as avg_rating FROM ratings WHERE festival_name=$1',
       [fest]
@@ -355,7 +424,7 @@ app.get('/rating', async (req, res) => {
     const average = avgResult.rows[0].avg_rating;
     console.log(`Average rating for ${fest}: ${average}`);
 
-    // Eventueel ook alle individuele ratings ophalen:
+    // Optionally also get all individual ratings:
     const allResult = await client.query(
       'SELECT user_email, rating FROM ratings WHERE festival_name=$1',
       [fest]
@@ -365,7 +434,7 @@ app.get('/rating', async (req, res) => {
 
     res.json({
       festival: fest,
-      averageRating: average,   // kan null zijn als nog geen ratings
+      averageRating: average,   // can be null if no ratings yet
       ratings: allRatings
     });
   } catch (err) {
@@ -377,7 +446,50 @@ app.get('/rating', async (req, res) => {
   }
 });
 
-// 12) Server starten
+// Test endpoints for email notifications (only enabled in development)
+if (process.env.NODE_ENV !== 'production') {
+  app.get('/test-notification', async (req, res) => {
+    try {
+      const testEmail = req.query.email || 'test@example.com';
+      const testFestival = req.query.festival || 'Test Festival';
+      const testDate = req.query.date || '2025-06-01';
+      const daysUntil = req.query.days || 7;
+      
+      console.log(`Sending test notification to ${testEmail} for ${testFestival}`);
+      
+      // Test sending a festival reminder
+      const result = await emailService.sendFestivalReminder(
+        testEmail,
+        testFestival,
+        testDate,
+        daysUntil
+      );
+      
+      res.json({ 
+        message: 'Test notification sent!', 
+        details: result,
+        previewUrl: result.testMessageUrl || 'No preview available'
+      });
+    } catch (err) {
+      console.error('Error sending test notification:', err);
+      res.status(500).json({ message: 'Failed to send test notification', error: err.message });
+    }
+  });
+  
+  // Test endpoint for running the festival reminder check
+  app.get('/test-reminders', async (req, res) => {
+    try {
+      console.log('Manually triggering festival reminder check');
+      await notificationScheduler.sendFestivalReminders();
+      res.json({ message: 'Festival reminder check completed' });
+    } catch (err) {
+      console.error('Error running reminder check:', err);
+      res.status(500).json({ message: 'Failed to run reminder check', error: err.message });
+    }
+  });
+}
+
+// 14) Start server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
