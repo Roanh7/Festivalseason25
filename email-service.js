@@ -7,25 +7,17 @@ const nodemailer = require('nodemailer');
 let transporter;
 
 // Initialize email transporter
-async function initializeTransporter() {
-  // For testing - creates a test account with Ethereal
-  const testAccount = await nodemailer.createTestAccount();
-  
+// Initialize email transporter
+function initializeTransporter() {
   transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    secure: false, // true for 465, false for other ports
+    service: 'gmail',
     auth: {
-      user: testAccount.user,
-      pass: testAccount.pass,
+      user: process.env.EMAIL_USER, // This reads festi.season25@gmail.com from the .env file
+      pass: process.env.EMAIL_PASSWORD, // This reads your app password from the .env file
     },
   });
   
-  console.log('Email transporter initialized');
-  console.log('Test Email URL: https://ethereal.email');
-  console.log('Test Email Login:', testAccount.user);
-  console.log('Test Email Password:', testAccount.pass);
-  
+  console.log('Email transporter initialized with Gmail');
   return transporter;
 }
 
@@ -55,7 +47,7 @@ async function sendNotificationEmail(to, subject, text, html) {
 
     // Setup email data
     const mailOptions = {
-      from: '"Festival Agenda" <festivalalerter@example.com>',
+      from: '"Festival Agenda" <festi.season25@gmail.com>',
       to: to,
       subject: subject,
       text: text, // Plain text version
