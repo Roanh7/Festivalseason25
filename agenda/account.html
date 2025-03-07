@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mijn Account - Festival Agenda 2025</title>
+  <link rel="stylesheet" href="/styling/account.css" />
+  <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+
+  <!-- Web app meta tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Festival Agenda 2025">
+
+  <!-- iOS icons -->
+  <link rel="apple-touch-icon" href="/images/app-icon-180.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/app-icon-180.png">
+
+  <!-- Android icon -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/app-icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="/images/app-icon-192.png">
+
+  <!-- Web App Manifest -->
+  <link rel="manifest" href="/manifest.json">
+</head>
+<body>
+  <header>
+    <h1>Mijn Account</h1>
+  </header>
+
+  <div class="logo-container">
+    <img src="/images/logo.png" alt="Festival Logo">
+  </div>
+
+  <nav class="nav-bar">
+    <!-- Hamburger-knop (optioneel), plus UL-menu -->
+    <div id="navToggle" class="nav-toggle">☰</div>
+    <ul class="nav-menu" id="navMenu">
+      <li><a href="agenda.html">Home</a></li>
+      <li><a href="reviews.html">Reviews</a></li>
+      <li><a href="extra-info.html">Extra Info</a></li>
+      <li><a href="register.html">Registreren</a></li>
+      <li><a href="login.html">Inloggen</a></li>
+      <li><a href="mijn-festivals.html">Mijn Festivals</a></li>
+      <li><a href="account.html" class="active">Mijn Account</a></li>
+    </ul>
+    <div id="userMenu" style="float:right;"></div>
+  </nav>
+
+  <main>
+    <div id="not-logged-in" class="account-message">
+      <p>Je bent niet ingelogd. <a href="login.html">Log in</a> om je accountinstellingen te wijzigen.</p>
+    </div>
+
+    <div id="account-container" class="account-container hidden">
+      <h2>Accountinstellingen</h2>
+      
+      <div class="account-info">
+        <p><strong>E-mail:</strong> <span id="userEmail"></span></p>
+        <p><strong>Gebruikersnaam:</strong> <span id="currentUsername">Nog niet ingesteld</span></p>
+      </div>
+      
+      <form id="usernameForm">
+        <div class="form-group">
+          <label for="username">Nieuwe gebruikersnaam</label>
+          <input type="text" id="username" name="username" placeholder="Voer een gebruikersnaam in" required />
+        </div>
+        <button type="submit" id="saveBtn" class="btn">Opslaan</button>
+      </form>
+      
+      <div id="updateResult" class="info-message"></div>
+      
+      <div class="account-description">
+        <p>Je gebruikersnaam wordt getoond aan andere gebruikers in plaats van je e-mailadres.</p>
+        <p>Je kunt altijd blijven inloggen met je e-mailadres.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Festival Agenda - Gecreëerd door Roan Hassan, S-team vertegenwoordiger</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/javascript/navstatus.js"></script>
+  <script src="/javascript/account.js"></script>
+</body>
+</html>

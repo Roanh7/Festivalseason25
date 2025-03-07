@@ -46,6 +46,7 @@ client.connect()
           id SERIAL PRIMARY KEY,
           email VARCHAR(255) UNIQUE NOT NULL,
           password VARCHAR(255) NOT NULL,
+          username VARCHAR(255) UNIQUE,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       `);
@@ -104,6 +105,9 @@ app.get('/register.html', (req, res) => {
 });
 app.get('/login.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'agenda', 'login.html'));
+});
+app.get('/account.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'agenda', 'account.html'));
 });
 
 // 6) POST /register => register user
@@ -283,11 +287,31 @@ app.get('/festival-attendees', async (req, res) => {
     if (!festival) {
       return res.status(400).json({ message: 'No festival provided' });
     }
+    
+    // Get all attendees for this festival
     const result = await client.query(
-      'SELECT user_email FROM attendances WHERE festival_name=$1',
+      'SELECT a.user_email FROM attendances a WHERE a.festival_name=$1',
       [festival]
     );
-    const attendees = result.rows.map(r => r.user_email);
+    
+    // Get all available display names (username or email)
+    const attendeeEmails = result.rows.map(r => r.user_email);
+    const attendees = [];
+    
+    // Look up usernames for all these emails
+    for (const email of attendeeEmails) {
+      const userResult = await client.query(
+        'SELECT username FROM users WHERE email = $1',
+        [email]
+      );
+      
+      // Use username if available, otherwise use email
+      if (userResult.rows.length > 0 && userResult.rows[0].username) {
+        attendees.push(userResult.rows[0].username);
+      } else {
+        attendees.push(email);
+      }
+    }
 
     res.json({ festival, attendees });
   } catch (err) {
@@ -426,10 +450,16 @@ app.get('/rating', async (req, res) => {
 
     // Optionally also get all individual ratings:
     const allResult = await client.query(
-      'SELECT user_email, rating FROM ratings WHERE festival_name=$1',
+      'SELECT r.user_email, r.rating, u.username FROM ratings r LEFT JOIN users u ON r.user_email = u.email WHERE r.festival_name=$1',
       [fest]
     );
-    const allRatings = allResult.rows; // [{ user_email, rating }, ...]
+    
+    // Format the result to use username if available
+    const allRatings = allResult.rows.map(row => ({
+      user_email: row.username || row.user_email, // Use username if available
+      rating: row.rating
+    }));
+    
     console.log(`Found ${allRatings.length} ratings for ${fest}`);
 
     res.json({
@@ -488,6 +518,98 @@ if (process.env.NODE_ENV !== 'production') {
     }
   });
 }
+
+// ============== USERNAME FUNCTIONALITY ==============
+
+// GET /username => get username for a specific email
+app.get('/username', async (req, res) => {
+  try {
+    const userEmail = req.query.email;
+    if (!userEmail) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    
+    const result = await client.query(
+      'SELECT username FROM users WHERE email = $1',
+      [userEmail]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    res.json({ username: result.rows[0].username });
+  } catch (err) {
+    console.error('Error fetching username:', err);
+    res.status(500).json({ message: 'Failed to fetch username', error: err.message });
+  }
+});
+
+// POST /username => set or update username for a user
+app.post('/username', async (req, res) => {
+  try {
+    const { email, username } = req.body;
+    
+    if (!email || !username) {
+      return res.status(400).json({ message: 'Email and username are required' });
+    }
+    
+    // Check if username is already taken by another user
+    const existingUser = await client.query(
+      'SELECT email FROM users WHERE username = $1 AND email != $2',
+      [username, email]
+    );
+    
+    if (existingUser.rows.length > 0) {
+      return res.status(409).json({ message: 'Username is already taken' });
+    }
+    
+    // Update the username
+    const result = await client.query(
+      'UPDATE users SET username = $1 WHERE email = $2 RETURNING username',
+      [username, email]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    res.json({ 
+      message: 'Username updated successfully',
+      username: result.rows[0].username 
+    });
+  } catch (err) {
+    console.error('Error updating username:', err);
+    res.status(500).json({ message: 'Failed to update username', error: err.message });
+  }
+});
+
+// GET /display-name => Get display name (username or email) for a specific email
+app.get('/display-name', async (req, res) => {
+  try {
+    const userEmail = req.query.email;
+    if (!userEmail) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    
+    const result = await client.query(
+      'SELECT username FROM users WHERE email = $1',
+      [userEmail]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // Return username if set, otherwise return email
+    const displayName = result.rows[0].username || userEmail;
+    
+    res.json({ displayName });
+  } catch (err) {
+    console.error('Error fetching display name:', err);
+    res.status(500).json({ message: 'Failed to fetch display name', error: err.message });
+  }
+});
 
 // 14) Start server
 app.listen(port, () => {
