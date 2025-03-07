@@ -246,8 +246,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterUpcoming = document.getElementById('filterUpcoming');
     const filterAll = document.getElementById('filterAll');
     const filterAttending = document.getElementById('filterAttending');
+    const filterPastAttended = document.getElementById('filterPastAttended');
     
-    if (filterUpcoming && filterAll && filterAttending) {
+    if (filterUpcoming && filterAll && filterAttending && filterPastAttended) {
       // Get the current date
       const now = new Date();
       
@@ -318,6 +319,37 @@ document.addEventListener('DOMContentLoaded', function() {
         setActiveFilter(filterAttending);
       });
       
+      // Show only past festivals you've attended
+      filterPastAttended.addEventListener('click', function() {
+        const cards = document.querySelectorAll('.festival-card');
+        let visibleCount = 0;
+        
+        cards.forEach(card => {
+          const dateText = card.querySelector('.festival-detail:nth-child(1)').textContent;
+          const dateMatch = dateText.match(/Datum:\s*(.+)/);
+          const checkbox = card.querySelector('.attend-checkbox-card');
+          
+          // Check if it's in the past AND the checkbox is checked
+          if (dateMatch && checkbox) {
+            const festDate = parseDate(dateMatch[1]);
+            if (festDate && festDate < now && checkbox.checked) {
+              card.style.display = '';
+              visibleCount++;
+            } else {
+              card.style.display = 'none';
+            }
+          } else {
+            card.style.display = 'none';
+          }
+        });
+        
+        // Show message if no results
+        showNoResultsMessageIfNeeded(visibleCount, 'Je bent nog niet naar festivals geweest.');
+        
+        // Highlight the active filter
+        setActiveFilter(filterPastAttended);
+      });
+      
       // Set 'All' as the default active filter
       setActiveFilter(filterAll);
     }
@@ -331,6 +363,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <button class="filter-button" id="filterUpcoming">Aankomende</button>
       <button class="filter-button active-filter" id="filterAll">Alle</button>
       <button class="filter-button" id="filterAttending">Ik ga</button>
+      <button class="filter-button" id="filterPastAttended">Waar ben ik geweest</button>
     `;
     
     const countdownContainer = document.getElementById('countdown-container');
@@ -366,9 +399,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterUpcoming = document.getElementById('filterUpcoming');
     const filterAll = document.getElementById('filterAll');
     const filterAttending = document.getElementById('filterAttending');
+    const filterPastAttended = document.getElementById('filterPastAttended');
     
-    if (filterUpcoming && filterAll && filterAttending) {
-      [filterUpcoming, filterAll, filterAttending].forEach(btn => {
+    if (filterUpcoming && filterAll && filterAttending && filterPastAttended) {
+      [filterUpcoming, filterAll, filterAttending, filterPastAttended].forEach(btn => {
         btn.classList.remove('active-filter');
       });
       activeButton.classList.add('active-filter');

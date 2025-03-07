@@ -263,17 +263,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Show loading state
     console.log("Fetching user festivals for:", userEmail);
     
-    // Set loading state visually (optional)
-    checkboxes.forEach(cb => {
-      cb.classList.add('loading');
-    });
+    // Add a visual loading state to the table
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.id = 'loading-indicator';
+    loadingIndicator.style.position = 'fixed';
+    loadingIndicator.style.top = '50%';
+    loadingIndicator.style.left = '50%';
+    loadingIndicator.style.transform = 'translate(-50%, -50%)';
+    loadingIndicator.style.background = 'rgba(255, 255, 255, 0.8)';
+    loadingIndicator.style.padding = '20px';
+    loadingIndicator.style.borderRadius = '5px';
+    loadingIndicator.style.boxShadow = '0 0 10px rgba(0,0,0,0.2)';
+    loadingIndicator.style.zIndex = '1000';
+    loadingIndicator.textContent = 'Laden van je festival selecties...';
+    document.body.appendChild(loadingIndicator);
     
     const resp = await fetch(`/my-festivals?email=${encodeURIComponent(userEmail)}`);
     
-    // Remove loading state
-    checkboxes.forEach(cb => {
-      cb.classList.remove('loading');
-    });
+    // Remove loading indicator
+    if (loadingIndicator) {
+      loadingIndicator.remove();
+    }
     
     // Check if response is ok
     if (!resp.ok) {
@@ -293,25 +303,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userFestivals = data.festivals || [];
     console.log("User festivals loaded:", userFestivals);
 
-    // Mark checkboxes that user already has
+    // First mark all checkboxes based on userFestivals
+    // This ensures that all your selected festivals stay selected, regardless of being past or future
     checkboxes.forEach(cb => {
       const festName = cb.dataset.festival;
       if (userFestivals.includes(festName)) {
         cb.checked = true;
         console.log(`Festival "${festName}" is checked`);
+      } else {
+        cb.checked = false;
       }
-
-      // Add change event listeners for future changes
-      cb.addEventListener('change', async () => {
+    });
+    
+    // Now set up event listeners for changes
+    checkboxes.forEach(cb => {
+      const festName = cb.dataset.festival;
+      
+      // Remove any existing event listeners to avoid duplicates
+      cb.removeEventListener('change', cb.changeHandler);
+      
+      // Create a new handler function and store a reference to it
+      cb.changeHandler = async function() {
         try {
           if (cb.checked) {
             console.log(`Marking festival "${festName}" as attending`);
+            // Show mini-loading indicator on the checkbox itself
+            cb.classList.add('updating');
+            
             // POST /attend
             const response = await fetch('/attend', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email: userEmail, festival: festName })
             });
+            
+            cb.classList.remove('updating');
             
             if (!response.ok) {
               const errorText = await response.text();
@@ -324,12 +350,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log(`Successfully marked "${festName}" as attending`);
           } else {
             console.log(`Unmarking festival "${festName}" as attending`);
+            // Show mini-loading indicator on the checkbox itself
+            cb.classList.add('updating');
+            
             // DELETE /attend
             const response = await fetch('/attend', {
               method: 'DELETE',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email: userEmail, festival: festName })
             });
+            
+            cb.classList.remove('updating');
             
             if (!response.ok) {
               const errorText = await response.text();
@@ -342,22 +373,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log(`Successfully unmarked "${festName}" as attending`);
           }
           
-          // Sync with mobile/card view
-          syncMobileCheckboxes(festName, cb.checked);
+          // Sync the state with other views
+          syncCheckboxes(festName, cb.checked);
           
-          // Important: Also update card view checkboxes
-          const cardCheckbox = document.querySelector(`.attend-checkbox-card[data-festival="${festName}"]`);
-          if (cardCheckbox) {
-            cardCheckbox.checked = cb.checked;
-          }
         } catch (err) {
+          cb.classList.remove('updating');
           console.error(`Failed to update attendance for "${festName}":`, err);
           alert(`Er ging iets mis bij het bijwerken van je festivalstatus. Probeer het later opnieuw.`);
         }
-      });
+      };
+      
+      // Add the change event listener
+      cb.addEventListener('change', cb.changeHandler);
     });
 
-    // Sync mobile/card view with initial data
+    // Now sync all checkboxes between table and card view
     syncAllCheckboxes(userFestivals);
 
   } catch (err) {
@@ -375,19 +405,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     errorMessage.innerHTML = `
       <p>Er is een probleem opgetreden bij het laden van je festivalgegevens.</p>
       <p>Probeer de pagina te vernieuwen of later opnieuw in te loggen.</p>
+      <p>Fout: ${err.message}</p>
     `;
     
-    // Insert error message at the top of the table container
-    const tableContainer = document.querySelector('.table-container');
-    if (tableContainer) {
-      tableContainer.insertBefore(errorMessage, tableContainer.firstChild);
+    // Insert error message at the top of main content
+    const mainElement = document.querySelector('main');
+    if (mainElement) {
+      mainElement.insertBefore(errorMessage, mainElement.firstChild);
     }
   }
 });
 
 // Helper function to sync all checkboxes between table and card views
 function syncAllCheckboxes(userFestivals) {
-  // First sync table checkboxes to card checkboxes
+  // First sync table checkboxes based on server data
   document.querySelectorAll('.attend-checkbox').forEach(tableCheckbox => {
     const festName = tableCheckbox.dataset.festival;
     const isChecked = userFestivals.includes(festName);
@@ -396,12 +427,18 @@ function syncAllCheckboxes(userFestivals) {
     tableCheckbox.checked = isChecked;
     
     // Find and update the corresponding card view checkbox
-    syncMobileCheckboxes(festName, isChecked);
+    syncCheckboxes(festName, isChecked);
   });
 }
 
 // Helper function to sync checkboxes between views
-function syncMobileCheckboxes(festivalName, isChecked) {
+function syncCheckboxes(festivalName, isChecked) {
+  // Update table view checkboxes
+  const tableCheckboxes = document.querySelectorAll(`.attend-checkbox[data-festival="${festivalName}"]`);
+  tableCheckboxes.forEach(checkbox => {
+    checkbox.checked = isChecked;
+  });
+  
   // Update card view checkboxes
   const cardCheckboxes = document.querySelectorAll(`.attend-checkbox-card[data-festival="${festivalName}"]`);
   cardCheckboxes.forEach(checkbox => {
@@ -415,23 +452,35 @@ function syncMobileCheckboxes(festivalName, isChecked) {
   });
 }
 
+// Add extra event listener to sync card view checkbox changes back to table view
 document.addEventListener('DOMContentLoaded', () => {
-  // Make sure card view event handlers also sync with table view
+  // Add event listeners to card view checkboxes if they exist
   document.querySelectorAll('.attend-checkbox-card').forEach(cardCheckbox => {
     const festName = cardCheckbox.dataset.festival;
     
-    cardCheckbox.addEventListener('change', () => {
-      // Find the table view checkbox and trigger its change event
+    // Remove existing event listeners to avoid duplicates
+    cardCheckbox.removeEventListener('change', cardCheckbox.changeHandler);
+    
+    // Create new handler and store reference
+    cardCheckbox.changeHandler = function() {
+      console.log(`Card checkbox for ${festName} changed to ${cardCheckbox.checked}`);
+      
+      // Find the corresponding table checkbox
       const tableCheckbox = document.querySelector(`.attend-checkbox[data-festival="${festName}"]`);
       if (tableCheckbox) {
+        // Update the checked state
         tableCheckbox.checked = cardCheckbox.checked;
-        // Trigger change event on table checkbox to run the server update
+        
+        // Trigger the change event to run the server update
         tableCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
       }
-    });
+    };
+    
+    // Add the event listener
+    cardCheckbox.addEventListener('change', cardCheckbox.changeHandler);
   });
   
-  // Code for attendee buttons 
+  // Attendee buttons functionality
   const attendeeButtons = document.querySelectorAll('.attendees-btn');
 
   attendeeButtons.forEach(btn => {
@@ -441,8 +490,18 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         console.log(`Fetching attendees for festival "${festName}"`);
         
+        // Add temporary loading indicator
+        const originalText = btn.textContent;
+        btn.textContent = "Laden...";
+        btn.disabled = true;
+        
         // Fetch the other users
         const resp = await fetch(`/festival-attendees?festival=${encodeURIComponent(festName)}`);
+        
+        // Restore button state
+        btn.textContent = originalText;
+        btn.disabled = false;
+        
         if (!resp.ok) {
           const errorText = await resp.text();
           throw new Error(`Server returned ${resp.status}: ${errorText}`);
@@ -485,4 +544,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+});
+
+// Add CSS to show updating state
+document.addEventListener('DOMContentLoaded', () => {
+  // Create style element for checkbox visual feedback
+  const style = document.createElement('style');
+  style.textContent = `
+    .attend-checkbox.updating,
+    .attend-checkbox-card.updating {
+      opacity: 0.5;
+      cursor: wait;
+    }
+  `;
+  document.head.appendChild(style);
 });
