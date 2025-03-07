@@ -120,23 +120,27 @@
       </div>
     </div>
 
-    <!-- View Other Users Section -->
+    <!-- View Other Users Section - UPDATED -->
     <div id="view-other-users" class="other-users-section hidden">
       <h2>Bekijk Festival Cards van Andere Gebruikers</h2>
       
-      <div class="search-container">
-        <input type="text" id="search-input" placeholder="Zoek op gebruikersnaam of email" />
-        <button id="search-btn" class="btn">Zoeken</button>
-      </div>
-      
-      <div id="search-results" class="search-results">
-        <!-- Search results will be displayed here -->
+      <!-- New collapsible users list -->
+      <div class="collapsible-container">
+        <button id="toggle-users-list" class="collapsible-button">
+          Toon Alle Gebruikers <span class="collapsible-icon">▼</span>
+        </button>
+        <div id="users-list-container" class="collapsible-content">
+          <div id="users-list" class="users-list">
+            <!-- Users will be populated here -->
+            <div class="loading-indicator">Gebruikers laden...</div>
+          </div>
+        </div>
       </div>
 
       <div id="user-festival-card" class="user-festival-card hidden">
         <!-- Selected user's festival card will be shown here -->
         <div class="back-btn-container">
-          <button id="back-to-search" class="btn back-btn">Terug naar zoeken</button>
+          <button id="back-to-list" class="btn back-btn">Terug naar gebruikerslijst</button>
         </div>
         <h3 id="user-card-name">User's Festival Card</h3>
         

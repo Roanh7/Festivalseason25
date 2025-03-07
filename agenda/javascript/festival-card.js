@@ -11,17 +11,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // DOM Elements - Other Users Section
   const viewOtherUsers = document.getElementById('view-other-users');
-  const searchInput = document.getElementById('search-input');
-  const searchBtn = document.getElementById('search-btn');
-  const searchResults = document.getElementById('search-results');
   const userFestivalCard = document.getElementById('user-festival-card');
-  const backToSearchBtn = document.getElementById('back-to-search');
+  const backToListBtn = document.getElementById('back-to-list');
   const userCardName = document.getElementById('user-card-name');
   const userUpcomingCount = document.getElementById('user-upcoming-count');
   const userPastCount = document.getElementById('user-past-count');
   const userTotalCount = document.getElementById('user-total-count');
   const userMedals = document.getElementById('user-medals');
   const commonFestivalsList = document.getElementById('common-festivals-list');
+  
+  // DOM Elements - New Collapsible Users List
+  const toggleUsersListBtn = document.getElementById('toggle-users-list');
+  const usersListContainer = document.getElementById('users-list-container');
+  const usersList = document.getElementById('users-list');
   
   // Check if user is logged in
   const token = localStorage.getItem('token');
@@ -217,20 +219,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     return html;
   }
   
-  // Search for users
-  async function searchUsers(searchTerm) {
+  // New function to load all users
+  async function loadAllUsers() {
     try {
-      // Clear previous results
-      searchResults.innerHTML = '';
-      
       // Show loading indicator
-      const loadingMessage = document.createElement('div');
-      loadingMessage.className = 'loading-message';
-      loadingMessage.textContent = 'Zoeken...';
-      searchResults.appendChild(loadingMessage);
+      usersList.innerHTML = '<div class="loading-indicator">Gebruikers laden...</div>';
       
-      // Make the API call to search for users
-      const response = await fetch(`/search-users?query=${encodeURIComponent(searchTerm)}`);
+      // Fetch all users from the server
+      const response = await fetch('/all-users');
       
       if (!response.ok) {
         throw new Error(`Server error: ${response.status}`);
@@ -239,49 +235,46 @@ document.addEventListener('DOMContentLoaded', async () => {
       const data = await response.json();
       const users = data.users || [];
       
-      // Remove loading indicator
-      searchResults.innerHTML = '';
+      // Clear loading indicator
+      usersList.innerHTML = '';
       
       // If no users found
       if (users.length === 0) {
-        const noResults = document.createElement('div');
-        noResults.className = 'no-results';
-        noResults.textContent = 'Geen gebruikers gevonden. Probeer een andere zoekterm.';
-        searchResults.appendChild(noResults);
+        usersList.innerHTML = '<div class="loading-indicator">Geen gebruikers gevonden</div>';
         return;
       }
       
-      // Display found users
+      // Display all users
       users.forEach(user => {
         // Skip the current user
         if (user.email === currentUserEmail) return;
         
-        const userElement = document.createElement('div');
-        userElement.className = 'user-result';
-        
         const displayName = user.username || user.email;
+        const initial = displayName.charAt(0).toUpperCase();
         
-        userElement.innerHTML = `
-          <div class="user-info">
-            <div class="user-name">${displayName}</div>
-            <div class="user-email">${user.email}</div>
+        const userItem = document.createElement('div');
+        userItem.className = 'user-item';
+        userItem.dataset.email = user.email;
+        userItem.innerHTML = `
+          <div class="user-avatar">${initial}</div>
+          <div class="user-details">
+            <div class="user-item-name">${displayName}</div>
+            ${user.username ? `<div class="user-item-email">${user.email}</div>` : ''}
           </div>
-          <button class="view-btn" data-email="${user.email}">Bekijk Card</button>
         `;
         
-        searchResults.appendChild(userElement);
-        
-        // Add click event to view button
-        const viewBtn = userElement.querySelector('.view-btn');
-        viewBtn.addEventListener('click', () => {
+        // Add click event to view user's festival card
+        userItem.addEventListener('click', () => {
           loadUserFestivalCard(user.email, displayName);
         });
+        
+        usersList.appendChild(userItem);
       });
     } catch (error) {
-      console.error('Error searching users:', error);
-      searchResults.innerHTML = `
-        <div class="error-message">
-          Er is een probleem opgetreden bij het zoeken van gebruikers.
+      console.error('Error loading users:', error);
+      usersList.innerHTML = `
+        <div class="loading-indicator">
+          Er is een probleem opgetreden bij het laden van gebruikers.
         </div>
       `;
     }
@@ -289,8 +282,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Load user's festival card
   async function loadUserFestivalCard(userEmail, displayName) {
-    // Hide search results and show user festival card
-    searchResults.classList.add('hidden');
+    // Hide users list and show user festival card
+    usersListContainer.classList.remove('active');
     userFestivalCard.classList.remove('hidden');
     
     // Update user card title
@@ -385,27 +378,46 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadCurrentUserInfo();
   loadCurrentUserFestivals();
   
-  // Set up event listeners
-  searchBtn.addEventListener('click', () => {
-    const searchTerm = searchInput.value.trim();
-    if (searchTerm.length > 0) {
-      searchUsers(searchTerm);
+  // Set up collapsible users list
+  toggleUsersListBtn.addEventListener('click', () => {
+    // Toggle active class on button
+    toggleUsersListBtn.classList.toggle('active');
+    
+    // Toggle active class on content
+    const isActive = usersListContainer.classList.toggle('active');
+    
+    // Toggle icon text
+    const icon = toggleUsersListBtn.querySelector('.collapsible-icon');
+    icon.textContent = isActive ? '▲' : '▼';
+    
+    // Load users when opening for the first time
+    if (isActive && usersList.children.length === 0) {
+      loadAllUsers();
     }
   });
   
-  // Allow searching with Enter key
-  searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      const searchTerm = searchInput.value.trim();
-      if (searchTerm.length > 0) {
-        searchUsers(searchTerm);
-      }
-    }
-  });
-  
-  // Back to search button
-  backToSearchBtn.addEventListener('click', () => {
+  // Back to list button
+  backToListBtn.addEventListener('click', () => {
     userFestivalCard.classList.add('hidden');
-    searchResults.classList.remove('hidden');
+    usersListContainer.classList.add('active');
   });
+  
+  // We need to add this endpoint to index.js
+  // Add this to index.js:
+  /*
+  // GET /all-users => get list of all registered users (for festival cards)
+  app.get('/all-users', async (req, res) => {
+    try {
+      const result = await client.query(
+        'SELECT email, username FROM users ORDER BY COALESCE(username, email)'
+      );
+      
+      const users = result.rows;
+      res.json({ users });
+    } catch (err) {
+      console.error('Error in /all-users:', err);
+      res.status(500).json({ message: 'Could not get users list' });
+    }
+  });
+  */
 });

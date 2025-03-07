@@ -191,7 +191,7 @@ body {
   font-weight: bold;
 }
 
-/* Other Users Section */
+/* Other Users Section - UPDATED STYLES */
 .other-users-section {
   width: 90%;
   max-width: 700px;
@@ -203,85 +203,106 @@ body {
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.search-container {
-  display: flex;
-  gap: 0.5rem;
+/* Collapsible styles */
+.collapsible-container {
   margin: 1.5rem 0;
-}
-
-.search-container input {
-  flex: 1;
-  padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.btn {
-  padding: 0.8rem 1.5rem;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.btn:hover {
-  background-color: #45a049;
-}
-
-.search-results {
-  margin-top: 1.5rem;
-}
-
-.user-result {
-  background-color: #f9f9f9;
   border: 1px solid #eaeaea;
   border-radius: 8px;
+  overflow: hidden;
+}
+
+.collapsible-button {
+  width: 100%;
+  background-color: #f0f0f0;
+  color: #333;
   padding: 1rem;
-  margin-bottom: 1rem;
+  text-align: left;
+  border: none;
+  border-bottom: 1px solid #eaeaea;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   transition: background-color 0.3s ease;
 }
 
-.user-result:hover {
-  background-color: #f0f9f0;
+.collapsible-button:hover {
+  background-color: #e7e7e7;
+}
+
+.collapsible-icon {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+.collapsible-button.active .collapsible-icon {
+  transform: rotate(180deg);
+}
+
+.collapsible-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.collapsible-content.active {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Users list styles */
+.users-list {
+  padding: 1rem;
+}
+
+.user-item {
+  padding: 0.8rem;
+  border-bottom: 1px solid #eaeaea;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
 }
 
-.user-info {
-  flex: 1;
+.user-item:last-child {
+  border-bottom: none;
 }
 
-.user-name {
+.user-item:hover {
+  background-color: #f0f9f0;
+}
+
+.user-item-name {
   font-weight: bold;
-  margin-bottom: 0.2rem;
+  margin-right: 0.5rem;
 }
 
-.user-email {
+.user-item-email {
   font-size: 0.9rem;
   color: #666;
 }
 
-.view-btn {
-  padding: 0.5rem 1rem;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
+.loading-indicator {
+  text-align: center;
+  padding: 1rem;
+  color: #666;
+  font-style: italic;
 }
 
-.view-btn:hover {
-  background-color: #45a049;
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  background-color: #4CAF50;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  margin-right: 1rem;
+  flex-shrink: 0;
 }
 
 /* User Festival Card */
@@ -352,10 +373,6 @@ body {
     margin: 0;
   }
 
-  .search-container {
-    flex-direction: column;
-  }
-
   .btn {
     width: 100%;
   }
@@ -367,5 +384,9 @@ body {
   .medal {
     min-width: 100px;
     padding: 0.8rem;
+  }
+  
+  .collapsible-content.active {
+    max-height: 300px;
   }
 }

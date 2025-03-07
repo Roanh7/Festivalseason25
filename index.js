@@ -611,6 +611,21 @@ app.get('/display-name', async (req, res) => {
   }
 });
 
+// GET /all-users => get list of all registered users (for festival cards)
+app.get('/all-users', async (req, res) => {
+  try {
+    const result = await client.query(
+      'SELECT email, username FROM users ORDER BY COALESCE(username, email)'
+    );
+    
+    const users = result.rows;
+    res.json({ users });
+  } catch (err) {
+    console.error('Error in /all-users:', err);
+    res.status(500).json({ message: 'Could not get users list' });
+  }
+});
+
 // 14) Start server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
