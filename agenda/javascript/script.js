@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Call the function to update button text
   updateButtonText();
 
-  // Niet ingelogd => disablen
+  // If user is not logged in, disable checkboxes and return
   if (!token || !userEmail) {
     checkboxes.forEach(cb => {
       cb.disabled = true;
@@ -258,17 +258,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     return; 
   }
 
-  // Wel ingelogd:
-  // 1) Haal eerst festivals op die de gebruiker al in DB heeft
+  // If user is logged in, fetch their festivals
   try {
     // Show loading state
     console.log("Fetching user festivals for:", userEmail);
     
+    // Set loading state visually (optional)
+    checkboxes.forEach(cb => {
+      cb.classList.add('loading');
+    });
+    
     const resp = await fetch(`/my-festivals?email=${encodeURIComponent(userEmail)}`);
     
-    // Check if response is ok (status code 200-299)
+    // Remove loading state
+    checkboxes.forEach(cb => {
+      cb.classList.remove('loading');
+    });
+    
+    // Check if response is ok
     if (!resp.ok) {
-      // Try to get error text
       const errorText = await resp.text();
       throw new Error(`Server returned ${resp.status}: ${errorText}`);
     }
@@ -281,11 +289,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       throw new Error(`Failed to parse JSON response: ${jsonError.message}`);
     }
     
-    // Get user festivals or default to empty array
+    // Get user festivals and mark checkboxes
     const userFestivals = data.festivals || [];
     console.log("User festivals loaded:", userFestivals);
 
-    // 2) Markeer checkboxes die user al heeft
+    // Mark checkboxes that user already has
     checkboxes.forEach(cb => {
       const festName = cb.dataset.festival;
       if (userFestivals.includes(festName)) {
@@ -293,7 +301,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log(`Festival "${festName}" is checked`);
       }
 
-      // 3) Bij (un)check roep /attend (POST) of /attend (DELETE) aan
+      // Add change event listeners for future changes
       cb.addEventListener('change', async () => {
         try {
           if (cb.checked) {
@@ -308,6 +316,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!response.ok) {
               const errorText = await response.text();
               console.error(`Error attending festival: ${errorText}`);
+              // Revert checkbox if error
+              cb.checked = false;
               return;
             }
             
@@ -324,16 +334,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!response.ok) {
               const errorText = await response.text();
               console.error(`Error unattending festival: ${errorText}`);
+              // Revert checkbox if error
+              cb.checked = true;
               return;
             }
             
             console.log(`Successfully unmarked "${festName}" as attending`);
           }
           
-          // Sync the state with mobile view if it exists
-          const mobileCheckbox = document.querySelector(`.attend-checkbox-mobile[data-festival="${festName}"]`);
-          if (mobileCheckbox) {
-            mobileCheckbox.checked = cb.checked;
+          // Sync with mobile/card view
+          syncMobileCheckboxes(festName, cb.checked);
+          
+          // Important: Also update card view checkboxes
+          const cardCheckbox = document.querySelector(`.attend-checkbox-card[data-festival="${festName}"]`);
+          if (cardCheckbox) {
+            cardCheckbox.checked = cb.checked;
           }
         } catch (err) {
           console.error(`Failed to update attendance for "${festName}":`, err);
@@ -341,6 +356,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       });
     });
+
+    // Sync mobile/card view with initial data
+    syncAllCheckboxes(userFestivals);
 
   } catch (err) {
     console.error('Fout bij ophalen festivals uit DB:', err);
@@ -367,18 +385,63 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
+// Helper function to sync all checkboxes between table and card views
+function syncAllCheckboxes(userFestivals) {
+  // First sync table checkboxes to card checkboxes
+  document.querySelectorAll('.attend-checkbox').forEach(tableCheckbox => {
+    const festName = tableCheckbox.dataset.festival;
+    const isChecked = userFestivals.includes(festName);
+    
+    // Update the checkbox in table view
+    tableCheckbox.checked = isChecked;
+    
+    // Find and update the corresponding card view checkbox
+    syncMobileCheckboxes(festName, isChecked);
+  });
+}
+
+// Helper function to sync checkboxes between views
+function syncMobileCheckboxes(festivalName, isChecked) {
+  // Update card view checkboxes
+  const cardCheckboxes = document.querySelectorAll(`.attend-checkbox-card[data-festival="${festivalName}"]`);
+  cardCheckboxes.forEach(checkbox => {
+    checkbox.checked = isChecked;
+  });
+  
+  // Update mobile view checkboxes if they exist
+  const mobileCheckboxes = document.querySelectorAll(`.attend-checkbox-mobile[data-festival="${festivalName}"]`);
+  mobileCheckboxes.forEach(checkbox => {
+    checkbox.checked = isChecked;
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  // Vind alle 'attendees-btn' knoppen:
+  // Make sure card view event handlers also sync with table view
+  document.querySelectorAll('.attend-checkbox-card').forEach(cardCheckbox => {
+    const festName = cardCheckbox.dataset.festival;
+    
+    cardCheckbox.addEventListener('change', () => {
+      // Find the table view checkbox and trigger its change event
+      const tableCheckbox = document.querySelector(`.attend-checkbox[data-festival="${festName}"]`);
+      if (tableCheckbox) {
+        tableCheckbox.checked = cardCheckbox.checked;
+        // Trigger change event on table checkbox to run the server update
+        tableCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+  });
+  
+  // Code for attendee buttons 
   const attendeeButtons = document.querySelectorAll('.attendees-btn');
 
   attendeeButtons.forEach(btn => {
     btn.addEventListener('click', async () => {
-      const festName = btn.dataset.festival; // "Wavy", "DGTL", etc.
+      const festName = btn.dataset.festival;
 
       try {
         console.log(`Fetching attendees for festival "${festName}"`);
         
-        // 1) Haal de andere gebruikers op
+        // Fetch the other users
         const resp = await fetch(`/festival-attendees?festival=${encodeURIComponent(festName)}`);
         if (!resp.ok) {
           const errorText = await resp.text();
@@ -388,18 +451,16 @@ document.addEventListener('DOMContentLoaded', () => {
         let result;
         try {
           result = await resp.json(); 
-          // result.attendees = ["jouw@vriend.com", "andere@user.nl", ...]
         } catch (jsonError) {
           throw new Error(`Failed to parse JSON response: ${jsonError.message}`);
         }
 
-        // 2) Verwijder jouw eigen email als je dat wilt
+        // Remove current user from list if desired
         const userEmail = localStorage.getItem('email') || '';
         const others = result.attendees.filter(u => u !== userEmail);
 
         console.log(`Found ${others.length} other attendees for "${festName}"`);
 
-        // 3) Toon in pop-up of alert, of in DOM
         // Determine message based on festival date
         const festival = festivals.find(f => f.name === festName);
         const isPast = festival && isFestivalInPast(festival.date);
