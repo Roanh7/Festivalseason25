@@ -1,4 +1,4 @@
-// mijn-festivals.js - Remove all custom user menu code as it's handled by navstatus.js
+// mijn-festivals.js - Updated with past/future button text
 
 document.addEventListener('DOMContentLoaded', async () => {
   const upcomingContainer = document.getElementById('upcomingFestContainer');
@@ -53,6 +53,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     return `${day}-${month}-${year}`;
   }
 
+  // Function to check if a festival date is in the past
+  function isFestivalInPast(festivalDate) {
+    const now = new Date().setHours(0,0,0,0);
+    const festDate = new Date(festivalDate).setHours(0,0,0,0);
+    return festDate < now;
+  }
+
   try {
     // 3) Haal festivals (namen) op voor deze user
     const res = await fetch(`/my-festivals?email=${encodeURIComponent(email)}`);
@@ -95,13 +102,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 4) Voor upcoming: maak cards zonder ratingknop
     upcomingFests.forEach(fest => {
-      const card = createFestivalCard(fest.name, fest.date, email, false); // false => geen ratingknop
+      const card = createFestivalCard(fest.name, fest.date, email, false, false); // false => geen ratingknop, false => niet in verleden
       upcomingContainer.appendChild(card);
     });
 
     // 5) Voor past: maak cards zonder ratingknop
     pastFests.forEach(fest => {
-      const card = createFestivalCard(fest.name, fest.date, email, false); // No rating button
+      const card = createFestivalCard(fest.name, fest.date, email, false, true); // No rating button, true => in het verleden
       pastContainer.appendChild(card);
     });
 
@@ -111,7 +118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // =========== Functie om een festival-card te bouwen ===========
-  function createFestivalCard(festName, isoDate, currentUserEmail, allowRating) {
+  function createFestivalCard(festName, isoDate, currentUserEmail, allowRating, isPast) {
     const card = document.createElement('div');
     card.classList.add('festival-card');
 
@@ -121,11 +128,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     titleDiv.textContent = `${festName} - ${formatDate(isoDate)}`;
     card.appendChild(titleDiv);
 
-    // Een "Wie gaan er nog meer?"-knop
+    // Een "Wie gaan er nog meer?"-knop of "Wie zijn er hier geweest?"-knop
     const attendeesRow = document.createElement('div');
     attendeesRow.classList.add('festival-text');
     const toggleBtn = document.createElement('button');
-    toggleBtn.textContent = "Wie gaan er nog meer?";
+    
+    // Set button text based on past/future
+    toggleBtn.textContent = isPast ? "Wie zijn er hier geweest?" : "Wie gaan er nog meer?";
+    
     attendeesRow.appendChild(toggleBtn);
     card.appendChild(attendeesRow);
 
@@ -153,7 +163,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const others = allAttendees.filter(u => u !== currentUserEmail);
 
             if (others.length === 0) {
-              attendeesDiv.textContent = "Geen andere gebruikers hebben zich aangemeld.";
+              // Customize message based on past/future
+              attendeesDiv.textContent = isPast ? 
+                "Geen andere gebruikers zijn hierheen geweest." : 
+                "Geen andere gebruikers hebben zich aangemeld.";
             } else {
               attendeesDiv.innerHTML = "";
               others.forEach(u => {
@@ -169,7 +182,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       } else {
         expanded = false;
-        toggleBtn.textContent = "Wie gaan er nog meer?";
+        // Reset the button text when collapsing
+        toggleBtn.textContent = isPast ? "Wie zijn er hier geweest?" : "Wie gaan er nog meer?";
         attendeesDiv.classList.remove('expanded');
       }
     });

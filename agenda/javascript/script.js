@@ -1,4 +1,4 @@
-// script.js with improved error handling
+// Updated script.js with conditional button text based on festival date
 
 // ================================
 // 1. COUNTDOWN-DEEL
@@ -12,6 +12,7 @@ const festivals = [
   { name: "Awakenings Upclose", date: "2025-05-17" },
   { name: "Soenda", date: "2025-05-31" },
   { name: "Diynamic", date: "2025-06-07" },
+  { name: "909", date: "2025-06-07" },
   { name: "Open Air", date: "2025-06-08" },
   { name: "Free Your Mind", date: "2025-06-08" },
   { name: "Mystic Garden Festival", date: "2025-06-14" },
@@ -25,6 +26,7 @@ const festivals = [
   { name: "Parels van de stad", date: "2025-09-13" },
   { name: "Into the woods", date: "2025-09-19" },
   { name: "KeineMusik", date: "2025-07-05" },
+  { name: "Vunzige Deuntjes", date: "2025-07-05" },
   { name: "Toffler", date: "2025-05-31" },
 ];
 
@@ -77,7 +79,12 @@ function updateCountdown() {
 setInterval(updateCountdown, 1000);
 updateCountdown(); // direct uitvoeren
 
-
+// Function to check if a festival date is in the past
+function isFestivalInPast(festivalDate) {
+  const now = new Date();
+  const festDate = new Date(festivalDate);
+  return festDate < now;
+}
 
 // ================================
 // 2. SPELER-STATS (popup)
@@ -158,8 +165,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("close-popup").addEventListener("click", () => {
     document.getElementById("player-stats-popup").classList.add("hidden");
   });
-
-  // REMOVED: Hamburger-klik code - this is now handled in navstatus.js
 });
 
 // ================================
@@ -215,6 +220,35 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Zoek de checkboxes
   const checkboxes = document.querySelectorAll('.attend-checkbox');
+
+  // Update attendee button text based on festival date
+  const updateButtonText = () => {
+    const now = new Date();
+    
+    // Get all attendee buttons
+    const attendeeButtons = document.querySelectorAll('.attendees-btn');
+    
+    attendeeButtons.forEach(btn => {
+      const festName = btn.dataset.festival;
+      
+      // Find the matching festival to get the date
+      const festival = festivals.find(f => f.name === festName);
+      
+      if (festival) {
+        const festDate = new Date(festival.date);
+        
+        // Update the button text based on if the date is in the past
+        if (festDate < now) {
+          btn.textContent = "Wie zijn er hier geweest?";
+        } else {
+          btn.textContent = "Wie gaan er nog meer?";
+        }
+      }
+    });
+  };
+  
+  // Call the function to update button text
+  updateButtonText();
 
   // Niet ingelogd => disablen
   if (!token || !userEmail) {
@@ -366,10 +400,22 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`Found ${others.length} other attendees for "${festName}"`);
 
         // 3) Toon in pop-up of alert, of in DOM
+        // Determine message based on festival date
+        const festival = festivals.find(f => f.name === festName);
+        const isPast = festival && isFestivalInPast(festival.date);
+        
+        const messagePrefix = isPast ? 
+          `Niemand anders is naar ${festName} geweest.` : 
+          `Niemand anders heeft zich nog aangemeld voor ${festName}.`;
+        
+        const listPrefix = isPast ?
+          `De volgende gebruikers zijn naar ${festName} geweest:` :
+          `De volgende gebruikers gaan naar ${festName}:`;
+
         if (others.length === 0) {
-          alert(`Niemand anders heeft zich nog aangemeld voor ${festName}.`);
+          alert(messagePrefix);
         } else {
-          alert(`De volgende gebruikers gaan naar ${festName}:\n\n• ${others.join('\n• ')}`);
+          alert(`${listPrefix}\n\n• ${others.join('\n• ')}`);
         }
 
       } catch (err) {

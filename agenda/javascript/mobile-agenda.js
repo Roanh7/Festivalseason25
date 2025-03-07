@@ -1,4 +1,4 @@
-// mobile-agenda.js - Fixed version with proper state synchronization
+// mobile-agenda.js - Updated with past/future button text
 
 document.addEventListener('DOMContentLoaded', function() {
   // Only run this code on mobile devices
@@ -20,6 +20,36 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   });
+
+  // Function to check if a festival date is in the past
+  function isFestivalInPast(dateStr) {
+    const now = new Date();
+    
+    // Handle date ranges like "18-20 april 2025"
+    if (dateStr.includes('-')) {
+      dateStr = dateStr.split('-')[1]; // Use the end date
+    }
+    
+    // Parse date in Dutch format
+    const months = {
+      'januari': 0, 'februari': 1, 'maart': 2, 'april': 3, 'mei': 4, 'juni': 5,
+      'juli': 6, 'augustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'december': 11
+    };
+    
+    const parts = dateStr.trim().split(' ');
+    if (parts.length >= 3) {
+      const day = parseInt(parts[0], 10);
+      const month = months[parts[1].toLowerCase()];
+      const year = parseInt(parts[2], 10);
+      
+      if (!isNaN(day) && month !== undefined && !isNaN(year)) {
+        const festDate = new Date(year, month, day);
+        return festDate < now;
+      }
+    }
+    
+    return false;
+  }
   
   function createMobileView() {
     // Check if mobile view already exists
@@ -71,6 +101,9 @@ document.addEventListener('DOMContentLoaded', function() {
       if (checkboxCell && checkboxCell.dataset.festival) {
         festivalCard.dataset.festival = checkboxCell.dataset.festival;
       }
+      
+      // Check if the festival date is in the past
+      const isPast = isFestivalInPast(date);
       
       // Build the card
       festivalCard.innerHTML = `
@@ -129,6 +162,14 @@ document.addEventListener('DOMContentLoaded', function() {
       // Clone and add the attendees button
       if (attendeesBtn) {
         const clonedBtn = attendeesBtn.cloneNode(true);
+        
+        // Update the button text based on past/future date
+        if (isPast) {
+          clonedBtn.textContent = "Wie zijn er hier geweest?";
+        } else {
+          clonedBtn.textContent = "Wie gaan er nog meer?";
+        }
+        
         festivalCard.querySelector('.action-others').appendChild(clonedBtn);
         
         // Ensure event listeners are preserved by manually adding them
