@@ -28,6 +28,7 @@ const festivals = [
   { name: "KeineMusik", date: "2025-07-05" },
   { name: "Vunzige Deuntjes", date: "2025-07-05" },
   { name: "Toffler", date: "2025-05-31" },
+  { name: "PIV", date: "2025-05-30" },
 ];
 
 function updateCountdown() {
@@ -193,6 +194,7 @@ const festivalLinks = {
   "Strafwerk": "https://www.strafwerkfestival.nl",
   "Parels van de stad": "https://www.parelsvandestad.nl",
   "Toffler": "https://tofflerfestival.nl",
+  "PIV": "https://pivrecords.com/pages/piv-10-years",
   "Into the woods": "https://www.intothewoodsfestival.nl"
 };
 

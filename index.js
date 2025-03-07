@@ -199,6 +199,7 @@ app.post('/attend', async (req, res) => {
       { name: "KeineMusik", date: "2025-07-05" },
       { name: "Vunzige Deuntjes", date: "2025-07-05" },
       { name: "Toffler", date: "2025-05-31" },
+      { name: "PIV", date: "2025-05-30" },
       { name: "Into the woods", date: "2025-09-19" }
     ];
     

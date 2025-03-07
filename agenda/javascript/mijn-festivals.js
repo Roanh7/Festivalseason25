@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     "Latin Village": "2025-08-17",
     "Parels van de stad": "2025-09-13",
     "Into the woods": "2025-09-19",
-    "PIV": "2025-09-30",
+    "PIV": "2025-05-30",
     "Boothstock Festival": "2025-07-12"
   };
   
