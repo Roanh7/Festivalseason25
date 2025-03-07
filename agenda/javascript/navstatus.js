@@ -39,14 +39,21 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
-});
 
-  // Navigation Authentication Logic
+  // Check if user is logged in
   const token = localStorage.getItem('token');
   const email = localStorage.getItem('email');
-  const navMenu = document.getElementById('navMenu');
   const userMenu = document.getElementById('userMenu');
 
+  // Select login and register nav items to hide when logged in
+  const loginNavItem = Array.from(navMenu.querySelectorAll('li')).find(item => 
+    item.querySelector('a[href="login.html"]')
+  );
+  
+  const registerNavItem = Array.from(navMenu.querySelectorAll('li')).find(item => 
+    item.querySelector('a[href="register.html"]')
+  );
+  
   // Helper function to create user display
   const createUserDisplay = (displayName) => {
     // Create desktop logout span
@@ -62,7 +69,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Clear previous content
     userMenu.innerHTML = '';
     userMenu.appendChild(desktopUserSpan);
-  }
+    
+    // Hide login and register items if they exist
+    if (loginNavItem) loginNavItem.style.display = 'none';
+    if (registerNavItem) registerNavItem.style.display = 'none';
+  };
 
   // If user is logged in
   if (token && email) {
@@ -81,64 +92,72 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Error:', error);
         createUserDisplay(email);
       });
+  } else {
+    // User is not logged in, make sure login/register are visible
+    if (loginNavItem) loginNavItem.style.display = '';
+    if (registerNavItem) registerNavItem.style.display = '';
   }
 
-// Authentication-related navigation links update
-const addAccountAndFestivalCardLinks = () => {
-  // First check if account link already exists to avoid duplicates
-  const existingAccountLink = Array.from(navMenu.querySelectorAll('a')).find(a => 
-    a.getAttribute('href') === 'account.html'
-  );
+  // Authentication-related navigation links update
+  const addAccountAndFestivalCardLinks = () => {
+    // First check if account link already exists to avoid duplicates
+    const existingAccountLink = Array.from(navMenu.querySelectorAll('a')).find(a => 
+      a.getAttribute('href') === 'account.html'
+    );
+    
+    const existingFestivalCardLink = Array.from(navMenu.querySelectorAll('a')).find(a => 
+      a.getAttribute('href') === 'festival-card.html'
+    );
+    
+    if (!existingAccountLink && token && email) {
+      // Create new Account link
+      const accountLi = document.createElement('li');
+      const accountLink = document.createElement('a');
+      accountLink.href = 'account.html';
+      accountLink.textContent = 'Mijn Account';
+      
+      // Add 'active' class if we're on the account page
+      if (window.location.pathname.includes('account.html')) {
+        accountLink.classList.add('active');
+      }
+      
+      accountLi.appendChild(accountLink);
+      
+      // Insert before the last item if on mobile (which would be the logout item)
+      if (window.innerWidth <= 768 && document.getElementById('userNameSpan')) {
+        const logoutLi = document.getElementById('userNameSpan').parentElement;
+        navMenu.insertBefore(accountLi, logoutLi);
+      } else {
+        // Otherwise append to the end
+        navMenu.appendChild(accountLi);
+      }
+    }
+    
+    // Add Festival Card link if not already present
+    if (!existingFestivalCardLink && token && email) {
+      // Create new Festival Card link
+      const festivalCardLi = document.createElement('li');
+      const festivalCardLink = document.createElement('a');
+      festivalCardLink.href = 'festival-card.html';
+      festivalCardLink.textContent = 'Festival Card';
+      
+      // Add 'active' class if we're on the festival card page
+      if (window.location.pathname.includes('festival-card.html')) {
+        festivalCardLink.classList.add('active');
+      }
+      
+      festivalCardLi.appendChild(festivalCardLink);
+      
+      // Insert at the appropriate position
+      if (window.innerWidth <= 768 && document.getElementById('userNameSpan')) {
+        const logoutLi = document.getElementById('userNameSpan').parentElement;
+        navMenu.insertBefore(festivalCardLi, logoutLi);
+      } else {
+        navMenu.appendChild(festivalCardLi);
+      }
+    }
+  };
   
-  const existingFestivalCardLink = Array.from(navMenu.querySelectorAll('a')).find(a => 
-    a.getAttribute('href') === 'festival-card.html'
-  );
-  
-  if (!existingAccountLink && token && email) {
-    // Create new Account link
-    const accountLi = document.createElement('li');
-    const accountLink = document.createElement('a');
-    accountLink.href = 'account.html';
-    accountLink.textContent = 'Mijn Account';
-    
-    // Add 'active' class if we're on the account page
-    if (window.location.pathname.includes('account.html')) {
-      accountLink.classList.add('active');
-    }
-    
-    accountLi.appendChild(accountLink);
-    
-    // Insert before the last item if on mobile (which would be the logout item)
-    if (window.innerWidth <= 768 && document.getElementById('userNameSpan')) {
-      const logoutLi = document.getElementById('userNameSpan').parentElement;
-      navMenu.insertBefore(accountLi, logoutLi);
-    } else {
-      // Otherwise append to the end
-      navMenu.appendChild(accountLi);
-    }
-  }
-  
-  // Add Festival Card link if not already present
-  if (!existingFestivalCardLink && token && email) {
-    // Create new Festival Card link
-    const festivalCardLi = document.createElement('li');
-    const festivalCardLink = document.createElement('a');
-    festivalCardLink.href = 'festival-card.html';
-    festivalCardLink.textContent = 'Festival Card';
-    
-    // Add 'active' class if we're on the festival card page
-    if (window.location.pathname.includes('festival-card.html')) {
-      festivalCardLink.classList.add('active');
-    }
-    
-    festivalCardLi.appendChild(festivalCardLink);
-    
-    // Insert at the appropriate position
-    if (window.innerWidth <= 768 && document.getElementById('userNameSpan')) {
-      const logoutLi = document.getElementById('userNameSpan').parentElement;
-      navMenu.insertBefore(festivalCardLi, logoutLi);
-    } else {
-      navMenu.appendChild(festivalCardLi);
-    }
-  }
-};
+  // Call function to update navigation
+  addAccountAndFestivalCardLinks();
+});
