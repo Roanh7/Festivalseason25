@@ -138,3 +138,30 @@
 .hidden {
   display: none !important;
 }
+
+/* Festival Card Button Styles */
+.festival-card-link {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.festival-card-btn {
+  display: inline-block;
+  width: auto;
+  padding: 0.8rem 1.5rem;
+  background-color: #4CAF50;
+  color: white;
+  text-decoration: none;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.festival-card-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
