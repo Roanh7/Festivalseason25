@@ -1,4 +1,4 @@
-// mobile-agenda.js - Updated with past/future button text
+// mobile-agenda.js - Updated with past/future button text and festival link support
 
 document.addEventListener('DOMContentLoaded', function() {
   // Only run this code on mobile devices
@@ -91,7 +91,9 @@ document.addEventListener('DOMContentLoaded', function() {
       const checkboxCell = cells[1].querySelector('input');
       const attendeesBtn = cells[2].querySelector('button');
       const date = cells[3].textContent;
-      const nameLink = cells[4].innerHTML; // Using innerHTML to keep the link
+      const nameCell = cells[4];
+      const nameLink = nameCell.querySelector('a');
+      const festivalName = nameLink ? nameLink.getAttribute('data-name') : cells[4].textContent;
       const location = cells.length > 5 ? cells[5].textContent : '';
       const price = cells.length > 6 ? cells[6].textContent : '';
       const recovery = cells.length > 7 ? cells[7].textContent : '';
@@ -109,7 +111,9 @@ document.addEventListener('DOMContentLoaded', function() {
       festivalCard.innerHTML = `
         <div class="festival-header">
           <span class="festival-number">${number}</span>
-          <div class="festival-name">${nameLink}</div>
+          <div class="festival-name">
+            ${nameLink ? `<a href="#" class="festival-link" data-name="${festivalName}">${festivalName}</a>` : festivalName}
+          </div>
         </div>
         <div class="festival-details">
           <div class="festival-detail"><strong>Datum:</strong> ${date}</div>
@@ -195,6 +199,37 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Make sure mobile checkboxes match desktop checkboxes initially
     updateMobileCheckboxes();
+    
+    // Add event listeners to festival links in mobile view
+    setupMobileFestivalLinks();
+  }
+  
+  // NEW FUNCTION: Add event listeners to festival links in the mobile view
+  function setupMobileFestivalLinks() {
+    // Get the festival links from the desktop version of the site to access URLs
+    const festivalLinks = {};
+    
+    // First, create a mapping of festival names to their URLs from the desktop version
+    document.querySelectorAll(".table-container .festival-link").forEach(link => {
+      const festivalName = link.dataset.name;
+      if (festivalName) {
+        // Store the festival name and associated URL in our dictionary
+        festivalLinks[festivalName] = link;
+      }
+    });
+    
+    // Now add click event listeners to mobile festival links
+    document.querySelectorAll("#mobile-festival-list .festival-link").forEach(link => {
+      link.addEventListener("click", function(event) {
+        event.preventDefault();
+        const festivalName = this.dataset.name;
+        
+        if (festivalName && festivalLinks[festivalName]) {
+          // Trigger the original link's click event to maintain the same behavior
+          festivalLinks[festivalName].click();
+        }
+      });
+    });
   }
   
   // Function to update mobile checkboxes from table view
