@@ -1,0 +1,350 @@
+/* =============== statistieken.css =============== */
+
+/* Import base styles from agenda.css */
+@import url('/styling/agenda.css');
+
+/* Desktop logout button style - repeat for completeness */
+#desktopUserSpan {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+#desktopUserSpan:hover {
+  background-color: #45a049;
+}
+
+/* Ensure userMenu is properly positioned */
+#userMenu {
+  display: inline-block;
+  margin-left: auto;
+}
+
+/* Override nav-menu styles to ensure proper mobile behavior */
+@media (max-width: 768px) {
+  .nav-menu {
+    display: none !important; /* Force hidden by default on mobile */
+  }
+  
+  .nav-menu.open {
+    display: flex !important; /* Force display when open class is applied */
+  }
+  
+  /* Make sure the hamburger toggle is displayed on mobile */
+  .nav-toggle {
+    display: block !important;
+    font-size: 1.8rem;
+    color: white;
+    cursor: pointer;
+  }
+  
+  /* Hide the userMenu completely on mobile */
+  #userMenu {
+    display: none !important;
+  }
+}
+
+/* Specific styles for statistieken page */
+.section-description {
+  text-align: center;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+/* Rankings container */
+.rankings-container {
+  width: 90%;
+  max-width: 800px;
+  margin: 0 auto 3rem;
+}
+
+/* User festivals container */
+.user-festivals-container {
+  width: 90%;
+  max-width: 800px;
+  margin: 0 auto 3rem;
+}
+
+/* Loading and message styles */
+.loading, .message-box {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin: 1rem 0;
+}
+
+/* User rank in rankings */
+.user-rank-card {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.user-rank-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Top 3 users with special colors */
+.user-rank-card.rank-1 {
+  background: linear-gradient(to right, #ffffff, #ffd700);
+  border: 2px solid #daa520;
+}
+
+.user-rank-card.rank-2 {
+  background: linear-gradient(to right, #ffffff, #c0c0c0);
+  border: 2px solid #a9a9a9;
+}
+
+.user-rank-card.rank-3 {
+  background: linear-gradient(to right, #ffffff, #cd7f32);
+  border: 2px solid #8b4513;
+}
+
+/* Current user highlight */
+.user-rank-card.current-user {
+  border: 2px solid #4CAF50;
+  background-color: #f0f9f0;
+}
+
+/* Rank number */
+.rank-number {
+  font-size: 1.8rem;
+  font-weight: bold;
+  min-width: 50px;
+  text-align: center;
+}
+
+.rank-1 .rank-number, .rank-2 .rank-number, .rank-3 .rank-number {
+  color: #333;
+}
+
+/* User info */
+.user-info {
+  flex-grow: 1;
+  padding: 0 1rem;
+}
+
+.user-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.2rem;
+}
+
+/* Phone numbers display */
+.phone-numbers-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+}
+
+.phone-count {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #4CAF50;
+}
+
+.phone-label {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* User festival cards */
+.user-festival-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: transform 0.2s ease;
+}
+
+.user-festival-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.user-festival-info {
+  flex-grow: 1;
+}
+
+.user-festival-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.2rem;
+}
+
+.user-festival-date {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.user-festival-score {
+  display: flex;
+  align-items: center;
+}
+
+.current-score {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #4CAF50;
+  margin-right: 1rem;
+}
+
+.phone-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.phone-btn:hover {
+  background-color: #45a049;
+}
+
+/* Modal styling */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #aaa;
+}
+
+.close-modal:hover {
+  color: #333;
+}
+
+/* Phone number input styling */
+.phone-number-input {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.phone-number-input label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.phone-number-input input {
+  width: 100%;
+  max-width: 200px;
+  padding: 0.8rem;
+  font-size: 1.2rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.submit-btn {
+  display: block;
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.submit-btn:not(:disabled):hover {
+  background-color: #45a049;
+}
+
+/* Helper class */
+.hidden {
+  display: none !important;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .user-rank-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 1rem 0.5rem;
+  }
+  
+  .rank-number {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .user-info {
+    margin-bottom: 0.5rem;
+    padding: 0;
+  }
+  
+  .user-festival-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .user-festival-score {
+    margin-top: 1rem;
+    flex-direction: column;
+  }
+  
+  .current-score {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+}

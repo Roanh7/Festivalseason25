@@ -1,4 +1,4 @@
-// index.js with email notification system added
+// index.js with S-team Statistieken feature added
 
 require('dotenv').config(); // For loading .env variables
 const express = require('express');
@@ -74,6 +74,19 @@ client.connect()
         );
       `);
       
+      // Create phone_numbers table if it doesn't exist (NEW)
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS phone_numbers (
+          id SERIAL PRIMARY KEY,
+          user_email VARCHAR(255) NOT NULL,
+          festival_name VARCHAR(255) NOT NULL,
+          phone_count INTEGER NOT NULL DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(user_email, festival_name)
+        );
+      `);
+      
       console.log('Tables checked/created successfully');
       
       // Initialize notification scheduler
@@ -108,6 +121,9 @@ app.get('/login.html', (req, res) => {
 });
 app.get('/account.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'agenda', 'account.html'));
+});
+app.get('/s-team-statistieken.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'agenda', 's-team-statistieken.html'));
 });
 
 // 6) POST /register => register user
@@ -477,6 +493,125 @@ app.get('/rating', async (req, res) => {
   }
 });
 
+// ============== S-TEAM PHONE NUMBER FUNCTIONALITY ==============
+
+// 14) POST /phone-numbers => user submits phone numbers for a festival
+app.post('/phone-numbers', async (req, res) => {
+  try {
+    const { email, festival, phoneCount } = req.body;
+    
+    if (!email || !festival || phoneCount === undefined) {
+      return res.status(400).json({ message: 'Missing required data' });
+    }
+    
+    // Ensure phoneCount is a non-negative integer
+    const count = Math.max(0, parseInt(phoneCount) || 0);
+    
+    // Check if this record already exists
+    const existingResult = await client.query(
+      'SELECT * FROM phone_numbers WHERE user_email = $1 AND festival_name = $2',
+      [email, festival]
+    );
+    
+    if (existingResult.rows.length > 0) {
+      // Update existing record
+      await client.query(
+        `UPDATE phone_numbers 
+         SET phone_count = $3, updated_at = CURRENT_TIMESTAMP
+         WHERE user_email = $1 AND festival_name = $2`,
+        [email, festival, count]
+      );
+    } else {
+      // Insert new record
+      await client.query(
+        `INSERT INTO phone_numbers (user_email, festival_name, phone_count)
+         VALUES ($1, $2, $3)`,
+        [email, festival, count]
+      );
+    }
+    
+    res.status(200).json({ 
+      message: 'Phone numbers saved successfully',
+      email,
+      festival,
+      phoneCount: count
+    });
+  } catch (err) {
+    console.error('Error in /phone-numbers:', err);
+    res.status(500).json({ message: 'Could not save phone numbers' });
+  }
+});
+
+// 15) GET /my-phone-numbers => get all phone numbers for current user
+app.get('/my-phone-numbers', async (req, res) => {
+  try {
+    const userEmail = req.query.email;
+    
+    if (!userEmail) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    
+    const result = await client.query(
+      'SELECT festival_name, phone_count FROM phone_numbers WHERE user_email = $1',
+      [userEmail]
+    );
+    
+    // Convert to object format for easier lookup
+    const phoneNumbers = {};
+    result.rows.forEach(row => {
+      phoneNumbers[row.festival_name] = row.phone_count;
+    });
+    
+    res.json({ phoneNumbers });
+  } catch (err) {
+    console.error('Error in /my-phone-numbers:', err);
+    res.status(500).json({ message: 'Could not get phone numbers' });
+  }
+});
+
+// 16) GET /phone-number-rankings => get rankings of users by total phone numbers
+app.get('/phone-number-rankings', async (req, res) => {
+  try {
+    // Query to get total phone numbers per user with festival count
+    const result = await client.query(`
+      WITH user_totals AS (
+        SELECT 
+          pn.user_email,
+          SUM(pn.phone_count) AS total_phone_count,
+          COUNT(DISTINCT pn.festival_name) AS festival_count
+        FROM 
+          phone_numbers pn
+        GROUP BY 
+          pn.user_email
+      )
+      SELECT 
+        ut.user_email,
+        u.username,
+        ut.total_phone_count,
+        ut.festival_count
+      FROM 
+        user_totals ut
+      LEFT JOIN 
+        users u ON ut.user_email = u.email
+      ORDER BY 
+        ut.total_phone_count DESC
+    `);
+    
+    // Format the rankings
+    const rankings = result.rows.map(row => ({
+      email: row.user_email,
+      username: row.username,
+      totalPhoneNumbers: parseInt(row.total_phone_count) || 0,
+      festivalCount: parseInt(row.festival_count) || 0
+    }));
+    
+    res.json({ rankings });
+  } catch (err) {
+    console.error('Error in /phone-number-rankings:', err);
+    res.status(500).json({ message: 'Could not get phone number rankings' });
+  }
+});
+
 // Test endpoints for email notifications (only enabled in development)
 if (process.env.NODE_ENV !== 'production') {
   app.get('/test-notification', async (req, res) => {
@@ -627,7 +762,7 @@ app.get('/all-users', async (req, res) => {
   }
 });
 
-// 14) Start server
+// 17) Start server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
