@@ -127,6 +127,56 @@ async function sendAttendanceNotification(userEmail, friendEmail, festivalName, 
   return await sendNotificationEmail(userEmail, subject, text, html);
 }
 
+// Add this to your email-service.js file
+
+/**
+ * Send a notification when a user reaches a streak milestone
+ */
+async function sendStreakMilestoneEmail(userEmail, streakCount) {
+  const subject = `🔥 Je festival streak is nu ${streakCount}!`;
+  
+  const text = `
+    Gefeliciteerd!
+    
+    Je hebt zojuist een festival streak van ${streakCount} bereikt door consequent festivals bij te wonen!
+    
+    Blijf zo doorgaan om je streak te verlengen. Mis geen enkel festival om je vlammen brandende te houden!
+    
+    Festival Agenda 2025
+  `;
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #4CAF50; border-radius: 10px;">
+      <h2 style="color: #ff6b6b;">🔥 Streak Milestone Bereikt! 🔥</h2>
+      <p>Gefeliciteerd!</p>
+      <p>Je hebt zojuist een festival streak van <strong style="color: #ff6b6b; font-size: 1.2em;">${streakCount}</strong> bereikt door consequent festivals bij te wonen!</p>
+      <p>Blijf zo doorgaan om je streak te verlengen. Mis geen enkel festival om je vlammen brandende te houden!</p>
+      <p style="margin-top: 30px; color: #666;">Festival Agenda 2025</p>
+    </div>
+  `;
+  
+  return await sendNotificationEmail(userEmail, subject, text, html);
+}
+
+// Updated streak logic to send notifications for milestones
+async function updateUserStreakWithNotifications(email, previousStreak, newStreak) {
+  // Define milestone values that trigger notifications
+  const milestones = [3, 5, 10, 15, 20, 25];
+  
+  // Check if we crossed a milestone
+  for (const milestone of milestones) {
+    if (previousStreak < milestone && newStreak >= milestone) {
+      try {
+        await sendStreakMilestoneEmail(email, milestone);
+        console.log(`Sent streak milestone (${milestone}) notification to ${email}`);
+      } catch (err) {
+        console.error(`Failed to send streak milestone notification to ${email}:`, err);
+      }
+      break; // Only notify for the highest milestone reached
+    }
+  }
+}
+
 // Initialize the transporter when the module is loaded
 initializeTransporter();
 

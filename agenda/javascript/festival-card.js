@@ -25,6 +25,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const usersListContainer = document.getElementById('users-list-container');
   const usersList = document.getElementById('users-list');
   
+  // DOM Elements - Streak Feature
+  const currentStreakEl = document.getElementById('current-streak');
+  const bestStreakEl = document.getElementById('best-streak');
+  
   // Check if user is logged in
   const token = localStorage.getItem('token');
   const currentUserEmail = localStorage.getItem('email');
@@ -37,6 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     "Loveland Kingsday": "2025-04-26",
     "Verbond": "2025-05-05",
     "Awakenings Upclose": "2025-05-17",
+    "PIV": "2025-05-30",
     "Soenda": "2025-05-31",
     "Toffler": "2025-05-31",
     "909": "2025-06-07",
@@ -46,6 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     "Mystic Garden Festival": "2025-06-14",
     "Vunzige Deuntjes": "2025-07-05",
     "KeineMusik": "2025-07-05",
+    "Boothstock Festival": "2025-07-12",
     "Awakenings Festival": "2025-07-11",
     "Tomorrowland": "2025-07-18",
     "Mysteryland": "2025-07-22",
@@ -54,9 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     "Strafwerk": "2025-08-16",
     "Latin Village": "2025-08-17",
     "Parels van de stad": "2025-09-13",
-    "Into the woods": "2025-09-19",
-    "PIV": "2025-05-30",
-    "Boothstock Festival": "2025-07-12"
+    "Into the woods": "2025-09-19"
   };
   
   // Helper function to format date
@@ -153,6 +157,97 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
   
+  // Function to load streak information
+  async function loadUserStreakInfo() {
+    try {
+      const userEmail = localStorage.getItem('email');
+      
+      if (!userEmail) {
+        return; // User not logged in
+      }
+      
+      const response = await fetch(`/user-streak?email=${encodeURIComponent(userEmail)}`);
+      
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Update UI with streak information
+      if (currentStreakEl && bestStreakEl) {
+        // Store previous values for animation
+        const prevCurrentStreak = parseInt(currentStreakEl.textContent) || 0;
+        
+        // Update values
+        currentStreakEl.textContent = data.currentStreak;
+        bestStreakEl.textContent = data.bestStreak;
+        
+        // Add animation if streak changed
+        if (prevCurrentStreak !== data.currentStreak) {
+          currentStreakEl.classList.add('streak-updated');
+          
+          // Remove animation class after it completes
+          setTimeout(() => {
+            currentStreakEl.classList.remove('streak-updated');
+          }, 600);
+        }
+        
+        // Update streak badges if function exists
+        if (typeof updateStreakBadges === 'function') {
+          updateStreakBadges(data.currentStreak, data.bestStreak);
+        }
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error loading streak info:', error);
+      
+      // Show error in streak element if it exists
+      if (currentStreakEl) {
+        currentStreakEl.textContent = "?";
+      }
+      if (bestStreakEl) {
+        bestStreakEl.textContent = "?";
+      }
+    }
+  }
+  
+  // Load user's streak ranking
+  async function loadStreakRanking() {
+    try {
+      const userEmail = localStorage.getItem('email');
+      
+      if (!userEmail) {
+        return; // User not logged in
+      }
+      
+      const response = await fetch(`/streak-ranking?email=${encodeURIComponent(userEmail)}`);
+      
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Update rank display if elements exist
+      const rankEl = document.getElementById('streak-rank');
+      const percentileEl = document.getElementById('streak-percentile');
+      
+      if (rankEl) {
+        rankEl.textContent = `#${data.rank} / ${data.totalUsers}`;
+      }
+      
+      if (percentileEl) {
+        percentileEl.textContent = `${data.percentile}%`;
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error loading streak ranking:', error);
+    }
+  }
+  
   // Update medal display based on achievement
   function updateMedals(pastCount, elementIdPrefix) {
     // Define medal thresholds and their element IDs
@@ -219,7 +314,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     return html;
   }
   
-  // New function to load all users - FIXED VERSION
+  // Create streak badges HTML for other users' cards
+  function createStreakBadgesHTML(currentStreak, bestStreak) {
+    const badgeConfigs = [
+      { threshold: 3, icon: "🔥", label: "Streak van 3" },
+      { threshold: 5, icon: "🔥🔥", label: "Streak van 5" },
+      { threshold: 10, icon: "🔥🔥🔥", label: "Streak van 10" },
+      { threshold: 15, icon: "⚡🔥⚡", label: "Streak van 15" },
+      { threshold: 20, icon: "🌟🔥🌟", label: "Streak Master" },
+      { threshold: 25, icon: "👑🔥👑", label: "Streak Legende" }
+    ];
+    
+    let html = '';
+    
+    badgeConfigs.forEach(badge => {
+      const earned = bestStreak >= badge.threshold;
+      const earnedClass = earned ? 'earned' : '';
+      const status = earned ? 'Behaald!' : `Nog ${badge.threshold - bestStreak} te gaan`;
+      
+      html += `
+        <div class="badge ${earnedClass}">
+          <div class="badge-icon">${badge.icon}</div>
+          <div class="badge-title">${badge.label}</div>
+          <div class="badge-status">${status}</div>
+        </div>
+      `;
+    });
+    
+    return html;
+  }
+  
+  // Load all users - FIXED VERSION
   async function loadAllUsers() {
     try {
       // Show loading indicator
@@ -301,6 +426,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       const data = await response.json();
       const userFestivals = data.festivals || [];
       
+      // Get user's streak info
+      const streakResponse = await fetch(`/user-streak?email=${encodeURIComponent(userEmail)}`);
+      let streakData = { currentStreak: 0, bestStreak: 0 };
+      
+      if (streakResponse.ok) {
+        streakData = await streakResponse.json();
+      }
+      
       // Divide festivals into upcoming and past
       const now = new Date();
       let upcomingFests = [];
@@ -325,6 +458,28 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // Update medals
       userMedals.innerHTML = createMedalsHTML(pastFests.length);
+      
+      // Add streak information if container exists
+      const userStreakContainer = document.getElementById('user-streak-container');
+      if (userStreakContainer) {
+        userStreakContainer.innerHTML = `
+          <div class="user-streak-info">
+            <div class="streak-box current-streak">
+              <div class="streak-icon">🔥</div>
+              <div class="streak-value">${streakData.currentStreak}</div>
+              <div class="streak-label">Huidige Streak</div>
+            </div>
+            <div class="streak-box best-streak">
+              <div class="streak-icon">🏆</div>
+              <div class="streak-value">${streakData.bestStreak}</div>
+              <div class="streak-label">Beste Streak</div>
+            </div>
+          </div>
+          <div class="streak-badges">
+            ${createStreakBadgesHTML(streakData.currentStreak, streakData.bestStreak)}
+          </div>
+        `;
+      }
       
       // Find common festivals between current user and selected user
       const currentUserData = await loadCurrentUserFestivals();
@@ -377,15 +532,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   
   // Initialize the page
-  loadCurrentUserInfo();
-  loadCurrentUserFestivals();
+  async function initializePage() {
+    await loadCurrentUserInfo();
+    await loadCurrentUserFestivals();
+    await loadUserStreakInfo();
+    await loadStreakRanking();
+  }
   
-  // Set up collapsible users list - FIXED VERSION
+  // Call the initialization function
+  initializePage();
+  
+  // Set up collapsible users list
   toggleUsersListBtn.addEventListener('click', () => {
     // Toggle active class on button
     toggleUsersListBtn.classList.toggle('active');
     
-    // Toggle active class on content - This fixes the display issue
+    // Toggle active class on content
     const isActive = usersListContainer.classList.toggle('active');
     
     // Toggle icon text
@@ -405,4 +567,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     userFestivalCard.classList.add('hidden');
     usersListContainer.classList.add('active');
   });
+  
+  // Function to update streak badges
+  window.updateStreakBadges = function(currentStreak, bestStreak) {
+    const streakThresholds = [3, 5, 10, 15, 20, 25];
+    
+    streakThresholds.forEach(threshold => {
+      const badgeElement = document.getElementById(`badge-streak-${threshold}`);
+      if (badgeElement) {
+        const statusElement = badgeElement.querySelector('.badge-status');
+        
+        if (bestStreak >= threshold) {
+          badgeElement.classList.add('earned');
+          statusElement.textContent = 'Behaald!';
+        } else {
+          badgeElement.classList.remove('earned');
+          statusElement.textContent = `Nog ${threshold - bestStreak} te gaan`;
+        }
+      }
+    });
+  };
 });

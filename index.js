@@ -1,4 +1,4 @@
-// index.js with S-team Statistieken feature added
+// index.js with Festival Streak feature added
 
 require('dotenv').config(); // For loading .env variables
 const express = require('express');
@@ -20,6 +20,335 @@ app.use(express.json());
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
+});
+
+// Test endpoints for email notifications (only enabled in development)
+if (process.env.NODE_ENV !== 'production') {
+  app.get('/test-notification', async (req, res) => {
+    try {
+      const testEmail = req.query.email || 'test@example.com';
+      const testFestival = req.query.festival || 'Test Festival';
+      const testDate = req.query.date || '2025-06-01';
+      const daysUntil = req.query.days || 7;
+      
+      console.log(`Sending test notification to ${testEmail} for ${testFestival}`);
+      
+      // Test sending a festival reminder
+      const result = await emailService.sendFestivalReminder(
+        testEmail,
+        testFestival,
+        testDate,
+        daysUntil
+      );
+      
+      res.json({ 
+        message: 'Test notification sent!', 
+        details: result,
+        previewUrl: result.testMessageUrl || 'No preview available'
+      });
+    } catch (err) {
+      console.error('Error sending test notification:', err);
+      res.status(500).json({ message: 'Failed to send test notification', error: err.message });
+    }
+  });
+  
+  // Test endpoint for running the festival reminder check
+  app.get('/test-reminders', async (req, res) => {
+    try {
+      console.log('Manually triggering festival reminder check');
+      await notificationScheduler.sendFestivalReminders();
+      res.json({ message: 'Festival reminder check completed' });
+    } catch (err) {
+      console.error('Error running reminder check:', err);
+      res.status(500).json({ message: 'Failed to run reminder check', error: err.message });
+    }
+  });
+  
+  // Test streak calculation
+  app.get('/test-streak', async (req, res) => {
+    try {
+      const testEmail = req.query.email;
+      if (!testEmail) {
+        return res.status(400).json({ message: 'Email parameter is required' });
+      }
+      
+      const streakInfo = await updateUserStreak(testEmail);
+      res.json({
+        message: 'Streak calculation performed',
+        email: testEmail,
+        streakInfo
+      });
+    } catch (err) {
+      console.error('Error in test streak calculation:', err);
+      res.status(500).json({ message: 'Failed to test streak calculation', error: err.message });
+    }
+  });
+}
+
+// 17) Start server
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
+
+// ============== EMAIL NOTIFICATION FOR STREAKS ==============
+
+// Add streak milestone notification function to email-service.js
+emailService.sendStreakMilestoneEmail = async function(userEmail, streakCount) {
+  const subject = `🔥 Je festival streak is nu ${streakCount}!`;
+  
+  const text = `
+    Gefeliciteerd!
+    
+    Je hebt zojuist een festival streak van ${streakCount} bereikt door consequent festivals bij te wonen!
+    
+    Blijf zo doorgaan om je streak te verlengen. Mis geen enkel festival om je vlammen brandende te houden!
+    
+    Festival Agenda 2025
+  `;
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #4CAF50; border-radius: 10px;">
+      <h2 style="color: #ff6b6b;">🔥 Streak Milestone Bereikt! 🔥</h2>
+      <p>Gefeliciteerd!</p>
+      <p>Je hebt zojuist een festival streak van <strong style="color: #ff6b6b; font-size: 1.2em;">${streakCount}</strong> bereikt door consequent festivals bij te wonen!</p>
+      <p>Blijf zo doorgaan om je streak te verlengen. Mis geen enkel festival om je vlammen brandende te houden!</p>
+      <p style="margin-top: 30px; color: #666;">Festival Agenda 2025</p>
+    </div>
+  `;
+  
+  return await emailService.sendNotificationEmail(userEmail, subject, text, html);
+};
+
+// ============== USERNAME FUNCTIONALITY ==============
+
+// GET /username => get username for a specific email
+app.get('/username', async (req, res) => {
+  try {
+    const userEmail = req.query.email;
+    if (!userEmail) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    
+    const result = await client.query(
+      'SELECT username FROM users WHERE email = $1',
+      [userEmail]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    res.json({ username: result.rows[0].username });
+  } catch (err) {
+    console.error('Error fetching username:', err);
+    res.status(500).json({ message: 'Failed to fetch username', error: err.message });
+  }
+});
+
+// POST /username => set or update username for a user
+app.post('/username', async (req, res) => {
+  try {
+    const { email, username } = req.body;
+    
+    if (!email || !username) {
+      return res.status(400).json({ message: 'Email and username are required' });
+    }
+    
+    // Check if username is already taken by another user
+    const existingUser = await client.query(
+      'SELECT email FROM users WHERE username = $1 AND email != $2',
+      [username, email]
+    );
+    
+    if (existingUser.rows.length > 0) {
+      return res.status(409).json({ message: 'Username is already taken' });
+    }
+    
+    // Update the username
+    const result = await client.query(
+      'UPDATE users SET username = $1 WHERE email = $2 RETURNING username',
+      [username, email]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    res.json({ 
+      message: 'Username updated successfully',
+      username: result.rows[0].username 
+    });
+  } catch (err) {
+    console.error('Error updating username:', err);
+    res.status(500).json({ message: 'Failed to update username', error: err.message });
+  }
+});
+
+// GET /display-name => Get display name (username or email) for a specific email
+app.get('/display-name', async (req, res) => {
+  try {
+    const userEmail = req.query.email;
+    if (!userEmail) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    
+    const result = await client.query(
+      'SELECT username FROM users WHERE email = $1',
+      [userEmail]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // Return username if set, otherwise return email
+    const displayName = result.rows[0].username || userEmail;
+    
+    res.json({ displayName });
+  } catch (err) {
+    console.error('Error fetching display name:', err);
+    res.status(500).json({ message: 'Failed to fetch display name', error: err.message });
+  }
+});
+
+// GET /all-users => get list of all registered users (for festival cards)
+app.get('/all-users', async (req, res) => {
+  try {
+    const result = await client.query(
+      'SELECT email, username FROM users ORDER BY COALESCE(username, email)'
+    );
+    
+    const users = result.rows;
+    res.json({ users });
+  } catch (err) {
+    console.error('Error in /all-users:', err);
+    res.status(500).json({ message: 'Could not get users list' });
+  }
+});
+
+// GET /streak-leaderboard => get top users by streak
+app.get('/streak-leaderboard', async (req, res) => {
+  try {
+    // Get top users by current streak or best streak
+    const result = await client.query(`
+      SELECT 
+        email, 
+        username, 
+        current_streak, 
+        best_streak
+      FROM 
+        users
+      WHERE 
+        best_streak > 0
+      ORDER BY 
+        best_streak DESC, 
+        current_streak DESC
+      LIMIT 10
+    `);
+    
+    // Format the data for the frontend
+    const leaderboard = result.rows.map(row => ({
+      displayName: row.username || row.email,
+      email: row.email,
+      currentStreak: row.current_streak || 0,
+      bestStreak: row.best_streak || 0
+    }));
+    
+    res.json({ leaderboard });
+  } catch (err) {
+    console.error('Error fetching streak leaderboard:', err);
+    res.status(500).json({ message: 'Could not get streak leaderboard' });
+  }
+});
+
+// GET /streak-ranking => get user's position in the streak rankings
+app.get('/streak-ranking', async (req, res) => {
+  try {
+    const userEmail = req.query.email;
+    if (!userEmail) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    
+    // Get user's best streak
+    const userResult = await client.query(`
+      SELECT best_streak FROM users WHERE email = $1
+    `, [userEmail]);
+    
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    const userBestStreak = userResult.rows[0].best_streak || 0;
+    
+    // Count how many users have a higher best streak
+    const rankingResult = await client.query(`
+      SELECT COUNT(*) as rank_position 
+      FROM users 
+      WHERE best_streak > $1
+    `, [userBestStreak]);
+    
+    // Get total number of users with streaks
+    const totalResult = await client.query(`
+      SELECT COUNT(*) as total 
+      FROM users 
+      WHERE best_streak > 0
+    `);
+    
+    // User's rank is their position plus 1 (0-indexed to 1-indexed)
+    const rankPosition = parseInt(rankingResult.rows[0].rank_position) + 1;
+    const totalUsers = parseInt(totalResult.rows[0].total);
+    
+    res.json({
+      rank: rankPosition,
+      totalUsers: totalUsers,
+      percentile: totalUsers > 0 ? Math.round(((totalUsers - rankPosition) / totalUsers) * 100) : 0
+    });
+  } catch (err) {
+    console.error('Error getting streak ranking:', err);
+    res.status(500).json({ message: 'Failed to get streak ranking' });
+  }
+});
+
+// POST /recalculate-streaks => Force recalculation of all user streaks
+// This endpoint is useful after database changes or to fix incorrect streaks
+app.post('/recalculate-streaks', async (req, res) => {
+  try {
+    // Get all users
+    const usersResult = await client.query('SELECT email FROM users');
+    const users = usersResult.rows;
+    
+    console.log(`Recalculating streaks for ${users.length} users`);
+    
+    // Process results
+    const results = {
+      totalProcessed: users.length,
+      successful: 0,
+      failed: 0,
+      errors: []
+    };
+    
+    // Update streak for each user
+    for (const user of users) {
+      try {
+        await updateUserStreak(user.email);
+        results.successful++;
+      } catch (error) {
+        results.failed++;
+        results.errors.push({
+          email: user.email,
+          error: error.message
+        });
+      }
+    }
+    
+    res.json({
+      message: 'Streak recalculation completed',
+      results
+    });
+  } catch (err) {
+    console.error('Error in streak recalculation:', err);
+    res.status(500).json({ message: 'Failed to recalculate streaks' });
+  }
 });
 
 // 3) Connect to Neon (Postgres)
@@ -47,6 +376,8 @@ client.connect()
           email VARCHAR(255) UNIQUE NOT NULL,
           password VARCHAR(255) NOT NULL,
           username VARCHAR(255) UNIQUE,
+          current_streak INTEGER DEFAULT 0,
+          best_streak INTEGER DEFAULT 0,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       `);
@@ -74,7 +405,7 @@ client.connect()
         );
       `);
       
-      // Create phone_numbers table if it doesn't exist (NEW)
+      // Create phone_numbers table if it doesn't exist
       await client.query(`
         CREATE TABLE IF NOT EXISTS phone_numbers (
           id SERIAL PRIMARY KEY,
@@ -86,6 +417,63 @@ client.connect()
           UNIQUE(user_email, festival_name)
         );
       `);
+      
+      // Create festivals table if it doesn't exist
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS festivals (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) UNIQUE NOT NULL,
+          date VARCHAR(10) NOT NULL,
+          location VARCHAR(255),
+          price VARCHAR(50),
+          chip_scale INTEGER,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+      
+      // Check if festivals data needs to be populated
+      const festivalCount = await client.query('SELECT COUNT(*) FROM festivals');
+      
+      if (parseInt(festivalCount.rows[0].count) === 0) {
+        // Populate with initial festivals from your existing data
+        const festivals = [
+          { name: "Wavy", date: "2024-12-21" },
+          { name: "DGTL", date: "2025-04-18" },
+          { name: "Free your mind Kingsday", date: "2025-04-26" },
+          { name: "Loveland Kingsday", date: "2025-04-26" },
+          { name: "Verbond", date: "2025-05-05" },
+          { name: "Awakenings Upclose", date: "2025-05-17" },
+          { name: "PIV", date: "2025-05-30" },
+          { name: "Soenda", date: "2025-05-31" },
+          { name: "Toffler", date: "2025-05-31" },
+          { name: "909", date: "2025-06-07" },
+          { name: "Diynamic", date: "2025-06-07" },
+          { name: "Open Air", date: "2025-06-08" },
+          { name: "Free Your Mind", date: "2025-06-08" },
+          { name: "Mystic Garden Festival", date: "2025-06-14" },
+          { name: "Vunzige Deuntjes", date: "2025-07-05" },
+          { name: "KeineMusik", date: "2025-07-05" },
+          { name: "Boothstock Festival", date: "2025-07-12" },
+          { name: "Awakenings Festival", date: "2025-07-11" },
+          { name: "Tomorrowland", date: "2025-07-18" },
+          { name: "Mysteryland", date: "2025-07-22" },
+          { name: "No Art", date: "2025-07-26" },
+          { name: "Loveland", date: "2025-08-09" },
+          { name: "Strafwerk", date: "2025-08-16" },
+          { name: "Latin Village", date: "2025-08-17" },
+          { name: "Parels van de stad", date: "2025-09-13" },
+          { name: "Into the woods", date: "2025-09-19" }
+        ];
+        
+        for (const festival of festivals) {
+          await client.query(
+            'INSERT INTO festivals (name, date) VALUES ($1, $2) ON CONFLICT (name) DO NOTHING',
+            [festival.name, festival.date]
+          );
+        }
+        
+        console.log('Festivals table populated with initial data');
+      }
       
       console.log('Tables checked/created successfully');
       
@@ -174,7 +562,115 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// 8) POST /attend => user signs up for festival
+// Streak calculation function
+async function updateUserStreak(email) {
+  try {
+    // Get all festivals sorted by date
+    const allFestivalsResult = await client.query(`
+      SELECT name, to_date(date, 'YYYY-MM-DD') as date_obj 
+      FROM festivals 
+      ORDER BY date_obj ASC
+    `);
+    const allFestivals = allFestivalsResult.rows;
+    
+    // Get user's attended festivals
+    const userFestivalsResult = await client.query(`
+      SELECT festival_name 
+      FROM attendances 
+      WHERE user_email = $1
+    `, [email]);
+    const userFestivals = new Set(userFestivalsResult.rows.map(row => row.festival_name));
+    
+    // Get current streak value for notifications
+    const currentStreakResult = await client.query(`
+      SELECT current_streak FROM users WHERE email = $1
+    `, [email]);
+    const previousStreak = currentStreakResult.rows.length > 0 ? currentStreakResult.rows[0].current_streak : 0;
+    
+    // Calculate the current streak
+    let currentStreak = 0;
+    let maxStreak = 0;
+    let lastAttendedIndex = -1;
+    
+    // Loop through festivals in chronological order
+    for (let i = 0; i < allFestivals.length; i++) {
+      const festivalName = allFestivals[i].name;
+      
+      if (userFestivals.has(festivalName)) {
+        // Check if this is the next festival in sequence or the first one
+        if (lastAttendedIndex === -1 || lastAttendedIndex === i - 1) {
+          currentStreak++;
+        } else {
+          // User missed a festival, reset streak
+          currentStreak = 1;
+        }
+        
+        lastAttendedIndex = i;
+        maxStreak = Math.max(maxStreak, currentStreak);
+      }
+    }
+    
+    // Update user's streak information
+    await client.query(`
+      UPDATE users 
+      SET current_streak = $1, 
+          best_streak = GREATEST(best_streak, $2)
+      WHERE email = $3
+    `, [currentStreak, maxStreak, email]);
+    
+    // Check for streak milestones and send notifications if necessary
+    if (currentStreak > previousStreak) {
+      // Define milestone values that trigger notifications
+      const milestones = [3, 5, 10, 15, 20, 25];
+      
+      // Check if we crossed a milestone
+      for (const milestone of milestones) {
+        if (previousStreak < milestone && currentStreak >= milestone) {
+          try {
+            await emailService.sendStreakMilestoneEmail(email, milestone);
+            console.log(`Sent streak milestone (${milestone}) notification to ${email}`);
+          } catch (err) {
+            console.error(`Failed to send streak milestone notification to ${email}:`, err);
+          }
+          break; // Only notify for the highest milestone reached
+        }
+      }
+    }
+    
+    return { currentStreak, maxStreak };
+  } catch (err) {
+    console.error('Error updating streak:', err);
+    throw err;
+  }
+}
+
+// Function to handle attendance change and update streak
+async function handleAttendanceChange(email, festivalName, isAttending) {
+  try {
+    if (isAttending) {
+      // User is attending a festival
+      await client.query(`
+        INSERT INTO attendances (user_email, festival_name)
+        VALUES ($1, $2)
+        ON CONFLICT (user_email, festival_name) DO NOTHING
+      `, [email, festivalName]);
+    } else {
+      // User is no longer attending a festival
+      await client.query(`
+        DELETE FROM attendances 
+        WHERE user_email = $1 AND festival_name = $2
+      `, [email, festivalName]);
+    }
+    
+    // Update streak after attendance change
+    return await updateUserStreak(email);
+  } catch (err) {
+    console.error('Error handling attendance change:', err);
+    throw err;
+  }
+}
+
+// 8) POST /attend => user signs up for festival (modified to update streak)
 app.post('/attend', async (req, res) => {
   try {
     const { email, festival } = req.body;
@@ -182,13 +678,8 @@ app.post('/attend', async (req, res) => {
       return res.status(400).json({ message: 'Missing email or festival' });
     }
     
-    // Add the attendance record
-    await client.query(
-      `INSERT INTO attendances (user_email, festival_name)
-       VALUES ($1, $2)
-       ON CONFLICT (user_email, festival_name) DO NOTHING`,
-      [email, festival]
-    );
+    // Add the attendance record and update streak
+    const streakInfo = await handleAttendanceChange(email, festival, true);
     
     // Get the festival date for the notification
     const festivals = [
@@ -252,25 +743,33 @@ app.post('/attend', async (req, res) => {
       }
     }
     
-    res.json({ message: `You are attending ${festival}!` });
+    res.json({ 
+      message: `You are attending ${festival}!`,
+      streak: streakInfo.currentStreak,
+      bestStreak: streakInfo.maxStreak
+    });
   } catch (err) {
     console.error('Error in /attend:', err);
     res.status(500).json({ message: 'Could not attend festival.' });
   }
 });
 
-// 9) DELETE /attend => user unregisters from festival
+// 9) DELETE /attend => user unregisters from festival (modified to update streak)
 app.delete('/attend', async (req, res) => {
   try {
     const { email, festival } = req.body;
     if (!email || !festival) {
       return res.status(400).json({ message: 'Missing email or festival' });
     }
-    await client.query(
-      'DELETE FROM attendances WHERE user_email=$1 AND festival_name=$2',
-      [email, festival]
-    );
-    res.json({ message: `You are no longer attending ${festival}.` });
+    
+    // Remove the attendance record and update streak
+    const streakInfo = await handleAttendanceChange(email, festival, false);
+    
+    res.json({ 
+      message: `You are no longer attending ${festival}.`,
+      streak: streakInfo.currentStreak,
+      bestStreak: streakInfo.maxStreak
+    });
   } catch (err) {
     console.error('Error in DELETE /attend:', err);
     res.status(500).json({ message: 'Could not unattend festival.' });
@@ -612,157 +1111,33 @@ app.get('/phone-number-rankings', async (req, res) => {
   }
 });
 
-// Test endpoints for email notifications (only enabled in development)
-if (process.env.NODE_ENV !== 'production') {
-  app.get('/test-notification', async (req, res) => {
-    try {
-      const testEmail = req.query.email || 'test@example.com';
-      const testFestival = req.query.festival || 'Test Festival';
-      const testDate = req.query.date || '2025-06-01';
-      const daysUntil = req.query.days || 7;
-      
-      console.log(`Sending test notification to ${testEmail} for ${testFestival}`);
-      
-      // Test sending a festival reminder
-      const result = await emailService.sendFestivalReminder(
-        testEmail,
-        testFestival,
-        testDate,
-        daysUntil
-      );
-      
-      res.json({ 
-        message: 'Test notification sent!', 
-        details: result,
-        previewUrl: result.testMessageUrl || 'No preview available'
-      });
-    } catch (err) {
-      console.error('Error sending test notification:', err);
-      res.status(500).json({ message: 'Failed to send test notification', error: err.message });
-    }
-  });
-  
-  // Test endpoint for running the festival reminder check
-  app.get('/test-reminders', async (req, res) => {
-    try {
-      console.log('Manually triggering festival reminder check');
-      await notificationScheduler.sendFestivalReminders();
-      res.json({ message: 'Festival reminder check completed' });
-    } catch (err) {
-      console.error('Error running reminder check:', err);
-      res.status(500).json({ message: 'Failed to run reminder check', error: err.message });
-    }
-  });
-}
+// ============== USER STREAK FUNCTIONALITY ==============
 
-// ============== USERNAME FUNCTIONALITY ==============
-
-// GET /username => get username for a specific email
-app.get('/username', async (req, res) => {
+// GET /user-streak => get user streak information
+app.get('/user-streak', async (req, res) => {
   try {
     const userEmail = req.query.email;
     if (!userEmail) {
       return res.status(400).json({ message: 'Email is required' });
     }
     
-    const result = await client.query(
-      'SELECT username FROM users WHERE email = $1',
-      [userEmail]
-    );
+    // Get streak information from the database
+    const result = await client.query(`
+      SELECT current_streak, best_streak 
+      FROM users 
+      WHERE email = $1
+    `, [userEmail]);
     
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'User not found' });
     }
     
-    res.json({ username: result.rows[0].username });
-  } catch (err) {
-    console.error('Error fetching username:', err);
-    res.status(500).json({ message: 'Failed to fetch username', error: err.message });
-  }
-});
-
-// POST /username => set or update username for a user
-app.post('/username', async (req, res) => {
-  try {
-    const { email, username } = req.body;
-    
-    if (!email || !username) {
-      return res.status(400).json({ message: 'Email and username are required' });
-    }
-    
-    // Check if username is already taken by another user
-    const existingUser = await client.query(
-      'SELECT email FROM users WHERE username = $1 AND email != $2',
-      [username, email]
-    );
-    
-    if (existingUser.rows.length > 0) {
-      return res.status(409).json({ message: 'Username is already taken' });
-    }
-    
-    // Update the username
-    const result = await client.query(
-      'UPDATE users SET username = $1 WHERE email = $2 RETURNING username',
-      [username, email]
-    );
-    
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    
-    res.json({ 
-      message: 'Username updated successfully',
-      username: result.rows[0].username 
+    res.json({
+      currentStreak: result.rows[0].current_streak || 0,
+      bestStreak: result.rows[0].best_streak || 0
     });
   } catch (err) {
-    console.error('Error updating username:', err);
-    res.status(500).json({ message: 'Failed to update username', error: err.message });
+    console.error('Error getting user streak:', err);
+    res.status(500).json({ message: 'Failed to get streak information' });
   }
-});
-
-// GET /display-name => Get display name (username or email) for a specific email
-app.get('/display-name', async (req, res) => {
-  try {
-    const userEmail = req.query.email;
-    if (!userEmail) {
-      return res.status(400).json({ message: 'Email is required' });
-    }
-    
-    const result = await client.query(
-      'SELECT username FROM users WHERE email = $1',
-      [userEmail]
-    );
-    
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    
-    // Return username if set, otherwise return email
-    const displayName = result.rows[0].username || userEmail;
-    
-    res.json({ displayName });
-  } catch (err) {
-    console.error('Error fetching display name:', err);
-    res.status(500).json({ message: 'Failed to fetch display name', error: err.message });
-  }
-});
-
-// GET /all-users => get list of all registered users (for festival cards)
-app.get('/all-users', async (req, res) => {
-  try {
-    const result = await client.query(
-      'SELECT email, username FROM users ORDER BY COALESCE(username, email)'
-    );
-    
-    const users = result.rows;
-    res.json({ users });
-  } catch (err) {
-    console.error('Error in /all-users:', err);
-    res.status(500).json({ message: 'Could not get users list' });
-  }
-});
-
-// 17) Start server
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
 });
