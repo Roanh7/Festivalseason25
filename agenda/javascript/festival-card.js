@@ -63,6 +63,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     "Into the woods": "2025-09-19"
   };
   
+  // Festival prices for spending calculation
+  const festivalPrices = {
+    "Wavy": 26.04,
+    "DGTL": 90.00,
+    "Free your mind Kingsday": 33.33,
+    "Loveland Kingsday": 51.00,
+    "Verbond": 60.00,
+    "Awakenings Upclose": 79.95,
+    "PIV": 60.00,
+    "Toffler": 50.00,
+    "Soenda": 69.95,
+    "Diynamic": 33.00,
+    "909": 52.50,
+    "Open Air": 63.00,
+    "Free Your Mind": 54.75,
+    "Mystic Garden Festival": 85.00,
+    "Vunzige Deuntjes": 69.00,
+    "KeineMusik": 100.00,
+    "Boothstock Festival": 70.00,
+    "Awakenings Festival": 109.00,
+    "Tomorrowland": 105.00,
+    "Mysteryland": 119.95,
+    "No Art": 70.00,
+    "Loveland": 82.50,
+    "Latin Village": 50.00,
+    "Strafwerk": 0.00, // Price not provided, setting to 0
+    "Parels van de stad": 36.00,
+    "Into the woods": 53.00
+  };
+  
   // Helper function to format date
   function formatDate(isoDate) {
     const d = new Date(isoDate);
@@ -84,6 +114,36 @@ document.addEventListener('DOMContentLoaded', async () => {
   notLoggedInSection.classList.add('hidden');
   myFestivalCard.classList.remove('hidden');
   viewOtherUsers.classList.remove('hidden');
+  
+  // Function to calculate spending on festivals, split between past and future
+  async function calculateTotalSpending(festivals) {
+    // Calculate spending split between past and future festivals
+    let pastSpent = 0;
+    let futureSpend = 0;
+    const now = new Date();
+    
+    festivals.forEach(festName => {
+      const dateStr = festivalDates[festName];
+      if (!dateStr || festivalPrices[festName] === undefined) return;
+      
+      const festDate = new Date(dateStr);
+      
+      // Check if festival is in the past or future
+      if (festDate < now) {
+        // Past festival - already spent
+        pastSpent += festivalPrices[festName];
+      } else {
+        // Future festival - about to spend
+        futureSpend += festivalPrices[festName];
+      }
+    });
+
+    return {
+      pastSpent: pastSpent.toFixed(2),     // Amount already spent
+      futureSpend: futureSpend.toFixed(2), // Amount to be spent
+      totalSpent: (pastSpent + futureSpend).toFixed(2) // Total overall
+    };
+  }
   
   // Load the user's display name (username or email)
   async function loadCurrentUserInfo() {
@@ -139,10 +199,35 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Update medals based on total past festivals
       updateMedals(pastFests.length, 'medal');
       
+      // Calculate and display spending breakdown
+      const spendingData = await calculateTotalSpending(userFestivals);
+      
+      // Update all spending displays
+      const pastSpentElement = document.getElementById('past-spending');
+      const futureSpendElement = document.getElementById('future-spending');
+      const totalSpendingElement = document.getElementById('total-spending');
+      
+      if (pastSpentElement) {
+        pastSpentElement.textContent = `€${spendingData.pastSpent}`;
+      }
+      
+      if (futureSpendElement) {
+        futureSpendElement.textContent = `€${spendingData.futureSpend}`;
+      }
+      
+      if (totalSpendingElement) {
+        totalSpendingElement.textContent = `€${spendingData.totalSpent}`;
+      }
+      
       return {
         upcoming: upcomingFests,
         past: pastFests,
-        all: userFestivals
+        all: userFestivals,
+        spendingData: {
+          pastSpent: spendingData.pastSpent,
+          futureSpend: spendingData.futureSpend,
+          totalSpent: spendingData.totalSpent
+        }
       };
     } catch (error) {
       console.error('Error fetching festival data:', error);
@@ -153,10 +238,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       errorDiv.textContent = 'Er is een probleem opgetreden bij het laden van je festival gegevens.';
       myFestivalCard.appendChild(errorDiv);
       
-      return { upcoming: [], past: [], all: [] };
+      return { upcoming: [], past: [], all: [], totalSpent: "0.00" };
     }
   }
-  
+
   // Function to load streak information
   async function loadUserStreakInfo() {
     try {
@@ -459,6 +544,26 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Update medals
       userMedals.innerHTML = createMedalsHTML(pastFests.length);
       
+      // Calculate and display spending breakdown for the selected user
+      const userSpendingData = await calculateTotalSpending(userFestivals);
+      
+      // Update all spending displays for the user
+      const userPastSpentElement = document.getElementById('user-past-spending');
+      const userFutureSpendElement = document.getElementById('user-future-spending');
+      const userTotalSpendingElement = document.getElementById('user-total-spending');
+      
+      if (userPastSpentElement) {
+        userPastSpentElement.textContent = `€${userSpendingData.pastSpent}`;
+      }
+      
+      if (userFutureSpendElement) {
+        userFutureSpendElement.textContent = `€${userSpendingData.futureSpend}`;
+      }
+      
+      if (userTotalSpendingElement) {
+        userTotalSpendingElement.textContent = `€${userSpendingData.totalSpent}`;
+      }
+      
       // Add streak information if container exists
       const userStreakContainer = document.getElementById('user-streak-container');
       if (userStreakContainer) {
@@ -534,9 +639,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize the page
   async function initializePage() {
     await loadCurrentUserInfo();
-    await loadCurrentUserFestivals();
+    const userData = await loadCurrentUserFestivals();
     await loadUserStreakInfo();
     await loadStreakRanking();
+    
+    // No need to update spending displays here as it's already handled in loadCurrentUserFestivals
   }
   
   // Call the initialization function

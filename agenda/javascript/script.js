@@ -1,4 +1,4 @@
-// Updated script.js with conditional button text based on festival date
+// Updated script.js with conditional button text based on festival date and spending tracking
 
 // ================================
 // 1. COUNTDOWN-DEEL
@@ -10,12 +10,17 @@ const festivals = [
   { name: "Loveland Kingsday", date: "2025-04-26" },
   { name: "Verbond", date: "2025-05-05" },
   { name: "Awakenings Upclose", date: "2025-05-17" },
+  { name: "PIV", date: "2025-05-30" },
   { name: "Soenda", date: "2025-05-31" },
-  { name: "Diynamic", date: "2025-06-07" },
+  { name: "Toffler", date: "2025-05-31" },
   { name: "909", date: "2025-06-07" },
+  { name: "Diynamic", date: "2025-06-07" },
   { name: "Open Air", date: "2025-06-08" },
   { name: "Free Your Mind", date: "2025-06-08" },
   { name: "Mystic Garden Festival", date: "2025-06-14" },
+  { name: "Vunzige Deuntjes", date: "2025-07-05" },
+  { name: "KeineMusik", date: "2025-07-05" },
+  { name: "Boothstock Festival", date: "2025-07-12" },
   { name: "Awakenings Festival", date: "2025-07-11" },
   { name: "Tomorrowland", date: "2025-07-18" },
   { name: "Mysteryland", date: "2025-07-22" },
@@ -24,12 +29,38 @@ const festivals = [
   { name: "Strafwerk", date: "2025-08-16" },
   { name: "Latin Village", date: "2025-08-17" },
   { name: "Parels van de stad", date: "2025-09-13" },
-  { name: "Into the woods", date: "2025-09-19" },
-  { name: "KeineMusik", date: "2025-07-05" },
-  { name: "Vunzige Deuntjes", date: "2025-07-05" },
-  { name: "Toffler", date: "2025-05-31" },
-  { name: "PIV", date: "2025-05-30" },
+  { name: "Into the woods", date: "2025-09-19" }
 ];
+
+// Festival prices for spending calculation
+const festivalPrices = {
+  "Wavy": 26.04,
+  "DGTL": 90.00,
+  "Free your mind Kingsday": 33.33,
+  "Loveland Kingsday": 51.00,
+  "Verbond": 60.00,
+  "Awakenings Upclose": 79.95,
+  "PIV": 60.00,
+  "Toffler": 50.00,
+  "Soenda": 69.95,
+  "Diynamic": 33.00,
+  "909": 52.50,
+  "Open Air": 63.00,
+  "Free Your Mind": 54.75,
+  "Mystic Garden Festival": 85.00,
+  "Vunzige Deuntjes": 69.00,
+  "KeineMusik": 100.00,
+  "Boothstock Festival": 70.00,
+  "Awakenings Festival": 109.00,
+  "Tomorrowland": 105.00,
+  "Mysteryland": 119.95,
+  "No Art": 70.00,
+  "Loveland": 82.50,
+  "Latin Village": 50.00,
+  "Strafwerk": 0.00, // Price not provided, setting to 0
+  "Parels van de stad": 36.00,
+  "Into the woods": 53.00
+};
 
 function updateCountdown() {
   const now = new Date();
@@ -213,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ================================
-// 4. FESTIVAL ATTENDANCE (DB-based)
+// 4. FESTIVAL ATTENDANCE & SPENDING (DB-based)
 // ================================
 document.addEventListener('DOMContentLoaded', async () => {
   // 4a) Check of user is ingelogd
@@ -260,12 +291,80 @@ document.addEventListener('DOMContentLoaded', async () => {
     return; 
   }
 
+  // Function to update spending display on the Festival Card page
+  async function updateFestivalCardSpending() {
+    // Only proceed if we have a logged-in user
+    const userEmail = localStorage.getItem('email');
+    if (!userEmail) return;
+    
+    try {
+      // Fetch the user's festivals
+      const response = await fetch(`/my-festivals?email=${encodeURIComponent(userEmail)}`);
+      
+      if (!response.ok) {
+        console.error(`Error fetching festivals: ${response.status}`);
+        return;
+      }
+      
+      const data = await response.json();
+      const festivals = data.festivals || [];
+      
+      // Calculate spending split between past and future
+      let pastSpent = 0;
+      let futureSpend = 0;
+      const now = new Date();
+      
+      festivals.forEach(fest => {
+        if (festivalPrices[fest] === undefined) return;
+        
+        const dateStr = festivals.find(f => f.name === fest)?.date;
+        if (!dateStr) return;
+        
+        const festDate = new Date(dateStr);
+        
+        if (festDate < now) {
+          // Past festival - already spent
+          pastSpent += festivalPrices[fest];
+        } else {
+          // Future festival - about to spend
+          futureSpend += festivalPrices[fest];
+        }
+      });
+      
+      // Store spending data for other pages
+      localStorage.setItem('pastSpent', pastSpent.toFixed(2));
+      localStorage.setItem('futureSpend', futureSpend.toFixed(2));
+      localStorage.setItem('totalSpending', (pastSpent + futureSpend).toFixed(2));
+      
+      // If on festival card page, update the displays
+      if (window.location.pathname.includes('festival-card.html')) {
+        const pastSpendingElement = document.getElementById('past-spending');
+        const futureSpendingElement = document.getElementById('future-spending');
+        const totalSpendingElement = document.getElementById('total-spending');
+        
+        if (pastSpendingElement) {
+          pastSpendingElement.textContent = `€${pastSpent.toFixed(2)}`;
+        }
+        
+        if (futureSpendingElement) {
+          futureSpendingElement.textContent = `€${futureSpend.toFixed(2)}`;
+        }
+        
+        if (totalSpendingElement) {
+          totalSpendingElement.textContent = `€${(pastSpent + futureSpend).toFixed(2)}`;
+        }
+      }
+    } catch (error) {
+      console.error('Error calculating spending:', error);
+    }
+  }
+
   // If user is logged in, fetch their festivals
   try {
     // Show loading state
     console.log("Fetching user festivals for:", userEmail);
     
-    // Add a visual loading state to the table
+    // Add a visual loading indicator
     const loadingIndicator = document.createElement('div');
     loadingIndicator.id = 'loading-indicator';
     loadingIndicator.style.position = 'fixed';
@@ -317,6 +416,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
     
+    // Initialize spending display
+    await updateFestivalCardSpending();
+    
     // Now set up event listeners for changes
     checkboxes.forEach(cb => {
       const festName = cb.dataset.festival;
@@ -350,6 +452,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             
             console.log(`Successfully marked "${festName}" as attending`);
+            
+            // Update spending data after checking
+            await updateFestivalCardSpending();
           } else {
             console.log(`Unmarking festival "${festName}" as attending`);
             // Show mini-loading indicator on the checkbox itself
@@ -373,6 +478,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             
             console.log(`Successfully unmarked "${festName}" as attending`);
+            
+            // Update spending data after unchecking
+            await updateFestivalCardSpending();
           }
           
           // Sync the state with other views
