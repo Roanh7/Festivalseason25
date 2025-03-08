@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return html;
   }
   
-  // New function to load all users
+  // New function to load all users - FIXED VERSION
   async function loadAllUsers() {
     try {
       // Show loading indicator
@@ -274,7 +274,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error('Error loading users:', error);
       usersList.innerHTML = `
         <div class="loading-indicator">
-          Er is een probleem opgetreden bij het laden van gebruikers.
+          Er is een probleem opgetreden bij het laden van gebruikers. <br>
+          Fout: ${error.message}
         </div>
       `;
     }
@@ -369,6 +370,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       userFestivalCard.innerHTML = `
         <div class="error-message">
           Er is een probleem opgetreden bij het laden van deze Festival Card.
+          <br>Fout: ${error.message}
         </div>
       `;
     }
@@ -378,20 +380,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadCurrentUserInfo();
   loadCurrentUserFestivals();
   
-  // Set up collapsible users list
+  // Set up collapsible users list - FIXED VERSION
   toggleUsersListBtn.addEventListener('click', () => {
     // Toggle active class on button
     toggleUsersListBtn.classList.toggle('active');
     
-    // Toggle active class on content
+    // Toggle active class on content - This fixes the display issue
     const isActive = usersListContainer.classList.toggle('active');
     
     // Toggle icon text
     const icon = toggleUsersListBtn.querySelector('.collapsible-icon');
-    icon.textContent = isActive ? '▲' : '▼';
+    if (icon) {
+      icon.textContent = isActive ? '▲' : '▼';
+    }
     
     // Load users when opening for the first time
-    if (isActive && usersList.children.length === 0) {
+    if (isActive && (!usersList.children.length || usersList.querySelector('.loading-indicator'))) {
       loadAllUsers();
     }
   });
@@ -401,23 +405,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     userFestivalCard.classList.add('hidden');
     usersListContainer.classList.add('active');
   });
-  
-  // We need to add this endpoint to index.js
-  // Add this to index.js:
-  /*
-  // GET /all-users => get list of all registered users (for festival cards)
-  app.get('/all-users', async (req, res) => {
-    try {
-      const result = await client.query(
-        'SELECT email, username FROM users ORDER BY COALESCE(username, email)'
-      );
-      
-      const users = result.rows;
-      res.json({ users });
-    } catch (err) {
-      console.error('Error in /all-users:', err);
-      res.status(500).json({ message: 'Could not get users list' });
-    }
-  });
-  */
 });

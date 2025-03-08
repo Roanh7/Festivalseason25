@@ -241,6 +241,7 @@ body {
   transform: rotate(180deg);
 }
 
+/* Fixed: The collapsible content should be hidden by default and shown when active */
 .collapsible-content {
   max-height: 0;
   overflow: hidden;
@@ -248,13 +249,15 @@ body {
 }
 
 .collapsible-content.active {
-  max-height: 400px;
-  overflow-y: auto;
+  max-height: 400px; /* Set a reasonable max height */
+  overflow-y: auto;  /* Add scrolling for long lists */
+  padding: 1rem;
+  border-top: 1px solid #eaeaea;
 }
 
 /* Users list styles */
 .users-list {
-  padding: 1rem;
+  padding: 0;
 }
 
 .user-item {
@@ -274,6 +277,20 @@ body {
   background-color: #f0f9f0;
 }
 
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  background-color: #4CAF50;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
 .user-item-name {
   font-weight: bold;
   margin-right: 0.5rem;
@@ -289,20 +306,6 @@ body {
   padding: 1rem;
   color: #666;
   font-style: italic;
-}
-
-.user-avatar {
-  width: 30px;
-  height: 30px;
-  background-color: #4CAF50;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-  margin-right: 1rem;
-  flex-shrink: 0;
 }
 
 /* User Festival Card */
