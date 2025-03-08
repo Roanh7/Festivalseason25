@@ -1,4 +1,4 @@
-// Update to script.js - Add custom popup for attendees
+// Updated script.js with conditional button text based on festival date
 
 // ================================
 // 1. COUNTDOWN-DEEL
@@ -10,17 +10,12 @@ const festivals = [
   { name: "Loveland Kingsday", date: "2025-04-26" },
   { name: "Verbond", date: "2025-05-05" },
   { name: "Awakenings Upclose", date: "2025-05-17" },
-  { name: "PIV", date: "2025-05-30" },
   { name: "Soenda", date: "2025-05-31" },
-  { name: "Toffler", date: "2025-05-31" },
-  { name: "909", date: "2025-06-07" },
   { name: "Diynamic", date: "2025-06-07" },
+  { name: "909", date: "2025-06-07" },
   { name: "Open Air", date: "2025-06-08" },
   { name: "Free Your Mind", date: "2025-06-08" },
   { name: "Mystic Garden Festival", date: "2025-06-14" },
-  { name: "Vunzige Deuntjes", date: "2025-07-05" },
-  { name: "KeineMusik", date: "2025-07-05" },
-  { name: "Boothstock Festival", date: "2025-07-12" },
   { name: "Awakenings Festival", date: "2025-07-11" },
   { name: "Tomorrowland", date: "2025-07-18" },
   { name: "Mysteryland", date: "2025-07-22" },
@@ -30,6 +25,10 @@ const festivals = [
   { name: "Latin Village", date: "2025-08-17" },
   { name: "Parels van de stad", date: "2025-09-13" },
   { name: "Into the woods", date: "2025-09-19" },
+  { name: "KeineMusik", date: "2025-07-05" },
+  { name: "Vunzige Deuntjes", date: "2025-07-05" },
+  { name: "Toffler", date: "2025-05-31" },
+  { name: "PIV", date: "2025-05-30" },
 ];
 
 function updateCountdown() {
@@ -109,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
       position: "Verdediger",
       age: 26,
       rating: "Rating: 79",
-      skills: ["1-op-1 verdedigen", "Vibes brengen", "Jokes maken", "Houdt van grote billen"]
+      skills: ["1-op-1 verdedigen", "Vibes brengen", "Jokes maken", "Houd van grote billen"]
     },
     "Chip": {
       position: "Middenvelder",
@@ -266,7 +265,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Show loading state
     console.log("Fetching user festivals for:", userEmail);
     
-    // Add a visual loading indicator to the table
+    // Add a visual loading state to the table
     const loadingIndicator = document.createElement('div');
     loadingIndicator.id = 'loading-indicator';
     loadingIndicator.style.position = 'fixed';
@@ -483,9 +482,6 @@ document.addEventListener('DOMContentLoaded', () => {
     cardCheckbox.addEventListener('change', cardCheckbox.changeHandler);
   });
   
-  // Initialize the custom attendees popup
-  initializeAttendeesPopup();
-  
   // Attendee buttons functionality
   const attendeeButtons = document.querySelectorAll('.attendees-btn');
 
@@ -496,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         console.log(`Fetching attendees for festival "${festName}"`);
         
-        // Add temporary loading indicator to button
+        // Add temporary loading indicator
         const originalText = btn.textContent;
         btn.textContent = "Laden...";
         btn.disabled = true;
@@ -534,141 +530,23 @@ document.addEventListener('DOMContentLoaded', () => {
           `Niemand anders is naar ${festName} geweest.` : 
           `Niemand anders heeft zich nog aangemeld voor ${festName}.`;
         
-        const titleText = isPast ?
-          `Wie zijn er naar ${festName} geweest:` :
-          `Wie gaan er naar ${festName}:`;
+        const listPrefix = isPast ?
+          `De volgende gebruikers zijn naar ${festName} geweest:` :
+          `De volgende gebruikers gaan naar ${festName}:`;
 
-        // Show custom popup instead of alert
         if (others.length === 0) {
-          showAttendeesPopup(festName, [], isPast);
+          alert(messagePrefix);
         } else {
-          showAttendeesPopup(festName, others, isPast);
+          alert(`${listPrefix}\n\n• ${others.join('\n• ')}`);
         }
 
       } catch (err) {
         console.error('Fout bij ophalen andere gebruikers:', err);
-        showAttendeesPopup(festName, [], false, err.message);
+        alert(`Er ging iets mis bij het ophalen van de aanwezigen: ${err.message}`);
       }
     });
   });
 });
-
-
-// Function to initialize the custom attendees popup
-function initializeAttendeesPopup() {
-  // Check if popup already exists
-  if (document.getElementById('attendees-popup')) {
-    return;
-  }
-  
-  // Create the popup elements
-  const popupOverlay = document.createElement('div');
-  popupOverlay.id = 'attendees-popup';
-  popupOverlay.className = 'attendees-popup hidden';
-  
-  popupOverlay.innerHTML = `
-    <div class="attendees-popup-content">
-      <div class="attendees-popup-header">
-        <h3 id="attendees-popup-title">Festival Attendees</h3>
-        <span class="attendees-popup-close">&times;</span>
-      </div>
-      <div class="attendees-popup-body">
-        <div id="attendees-list"></div>
-        <div id="attendees-error" class="attendees-error hidden"></div>
-      </div>
-      <div class="attendees-popup-footer">
-        <button class="attendees-popup-btn">Sluiten</button>
-      </div>
-    </div>
-  `;
-  
-  // Append the popup to the body
-  document.body.appendChild(popupOverlay);
-  
-  // Add event listeners for closing the popup
-  const closeBtn = popupOverlay.querySelector('.attendees-popup-close');
-  const closeButtonBottom = popupOverlay.querySelector('.attendees-popup-btn');
-  
-  // Close when clicking X
-  if (closeBtn) {
-    closeBtn.addEventListener('click', function() {
-      popupOverlay.classList.add('hidden');
-      console.log('Close button (X) clicked');
-    });
-  }
-  
-  // Close when clicking the button
-  if (closeButtonBottom) {
-    closeButtonBottom.addEventListener('click', function() {
-      popupOverlay.classList.add('hidden');
-      console.log('Close button (bottom) clicked');
-    });
-  }
-  
-  // Close when clicking outside the popup
-  popupOverlay.addEventListener('click', function(e) {
-    if (e.target === popupOverlay) {
-      popupOverlay.classList.add('hidden');
-      console.log('Outside popup clicked');
-    }
-  });
-}
-
-// Function to show the attendees popup
-function showAttendeesPopup(festivalName, attendees, isPast, errorMessage = null) {
-  const popup = document.getElementById('attendees-popup');
-  const popupTitle = document.getElementById('attendees-popup-title');
-  const attendeesList = document.getElementById('attendees-list');
-  const errorElement = document.getElementById('attendees-error');
-  
-  // Set the title based on past/future
-  popupTitle.textContent = isPast ? 
-    `Wie zijn er naar ${festivalName} geweest:` : 
-    `Wie gaan er naar ${festivalName}:`;
-  
-  // Clear previous content
-  attendeesList.innerHTML = '';
-  errorElement.classList.add('hidden');
-  
-  // Display error message if there is one
-  if (errorMessage) {
-    errorElement.textContent = `Er is een fout opgetreden: ${errorMessage}`;
-    errorElement.classList.remove('hidden');
-  }
-  // Display attendees or "no attendees" message
-  else if (attendees.length === 0) {
-    const messagePrefix = isPast ? 
-      `Niemand anders is naar ${festivalName} geweest.` : 
-      `Niemand anders heeft zich nog aangemeld voor ${festivalName}.`;
-    
-    attendeesList.innerHTML = `<p class="no-attendees">${messagePrefix}</p>`;
-  } 
-  else {
-    // Create user list
-    const userList = document.createElement('ul');
-    userList.className = 'attendees-user-list';
-    
-    attendees.forEach(user => {
-      const listItem = document.createElement('li');
-      listItem.className = 'attendee-item';
-      
-      // Create avatar with first letter of username
-      const firstLetter = user.charAt(0).toUpperCase();
-      
-      listItem.innerHTML = `
-        <div class="attendee-avatar">${firstLetter}</div>
-        <div class="attendee-name">${user}</div>
-      `;
-      
-      userList.appendChild(listItem);
-    });
-    
-    attendeesList.appendChild(userList);
-  }
-  
-  // Show the popup
-  popup.classList.remove('hidden');
-}
 
 // Add CSS to show updating state
 document.addEventListener('DOMContentLoaded', () => {
@@ -680,175 +558,6 @@ document.addEventListener('DOMContentLoaded', () => {
       opacity: 0.5;
       cursor: wait;
     }
-    
-    /* Attendees Popup Styles */
-    .attendees-popup {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-    }
-    
-    .attendees-popup.hidden {
-      display: none;
-    }
-    
-    .attendees-popup-content {
-      background-color: white;
-      border-radius: 10px;
-      max-width: 500px;
-      width: 90%;
-      max-height: 80vh;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      animation: popupFadeIn 0.3s ease;
-    }
-    
-    @keyframes popupFadeIn {
-      from {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-    
-    .attendees-popup-header {
-      padding: 15px 20px;
-      border-bottom: 1px solid #e0e0e0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #4CAF50;
-      color: white;
-      border-radius: 10px 10px 0 0;
-    }
-    
-    .attendees-popup-header h3 {
-      margin: 0;
-      font-size: 1.2rem;
-    }
-    
-    .attendees-popup-close {
-      font-size: 24px;
-      color: white;
-      cursor: pointer;
-      padding: 0 5px;
-    }
-    
-    .attendees-popup-close:hover {
-      color: #ddd;
-    }
-    
-    .attendees-popup-body {
-      padding: 20px;
-      overflow-y: auto;
-      max-height: 50vh;
-    }
-    
-    .attendees-user-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    
-    .attendee-item {
-      display: flex;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-    }
-    
-    .attendee-item:last-child {
-      border-bottom: none;
-    }
-    
-    .attendee-avatar {
-      width: 40px;
-      height: 40px;
-      background-color: #4CAF50;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-      margin-right: 15px;
-      font-size: 18px;
-    }
-    
-    .attendee-name {
-      font-size: 16px;
-    }
-    
-    .attendees-popup-footer {
-      padding: 15px 20px;
-      border-top: 1px solid #e0e0e0;
-      text-align: right;
-      border-radius: 0 0 10px 10px;
-    }
-    
-    .attendees-popup-btn {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 8px 16px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.3s;
-    }
-    
-    .attendees-popup-btn:hover {
-      background-color: #45a049;
-    }
-    
-    .no-attendees {
-      text-align: center;
-      font-style: italic;
-      color: #666;
-      padding: 15px 0;
-    }
-    
-    .attendees-error {
-      color: #d32f2f;
-      background-color: #ffebee;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
-      border-left: 4px solid #d32f2f;
-    }
-    
-    .attendees-error.hidden {
-      display: none;
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 600px) {
-      .attendees-popup-content {
-        width: 95%;
-      }
-      
-      .attendees-popup-header h3 {
-        font-size: 1.1rem;
-      }
-      
-      .attendee-avatar {
-        width: 35px;
-        height: 35px;
-        font-size: 16px;
-      }
-    }
   `;
-  
   document.head.appendChild(style);
 });
