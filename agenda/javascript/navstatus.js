@@ -1,4 +1,4 @@
-// Improved navstatus.js with smoother animations
+// Updated navstatus.js script with separate greeting and logout functionality
 
 document.addEventListener('DOMContentLoaded', () => {
   // Select navigation elements
@@ -58,22 +58,38 @@ document.addEventListener('DOMContentLoaded', () => {
     item.querySelector('a[href="register.html"]')
   );
   
-  // Helper function to create user display
+  // Modified: Create separate greeting and logout elements
   const createUserDisplay = (displayName) => {
-    // Create desktop logout span
-    const desktopUserSpan = document.createElement('span');
-    desktopUserSpan.id = 'desktopUserSpan';
-    desktopUserSpan.textContent = `Hallo, ${displayName}`;
-    desktopUserSpan.addEventListener('click', () => {
+    // Create the container for user info in navbar
+    const userInfoContainer = document.createElement('div');
+    userInfoContainer.id = 'userInfoContainer';
+    userInfoContainer.className = 'user-info-container';
+    
+    // Create greeting span
+    const greetingSpan = document.createElement('span');
+    greetingSpan.id = 'userGreeting';
+    greetingSpan.className = 'user-greeting';
+    greetingSpan.textContent = `Hallo, ${displayName}`;
+    
+    // Create logout button
+    const logoutButton = document.createElement('button');
+    logoutButton.id = 'logoutButton';
+    logoutButton.className = 'logout-button';
+    logoutButton.textContent = 'Uitloggen';
+    logoutButton.addEventListener('click', () => {
       localStorage.removeItem('token');
       localStorage.removeItem('email');
       window.location.href = 'login.html';
     });
 
+    // Add elements to container
+    userInfoContainer.appendChild(greetingSpan);
+    userInfoContainer.appendChild(logoutButton);
+
     // Clear previous content
     if (userMenu) {
       userMenu.innerHTML = '';
-      userMenu.appendChild(desktopUserSpan);
+      userMenu.appendChild(userInfoContainer);
     }
     
     // Hide login and register items if they exist
@@ -123,6 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // User is not logged in, make sure login/register are visible
     if (loginNavItem) loginNavItem.style.display = '';
     if (registerNavItem) registerNavItem.style.display = '';
+    
+    // Clear user menu
+    if (userMenu) {
+      userMenu.innerHTML = '';
+    }
   }
 
   // Authentication-related navigation links update
