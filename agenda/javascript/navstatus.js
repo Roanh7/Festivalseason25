@@ -1,4 +1,4 @@
-// navstatus.js - User Authentication and Navigation Status
+// Improved navstatus.js with smoother animations
 
 document.addEventListener('DOMContentLoaded', () => {
   // Select navigation elements
@@ -8,34 +8,38 @@ document.addEventListener('DOMContentLoaded', () => {
   // Ensure the elements exist before adding event listener
   if (navToggle && navMenu) {
     // Add click event listener to the hamburger toggle
-    navToggle.addEventListener('click', () => {
+    navToggle.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent event from bubbling up
+      
       // Toggle the 'open' class on the nav menu
       navMenu.classList.toggle('open');
       
-      // Optional: Toggle a class on the hamburger icon if you want visual feedback
+      // Toggle active class on the hamburger icon for rotation animation
       navToggle.classList.toggle('active');
     });
 
-    // Close menu when clicking outside of it on mobile
+    // Close menu when clicking outside of it
     document.addEventListener('click', (event) => {
-      // Check if we're on mobile
-      if (window.innerWidth <= 768) {
-        // If the click is outside the nav menu and not on the toggle
-        if (!navMenu.contains(event.target) && event.target !== navToggle) {
-          navMenu.classList.remove('open');
-          navToggle.classList.remove('active');
-        }
+      // If the menu is open and the click is outside the menu and not on the toggle
+      if (navMenu.classList.contains('open') && 
+          !navMenu.contains(event.target) && 
+          event.target !== navToggle) {
+        navMenu.classList.remove('open');
+        navToggle.classList.remove('active');
       }
+    });
+
+    // Prevent clicks on the menu from closing it
+    navMenu.addEventListener('click', (event) => {
+      event.stopPropagation();
     });
 
     // Close menu when a menu item is clicked
     const menuItems = navMenu.querySelectorAll('a');
     menuItems.forEach(item => {
       item.addEventListener('click', () => {
-        if (window.innerWidth <= 768) {
-          navMenu.classList.remove('open');
-          navToggle.classList.remove('active');
-        }
+        navMenu.classList.remove('open');
+        navToggle.classList.remove('active');
       });
     });
   }
@@ -46,11 +50,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const userMenu = document.getElementById('userMenu');
 
   // Select login and register nav items to hide when logged in
-  const loginNavItem = Array.from(navMenu.querySelectorAll('li')).find(item => 
+  const loginNavItem = Array.from(navMenu?.querySelectorAll('li') || []).find(item => 
     item.querySelector('a[href="login.html"]')
   );
   
-  const registerNavItem = Array.from(navMenu.querySelectorAll('li')).find(item => 
+  const registerNavItem = Array.from(navMenu?.querySelectorAll('li') || []).find(item => 
     item.querySelector('a[href="register.html"]')
   );
   
@@ -67,12 +71,35 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Clear previous content
-    userMenu.innerHTML = '';
-    userMenu.appendChild(desktopUserSpan);
+    if (userMenu) {
+      userMenu.innerHTML = '';
+      userMenu.appendChild(desktopUserSpan);
+    }
     
     // Hide login and register items if they exist
     if (loginNavItem) loginNavItem.style.display = 'none';
     if (registerNavItem) registerNavItem.style.display = 'none';
+    
+    // Add mobile logout option
+    if (navMenu) {
+      // Check if mobile logout already exists
+      const existingMobileLogout = navMenu.querySelector('.mobile-logout');
+      if (!existingMobileLogout && window.innerWidth <= 768) {
+        const mobileLogoutLi = document.createElement('li');
+        mobileLogoutLi.className = 'mobile-logout';
+        const mobileLogoutLink = document.createElement('a');
+        mobileLogoutLink.href = '#';
+        mobileLogoutLink.textContent = `Uitloggen (${displayName})`;
+        mobileLogoutLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          localStorage.removeItem('token');
+          localStorage.removeItem('email');
+          window.location.href = 'login.html';
+        });
+        mobileLogoutLi.appendChild(mobileLogoutLink);
+        navMenu.appendChild(mobileLogoutLi);
+      }
+    }
   };
 
   // If user is logged in
@@ -100,6 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Authentication-related navigation links update
   const addAccountAndFestivalCardLinks = () => {
+    if (!navMenu) return;
+    
     // First check if account link already exists to avoid duplicates
     const existingAccountLink = Array.from(navMenu.querySelectorAll('a')).find(a => 
       a.getAttribute('href') === 'account.html'
@@ -123,12 +152,11 @@ document.addEventListener('DOMContentLoaded', () => {
       
       accountLi.appendChild(accountLink);
       
-      // Insert before the last item if on mobile (which would be the logout item)
-      if (window.innerWidth <= 768 && document.getElementById('userNameSpan')) {
-        const logoutLi = document.getElementById('userNameSpan').parentElement;
-        navMenu.insertBefore(accountLi, logoutLi);
+      // Insert before the last item or logout if it exists
+      const mobileLogout = navMenu.querySelector('.mobile-logout');
+      if (mobileLogout) {
+        navMenu.insertBefore(accountLi, mobileLogout);
       } else {
-        // Otherwise append to the end
         navMenu.appendChild(accountLi);
       }
     }
@@ -149,9 +177,15 @@ document.addEventListener('DOMContentLoaded', () => {
       festivalCardLi.appendChild(festivalCardLink);
       
       // Insert at the appropriate position
-      if (window.innerWidth <= 768 && document.getElementById('userNameSpan')) {
-        const logoutLi = document.getElementById('userNameSpan').parentElement;
-        navMenu.insertBefore(festivalCardLi, logoutLi);
+      const mobileLogout = navMenu.querySelector('.mobile-logout');
+      const accountLink = Array.from(navMenu.querySelectorAll('a')).find(a => 
+        a.getAttribute('href') === 'account.html'
+      );
+      
+      if (accountLink && accountLink.parentElement) {
+        navMenu.insertBefore(festivalCardLi, accountLink.parentElement.nextSibling);
+      } else if (mobileLogout) {
+        navMenu.insertBefore(festivalCardLi, mobileLogout);
       } else {
         navMenu.appendChild(festivalCardLi);
       }
