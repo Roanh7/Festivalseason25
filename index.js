@@ -122,8 +122,8 @@ app.get('/login.html', (req, res) => {
 app.get('/account.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'agenda', 'account.html'));
 });
-app.get('/s-team-statistieken.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'agenda', 's-team-statistieken.html'));
+app.get('/statistieken.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'agenda', 'statistieken.html'));
 });
 
 // 6) POST /register => register user
