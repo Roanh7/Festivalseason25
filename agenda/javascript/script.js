@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
       position: "Verdediger",
       age: 26,
       rating: "Rating: 79",
-      skills: ["1-op-1 verdedigen", "Vibes brengen", "Jokes maken", "Houd van grote billen"]
+      skills: ["1-op-1 verdedigen", "Vibes brengen", "Jokes maken", "Houdt van grote billen"]
     },
     "Chip": {
       position: "Middenvelder",
