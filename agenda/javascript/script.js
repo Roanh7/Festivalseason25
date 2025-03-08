@@ -553,6 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+
 // Function to initialize the custom attendees popup
 function initializeAttendeesPopup() {
   // Check if popup already exists
@@ -589,19 +590,26 @@ function initializeAttendeesPopup() {
   const closeButtonBottom = popupOverlay.querySelector('.attendees-popup-btn');
   
   // Close when clicking X
-  closeBtn.addEventListener('click', () => {
-    popupOverlay.classList.add('hidden');
-  });
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function() {
+      popupOverlay.classList.add('hidden');
+      console.log('Close button (X) clicked');
+    });
+  }
   
   // Close when clicking the button
-  closeButtonBottom.addEventListener('click', () => {
-    popupOverlay.classList.add('hidden');
-  });
+  if (closeButtonBottom) {
+    closeButtonBottom.addEventListener('click', function() {
+      popupOverlay.classList.add('hidden');
+      console.log('Close button (bottom) clicked');
+    });
+  }
   
   // Close when clicking outside the popup
-  popupOverlay.addEventListener('click', (e) => {
+  popupOverlay.addEventListener('click', function(e) {
     if (e.target === popupOverlay) {
       popupOverlay.classList.add('hidden');
+      console.log('Outside popup clicked');
     }
   });
 }
