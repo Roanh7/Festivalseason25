@@ -1,4 +1,4 @@
-// Updated script.js with conditional button text based on festival date and spending tracking
+//  script.js 
 
 // ================================
 // 1. COUNTDOWN-DEEL
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ================================
-// 4. FESTIVAL ATTENDANCE & SPENDING (DB-based)
+// 4. FESTIVAL ATTENDANCE & TICKET PURCHASE (DB-based)
 // ================================
 document.addEventListener('DOMContentLoaded', async () => {
   // 4a) Check of user is ingelogd
@@ -252,7 +252,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const userEmail = localStorage.getItem('email');
 
   // Zoek de checkboxes
-  const checkboxes = document.querySelectorAll('.attend-checkbox');
+  const attendCheckboxes = document.querySelectorAll('.attend-checkbox');
+  const ticketCheckboxes = document.querySelectorAll('.ticket-checkbox');
 
   // Update attendee button text based on festival date
   const updateButtonText = () => {
@@ -285,9 +286,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // If user is not logged in, disable checkboxes and return
   if (!token || !userEmail) {
-    checkboxes.forEach(cb => {
+    attendCheckboxes.forEach(cb => {
       cb.disabled = true;
     });
+    
+    ticketCheckboxes.forEach(cb => {
+      cb.disabled = true;
+    });
+    
     return; 
   }
 
@@ -298,36 +304,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!userEmail) return;
     
     try {
-      // Fetch the user's festivals
+      // Fetch the user's festivals and ticket status
       const response = await fetch(`/my-festivals?email=${encodeURIComponent(userEmail)}`);
+      const ticketResponse = await fetch(`/my-tickets?email=${encodeURIComponent(userEmail)}`);
       
-      if (!response.ok) {
-        console.error(`Error fetching festivals: ${response.status}`);
+      if (!response.ok || !ticketResponse.ok) {
+        console.error(`Error fetching data: ${response.status} / ${ticketResponse.status}`);
         return;
       }
       
       const data = await response.json();
-      const festivals = data.festivals || [];
+      const ticketData = await ticketResponse.json();
       
-      // Calculate spending split between past and future
+      const attendingFestivals = data.festivals || [];
+      const purchasedTickets = ticketData.tickets || [];
+      
+      // Calculate spending split between past and future, and already purchased vs to be purchased
       let pastSpent = 0;
       let futureSpend = 0;
       const now = new Date();
       
-      festivals.forEach(fest => {
+      attendingFestivals.forEach(fest => {
         if (festivalPrices[fest] === undefined) return;
         
-        const dateStr = festivals.find(f => f.name === fest)?.date;
-        if (!dateStr) return;
+        const festInfo = festivals.find(f => f.name === fest);
+        if (!festInfo) return;
         
-        const festDate = new Date(dateStr);
+        const festDate = new Date(festInfo.date);
+        const ticketPurchased = purchasedTickets.includes(fest);
         
         if (festDate < now) {
-          // Past festival - already spent
+          // Past festival - already spent (assuming they purchased the ticket if they attended)
           pastSpent += festivalPrices[fest];
         } else {
-          // Future festival - about to spend
-          futureSpend += festivalPrices[fest];
+          // Future festival - categorize based on ticket purchase status
+          if (ticketPurchased) {
+            // Already purchased this ticket
+            pastSpent += festivalPrices[fest];
+          } else {
+            // Planning to attend but hasn't bought ticket yet
+            futureSpend += festivalPrices[fest];
+          }
         }
       });
       
@@ -359,10 +376,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // If user is logged in, fetch their festivals
+  // If user is logged in, fetch their festivals and ticket status
   try {
     // Show loading state
-    console.log("Fetching user festivals for:", userEmail);
+    console.log("Fetching user data for:", userEmail);
     
     // Add a visual loading indicator
     const loadingIndicator = document.createElement('div');
@@ -379,38 +396,56 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadingIndicator.textContent = 'Laden van je festival selecties...';
     document.body.appendChild(loadingIndicator);
     
+    // Fetch attending status
     const resp = await fetch(`/my-festivals?email=${encodeURIComponent(userEmail)}`);
+    
+    // Fetch ticket purchase status
+    const ticketResp = await fetch(`/my-tickets?email=${encodeURIComponent(userEmail)}`);
     
     // Remove loading indicator
     if (loadingIndicator) {
       loadingIndicator.remove();
     }
     
-    // Check if response is ok
-    if (!resp.ok) {
+    // Check if responses are ok
+    if (!resp.ok || !ticketResp.ok) {
       const errorText = await resp.text();
       throw new Error(`Server returned ${resp.status}: ${errorText}`);
     }
     
-    // Try to parse JSON response
-    let data;
+    // Parse JSON responses
+    let data, ticketData;
     try {
       data = await resp.json();
+      ticketData = await ticketResp.json();
     } catch (jsonError) {
       throw new Error(`Failed to parse JSON response: ${jsonError.message}`);
     }
     
-    // Get user festivals and mark checkboxes
+    // Get user festivals and ticket statuses
     const userFestivals = data.festivals || [];
+    const userTickets = ticketData.tickets || [];
+    
     console.log("User festivals loaded:", userFestivals);
+    console.log("User tickets loaded:", userTickets);
 
-    // First mark all checkboxes based on userFestivals
-    // This ensures that all your selected festivals stay selected, regardless of being past or future
-    checkboxes.forEach(cb => {
+    // First mark all attendance checkboxes based on userFestivals
+    attendCheckboxes.forEach(cb => {
       const festName = cb.dataset.festival;
       if (userFestivals.includes(festName)) {
         cb.checked = true;
-        console.log(`Festival "${festName}" is checked`);
+        console.log(`Festival "${festName}" is checked for attendance`);
+      } else {
+        cb.checked = false;
+      }
+    });
+    
+    // Then mark all ticket checkboxes based on userTickets
+    ticketCheckboxes.forEach(cb => {
+      const festName = cb.dataset.festival;
+      if (userTickets.includes(festName)) {
+        cb.checked = true;
+        console.log(`Festival "${festName}" is checked for ticket purchased`);
       } else {
         cb.checked = false;
       }
@@ -419,8 +454,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize spending display
     await updateFestivalCardSpending();
     
-    // Now set up event listeners for changes
-    checkboxes.forEach(cb => {
+    // Now set up event listeners for attendance changes
+    attendCheckboxes.forEach(cb => {
       const festName = cb.dataset.festival;
       
       // Remove any existing event listeners to avoid duplicates
@@ -431,7 +466,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
           if (cb.checked) {
             console.log(`Marking festival "${festName}" as attending`);
-            // Show mini-loading indicator on the checkbox itself
             cb.classList.add('updating');
             
             // POST /attend
@@ -446,7 +480,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!response.ok) {
               const errorText = await response.text();
               console.error(`Error attending festival: ${errorText}`);
-              // Revert checkbox if error
               cb.checked = false;
               return;
             }
@@ -457,8 +490,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             await updateFestivalCardSpending();
           } else {
             console.log(`Unmarking festival "${festName}" as attending`);
-            // Show mini-loading indicator on the checkbox itself
             cb.classList.add('updating');
+            
+            // If attendance is being unchecked, also uncheck the ticket purchase
+            const ticketCheckbox = document.querySelector(`.ticket-checkbox[data-festival="${festName}"]`);
+            if (ticketCheckbox && ticketCheckbox.checked) {
+              ticketCheckbox.checked = false;
+              
+              // Update ticket status on the server
+              await fetch('/ticket', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail, festival: festName })
+              });
+            }
             
             // DELETE /attend
             const response = await fetch('/attend', {
@@ -472,7 +517,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!response.ok) {
               const errorText = await response.text();
               console.error(`Error unattending festival: ${errorText}`);
-              // Revert checkbox if error
               cb.checked = true;
               return;
             }
@@ -484,7 +528,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
           
           // Sync the state with other views
-          syncCheckboxes(festName, cb.checked);
+          syncCheckboxes(festName, cb.checked, 'attend');
           
         } catch (err) {
           cb.classList.remove('updating');
@@ -496,9 +540,93 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Add the change event listener
       cb.addEventListener('change', cb.changeHandler);
     });
+    
+    // Set up event listeners for ticket purchase changes
+    ticketCheckboxes.forEach(cb => {
+      const festName = cb.dataset.festival;
+      
+      // Remove any existing event listeners to avoid duplicates
+      cb.removeEventListener('change', cb.ticketHandler);
+      
+      // Create a new handler function and store a reference to it
+      cb.ticketHandler = async function() {
+        try {
+          // First, check if the user is attending this festival
+          const attendCheckbox = document.querySelector(`.attend-checkbox[data-festival="${festName}"]`);
+          
+          if (!attendCheckbox || !attendCheckbox.checked) {
+            // Cannot purchase ticket if not attending
+            cb.checked = false;
+            alert(`Je moet eerst aangeven dat je naar "${festName}" wilt gaan voordat je een ticket kunt kopen.`);
+            return;
+          }
+          
+          if (cb.checked) {
+            console.log(`Marking festival "${festName}" as ticket purchased`);
+            cb.classList.add('updating');
+            
+            // POST /ticket
+            const response = await fetch('/ticket', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: userEmail, festival: festName })
+            });
+            
+            cb.classList.remove('updating');
+            
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error(`Error marking ticket as purchased: ${errorText}`);
+              cb.checked = false;
+              return;
+            }
+            
+            console.log(`Successfully marked "${festName}" ticket as purchased`);
+            
+            // Update spending data after checking
+            await updateFestivalCardSpending();
+          } else {
+            console.log(`Unmarking festival "${festName}" ticket as purchased`);
+            cb.classList.add('updating');
+            
+            // DELETE /ticket
+            const response = await fetch('/ticket', {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: userEmail, festival: festName })
+            });
+            
+            cb.classList.remove('updating');
+            
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error(`Error unmarking ticket as purchased: ${errorText}`);
+              cb.checked = true;
+              return;
+            }
+            
+            console.log(`Successfully unmarked "${festName}" ticket as purchased`);
+            
+            // Update spending data after unchecking
+            await updateFestivalCardSpending();
+          }
+          
+          // Sync the state with other views
+          syncCheckboxes(festName, cb.checked, 'ticket');
+          
+        } catch (err) {
+          cb.classList.remove('updating');
+          console.error(`Failed to update ticket status for "${festName}":`, err);
+          alert(`Er ging iets mis bij het bijwerken van je ticketstatus. Probeer het later opnieuw.`);
+        }
+      };
+      
+      // Add the change event listener
+      cb.addEventListener('change', cb.ticketHandler);
+    });
 
     // Now sync all checkboxes between table and card view
-    syncAllCheckboxes(userFestivals);
+    syncAllCheckboxes(userFestivals, userTickets);
 
   } catch (err) {
     console.error('Fout bij ophalen festivals uit DB:', err);
@@ -527,8 +655,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Helper function to sync all checkboxes between table and card views
-function syncAllCheckboxes(userFestivals) {
-  // First sync table checkboxes based on server data
+function syncAllCheckboxes(userFestivals, userTickets) {
+  // First sync table checkboxes for attendance based on server data
   document.querySelectorAll('.attend-checkbox').forEach(tableCheckbox => {
     const festName = tableCheckbox.dataset.festival;
     const isChecked = userFestivals.includes(festName);
@@ -537,26 +665,42 @@ function syncAllCheckboxes(userFestivals) {
     tableCheckbox.checked = isChecked;
     
     // Find and update the corresponding card view checkbox
-    syncCheckboxes(festName, isChecked);
+    syncCheckboxes(festName, isChecked, 'attend');
+  });
+  
+  // Then sync table checkboxes for tickets based on server data
+  document.querySelectorAll('.ticket-checkbox').forEach(tableCheckbox => {
+    const festName = tableCheckbox.dataset.festival;
+    const isChecked = userTickets.includes(festName);
+    
+    // Update the checkbox in table view
+    tableCheckbox.checked = isChecked;
+    
+    // Find and update the corresponding card view checkbox
+    syncCheckboxes(festName, isChecked, 'ticket');
   });
 }
 
 // Helper function to sync checkboxes between views
-function syncCheckboxes(festivalName, isChecked) {
+function syncCheckboxes(festivalName, isChecked, type) {
+  const selector = type === 'attend' ? '.attend-checkbox' : '.ticket-checkbox';
+  const cardSelector = type === 'attend' ? '.attend-checkbox-card' : '.ticket-checkbox-card';
+  const mobileSelector = type === 'attend' ? '.attend-checkbox-mobile' : '.ticket-checkbox-mobile';
+  
   // Update table view checkboxes
-  const tableCheckboxes = document.querySelectorAll(`.attend-checkbox[data-festival="${festivalName}"]`);
+  const tableCheckboxes = document.querySelectorAll(`${selector}[data-festival="${festivalName}"]`);
   tableCheckboxes.forEach(checkbox => {
     checkbox.checked = isChecked;
   });
   
   // Update card view checkboxes
-  const cardCheckboxes = document.querySelectorAll(`.attend-checkbox-card[data-festival="${festivalName}"]`);
+  const cardCheckboxes = document.querySelectorAll(`${cardSelector}[data-festival="${festivalName}"]`);
   cardCheckboxes.forEach(checkbox => {
     checkbox.checked = isChecked;
   });
   
   // Update mobile view checkboxes if they exist
-  const mobileCheckboxes = document.querySelectorAll(`.attend-checkbox-mobile[data-festival="${festivalName}"]`);
+  const mobileCheckboxes = document.querySelectorAll(`${mobileSelector}[data-festival="${festivalName}"]`);
   mobileCheckboxes.forEach(checkbox => {
     checkbox.checked = isChecked;
   });
@@ -564,7 +708,7 @@ function syncCheckboxes(festivalName, isChecked) {
 
 // Add extra event listener to sync card view checkbox changes back to table view
 document.addEventListener('DOMContentLoaded', () => {
-  // Add event listeners to card view checkboxes if they exist
+  // Synchronize attendance checkboxes
   document.querySelectorAll('.attend-checkbox-card').forEach(cardCheckbox => {
     const festName = cardCheckbox.dataset.festival;
     
@@ -573,13 +717,26 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Create new handler and store reference
     cardCheckbox.changeHandler = function() {
-      console.log(`Card checkbox for ${festName} changed to ${cardCheckbox.checked}`);
+      console.log(`Card checkbox for ${festName} attendance changed to ${cardCheckbox.checked}`);
       
       // Find the corresponding table checkbox
       const tableCheckbox = document.querySelector(`.attend-checkbox[data-festival="${festName}"]`);
       if (tableCheckbox) {
         // Update the checked state
         tableCheckbox.checked = cardCheckbox.checked;
+        
+        // If unchecking attendance, also uncheck ticket purchase
+        if (!cardCheckbox.checked) {
+          const ticketCardCheckbox = document.querySelector(`.ticket-checkbox-card[data-festival="${festName}"]`);
+          if (ticketCardCheckbox) {
+            ticketCardCheckbox.checked = false;
+          }
+          
+          const ticketTableCheckbox = document.querySelector(`.ticket-checkbox[data-festival="${festName}"]`);
+          if (ticketTableCheckbox) {
+            ticketTableCheckbox.checked = false;
+          }
+        }
         
         // Trigger the change event to run the server update
         tableCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
@@ -588,6 +745,40 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Add the event listener
     cardCheckbox.addEventListener('change', cardCheckbox.changeHandler);
+  });
+  
+  // Synchronize ticket purchase checkboxes
+  document.querySelectorAll('.ticket-checkbox-card').forEach(cardCheckbox => {
+    const festName = cardCheckbox.dataset.festival;
+    
+    // Remove existing event listeners to avoid duplicates
+    cardCheckbox.removeEventListener('change', cardCheckbox.ticketHandler);
+    
+    // Create new handler and store reference
+    cardCheckbox.ticketHandler = function() {
+      console.log(`Card checkbox for ${festName} ticket purchase changed to ${cardCheckbox.checked}`);
+      
+      // Find the corresponding table checkbox
+      const tableCheckbox = document.querySelector(`.ticket-checkbox[data-festival="${festName}"]`);
+      if (tableCheckbox) {
+        // Update the checked state
+        tableCheckbox.checked = cardCheckbox.checked;
+        
+        // Ticket can only be purchased if attending
+        const attendCardCheckbox = document.querySelector(`.attend-checkbox-card[data-festival="${festName}"]`);
+        if (!attendCardCheckbox || !attendCardCheckbox.checked) {
+          cardCheckbox.checked = false;
+          alert(`Je moet eerst aangeven dat je naar "${festName}" wilt gaan voordat je een ticket kunt kopen.`);
+          return;
+        }
+        
+        // Trigger the change event to run the server update
+        tableCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    };
+    
+    // Add the event listener
+    cardCheckbox.addEventListener('change', cardCheckbox.ticketHandler);
   });
   
   // Attendee buttons functionality
@@ -662,9 +853,56 @@ document.addEventListener('DOMContentLoaded', () => {
   const style = document.createElement('style');
   style.textContent = `
     .attend-checkbox.updating,
-    .attend-checkbox-card.updating {
+    .attend-checkbox-card.updating,
+    .ticket-checkbox.updating,
+    .ticket-checkbox-card.updating {
       opacity: 0.5;
       cursor: wait;
+    }
+    
+    /* Styling for ticket purchase checkbox label */
+    .ticket-label {
+      display: inline-block;
+      margin-left: 10px;
+      color: #4CAF50;
+      font-weight: bold;
+    }
+    
+    /* Style for the ticket purchase checkbox */
+    .ticket-checkbox {
+      margin-left: 5px;
+    }
+    
+    /* Tooltip style */
+    .ticket-tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+      font-size: 14px;
+      color: #666;
+      margin-left: 5px;
+    }
+    
+    .ticket-tooltip .tooltip-text {
+      visibility: hidden;
+      width: 250px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -125px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .ticket-tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
     }
   `;
   document.head.appendChild(style);
