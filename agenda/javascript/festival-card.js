@@ -102,6 +102,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     return `${day}-${month}-${year}`;
   }
   
+  // Make the function available globally
+  window.updateFestivalCardSpending = updateFestivalCardSpending;
+  
+  // Check if there are pending ticket updates from other pages
+  const ticketsUpdated = localStorage.getItem('ticketsUpdated');
+  if (ticketsUpdated === 'true') {
+    // Clear the flag
+    localStorage.removeItem('ticketsUpdated');
+    
+    // Re-load the spending data
+    console.log('Detected ticket changes from another page, refreshing spending data...');
+    setTimeout(() => {
+      initializePage();
+    }, 500);
+  }
+  
   // If user is not logged in, show message and return
   if (!token || !currentUserEmail) {
     notLoggedInSection.classList.remove('hidden');
@@ -117,34 +133,106 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Function to calculate spending on festivals, split between past and future
   async function calculateTotalSpending(festivals) {
-    // Calculate spending split between past and future festivals
-    let pastSpent = 0;
-    let futureSpend = 0;
-    const now = new Date();
-    
-    festivals.forEach(festName => {
-      const dateStr = festivalDates[festName];
-      if (!dateStr || festivalPrices[festName] === undefined) return;
+    try {
+      // First, get the user's email
+      const userEmail = localStorage.getItem('email');
+      if (!userEmail) return { pastSpent: "0.00", futureSpend: "0.00", totalSpent: "0.00" };
       
-      const festDate = new Date(dateStr);
-      
-      // Check if festival is in the past or future
-      if (festDate < now) {
-        // Past festival - already spent
-        pastSpent += festivalPrices[festName];
-      } else {
-        // Future festival - about to spend
-        futureSpend += festivalPrices[festName];
+      // Fetch ticket purchase status from the server
+      const ticketResponse = await fetch(`/my-tickets?email=${encodeURIComponent(userEmail)}`);
+      if (!ticketResponse.ok) {
+        console.error(`Error fetching ticket data: ${ticketResponse.status}`);
+        return { pastSpent: "0.00", futureSpend: "0.00", totalSpent: "0.00" };
       }
-    });
+      
+      const ticketData = await ticketResponse.json();
+      const purchasedTickets = ticketData.tickets || [];
+      
+      // Calculate spending split between past and future festivals
+      let pastSpent = 0;
+      let futureSpend = 0;
+      const now = new Date();
+      
+      festivals.forEach(festName => {
+        const dateStr = festivalDates[festName];
+        if (!dateStr || festivalPrices[festName] === undefined) return;
+        
+        const festDate = new Date(dateStr);
+        const ticketPurchased = purchasedTickets.includes(festName);
+        
+        // Check if festival is in the past or future
+        if (festDate < now) {
+          // Past festival - always count as spent
+          pastSpent += festivalPrices[festName];
+        } else {
+          // Future festival - depend on ticket status
+          if (ticketPurchased) {
+            // Already purchased ticket - add to past spent
+            pastSpent += festivalPrices[festName];
+          } else {
+            // Planning to attend but hasn't bought ticket - add to future spend
+            futureSpend += festivalPrices[festName];
+          }
+        }
+      });
 
-    return {
-      pastSpent: pastSpent.toFixed(2),     // Amount already spent
-      futureSpend: futureSpend.toFixed(2), // Amount to be spent
-      totalSpent: (pastSpent + futureSpend).toFixed(2) // Total overall
-    };
+      return {
+        pastSpent: pastSpent.toFixed(2),     // Amount already spent
+        futureSpend: futureSpend.toFixed(2), // Amount to be spent
+        totalSpent: (pastSpent + futureSpend).toFixed(2) // Total overall
+      };
+    } catch (error) {
+      console.error('Error calculating spending:', error);
+      return { pastSpent: "0.00", futureSpend: "0.00", totalSpent: "0.00" };
+    }
   }
   
+  // Function to update spending display on the festival card
+  async function updateFestivalCardSpending() {
+    // Only proceed if we're on the festival card page
+    if (!window.location.pathname.includes('festival-card.html')) {
+      return;
+    }
+    
+    try {
+      // Get the logged-in user
+      const userEmail = localStorage.getItem('email');
+      if (!userEmail) return;
+      
+      // Get the user's festivals
+      const response = await fetch(`/my-festivals?email=${encodeURIComponent(userEmail)}`);
+      if (!response.ok) {
+        console.error(`Error fetching user festivals: ${response.status}`);
+        return;
+      }
+      
+      const data = await response.json();
+      const userFestivals = data.festivals || [];
+      
+      // Calculate spending with ticket status
+      const spendingData = await calculateTotalSpending(userFestivals);
+      
+      // Update the spending displays
+      const pastSpentElement = document.getElementById('past-spending');
+      const futureSpendElement = document.getElementById('future-spending');
+      const totalSpendingElement = document.getElementById('total-spending');
+      
+      if (pastSpentElement) {
+        pastSpentElement.textContent = `€${spendingData.pastSpent}`;
+      }
+      
+      if (futureSpendElement) {
+        futureSpendElement.textContent = `€${spendingData.futureSpend}`;
+      }
+      
+      if (totalSpendingElement) {
+        totalSpendingElement.textContent = `€${spendingData.totalSpent}`;
+      }
+    } catch (error) {
+      console.error('Error updating festival card spending:', error);
+    }
+  }
+
   // Load the user's display name (username or email)
   async function loadCurrentUserInfo() {
     try {

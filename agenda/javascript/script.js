@@ -298,6 +298,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Function to update spending display on the Festival Card page
+  // Call this whenever ticket checkbox state changes
   async function updateFestivalCardSpending() {
     // Only proceed if we have a logged-in user
     const userEmail = localStorage.getItem('email');
@@ -585,6 +586,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // Update spending data after checking
             await updateFestivalCardSpending();
+            
+            // Flag that tickets have been updated for other pages
+            localStorage.setItem('ticketsUpdated', 'true');
+            localStorage.setItem('lastTicketUpdate', Date.now().toString());
           } else {
             console.log(`Unmarking festival "${festName}" ticket as purchased`);
             cb.classList.add('updating');
@@ -609,6 +614,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // Update spending data after unchecking
             await updateFestivalCardSpending();
+            
+            // Flag that tickets have been updated for other pages
+            localStorage.setItem('ticketsUpdated', 'true');
+            localStorage.setItem('lastTicketUpdate', Date.now().toString());
           }
           
           // Sync the state with other views
@@ -774,6 +783,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Trigger the change event to run the server update
         tableCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        // Flag that tickets have been updated
+        localStorage.setItem('ticketsUpdated', 'true');
+        localStorage.setItem('lastTicketUpdate', Date.now().toString());
       }
     };
     
