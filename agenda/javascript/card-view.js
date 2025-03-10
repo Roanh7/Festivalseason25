@@ -71,20 +71,21 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Get important data
       const number = cells[0].textContent;
-      const checkboxCell = cells[1].querySelector('input');
-      const attendeesBtn = cells[2].querySelector('button');
-      const date = cells[3].textContent;
-      const nameCell = cells[4];
+      const attendCheckbox = cells[1].querySelector('input');
+      const ticketCheckbox = cells[2].querySelector('input'); // New ticket checkbox
+      const attendeesBtn = cells[3].querySelector('button');
+      const date = cells[4].textContent;
+      const nameCell = cells[5];
       const nameLink = nameCell.querySelector('a');
-      const festivalName = nameLink ? nameLink.getAttribute('data-name') : cells[4].textContent;
-      const location = cells.length > 5 ? cells[5].textContent : '';
-      const price = cells.length > 6 ? cells[6].textContent : '';
-      const recovery = cells.length > 7 ? cells[7].textContent : '';
-      const chipScale = cells.length > 8 ? cells[8].textContent : '';
+      const festivalName = nameLink ? nameLink.getAttribute('data-name') : cells[5].textContent;
+      const location = cells.length > 6 ? cells[6].textContent : '';
+      const price = cells.length > 7 ? cells[7].textContent : '';
+      const recovery = cells.length > 8 ? cells[8].textContent : '';
+      const chipScale = cells.length > 9 ? cells[9].textContent : '';
       
       // Store the festival name as data attribute for easier reference
-      if (checkboxCell && checkboxCell.dataset.festival) {
-        festivalCard.dataset.festival = checkboxCell.dataset.festival;
+      if (attendCheckbox && attendCheckbox.dataset.festival) {
+        festivalCard.dataset.festival = attendCheckbox.dataset.festival;
       }
       
       // Check if the festival date is in the past
@@ -112,39 +113,79 @@ document.addEventListener('DOMContentLoaded', function() {
               <div class="checkbox-container"></div>
             </label>
           </div>
+          <div class="action-ticket">
+            <label>
+              <span>Ticket?</span>
+              <div class="ticket-checkbox-container"></div>
+            </label>
+          </div>
           <div class="action-others"></div>
         </div>
       `;
       
-      // Create a new checkbox element for the card view
+      // Create a new attendance checkbox element for the card view
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.className = 'attend-checkbox-card';
       
       // Copy data attributes and checked state from original checkbox
-      if (checkboxCell) {
-        checkbox.dataset.festival = checkboxCell.dataset.festival;
+      if (attendCheckbox) {
+        checkbox.dataset.festival = attendCheckbox.dataset.festival;
         // Set the initial checked state based on the table checkbox
-        checkbox.checked = checkboxCell.checked;
+        checkbox.checked = attendCheckbox.checked;
         
         // Sync checkbox state between table and card view
         checkbox.addEventListener('change', function() {
           // When card checkbox changes, update the table checkbox
-          checkboxCell.checked = checkbox.checked;
+          attendCheckbox.checked = checkbox.checked;
+          
+          // If unchecking attendance, also uncheck ticket purchase
+          if (!checkbox.checked) {
+            const ticketCheckboxCard = festivalCard.querySelector('.ticket-checkbox-card');
+            if (ticketCheckboxCard) {
+              ticketCheckboxCard.checked = false;
+            }
+          }
+          
           // Trigger the original checkbox's change event to maintain backend functionality
           const event = new Event('change', { bubbles: true });
-          checkboxCell.dispatchEvent(event);
-        });
-        
-        // Listen for changes to the table checkbox as well (two-way binding)
-        checkboxCell.addEventListener('change', function() {
-          // When table checkbox changes, update the card checkbox
-          checkbox.checked = checkboxCell.checked;
+          attendCheckbox.dispatchEvent(event);
         });
       }
       
-      // Add checkbox to the card
+      // Add attendance checkbox to the card
       festivalCard.querySelector('.checkbox-container').appendChild(checkbox);
+      
+      // Create a new ticket checkbox for card view
+      const ticketCheckboxCard = document.createElement('input');
+      ticketCheckboxCard.type = 'checkbox';
+      ticketCheckboxCard.className = 'ticket-checkbox-card';
+      
+      // Copy data attributes and checked state from original ticket checkbox
+      if (ticketCheckbox) {
+        ticketCheckboxCard.dataset.festival = ticketCheckbox.dataset.festival;
+        // Set the initial checked state based on the table checkbox
+        ticketCheckboxCard.checked = ticketCheckbox.checked;
+        
+        // Sync checkbox state between table and card view
+        ticketCheckboxCard.addEventListener('change', function() {
+          // Check if user is attending first
+          if (!checkbox.checked) {
+            alert(`Je moet eerst aangeven dat je naar "${festivalName}" wilt gaan voordat je een ticket kunt kopen.`);
+            ticketCheckboxCard.checked = false;
+            return;
+          }
+          
+          // When card checkbox changes, update the table checkbox
+          ticketCheckbox.checked = ticketCheckboxCard.checked;
+          // Trigger the original checkbox's change event to maintain backend functionality
+          const event = new Event('change', { bubbles: true });
+          ticketCheckbox.dispatchEvent(event);
+        });
+      }
+      
+      // Add ticket checkbox to the card
+      festivalCard.querySelector('.ticket-checkbox-container').appendChild(ticketCheckboxCard);
       
       // Clone and add the attendees button
       if (attendeesBtn) {
@@ -217,6 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Function to update card checkboxes from table view
   function updateCardCheckboxes() {
+    // Update attendance checkboxes
     const tableCheckboxes = document.querySelectorAll('.attend-checkbox');
     tableCheckboxes.forEach(tableCheckbox => {
       const festivalName = tableCheckbox.dataset.festival;
@@ -225,6 +267,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const card = document.querySelector(`.festival-card[data-festival="${festivalName}"]`);
         if (card) {
           const cardCheckbox = card.querySelector('.attend-checkbox-card');
+          if (cardCheckbox) {
+            // Sync the checked state
+            cardCheckbox.checked = tableCheckbox.checked;
+          }
+        }
+      }
+    });
+    
+    // Update ticket checkboxes
+    const ticketCheckboxes = document.querySelectorAll('.ticket-checkbox');
+    ticketCheckboxes.forEach(tableCheckbox => {
+      const festivalName = tableCheckbox.dataset.festival;
+      if (festivalName) {
+        // Find the corresponding card and checkbox
+        const card = document.querySelector(`.festival-card[data-festival="${festivalName}"]`);
+        if (card) {
+          const cardCheckbox = card.querySelector('.ticket-checkbox-card');
           if (cardCheckbox) {
             // Sync the checked state
             cardCheckbox.checked = tableCheckbox.checked;

@@ -237,6 +237,91 @@ header {
   font-weight: bold;
 }
 
+/* Add this to your styling/agenda.css file */
+
+/* Ticket checkbox styling */
+.ticket-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.ticket-checkbox-card {
+  width: 20px;
+  height: 20px;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+/* Add tooltip styling for ticket information */
+.ticket-info {
+  position: relative;
+  display: inline-block;
+}
+
+.ticket-info .tooltip {
+  visibility: hidden;
+  width: 200px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -100px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.ticket-info:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Style for when ticket is purchased */
+.ticket-purchased {
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+/* In the card view, we need space for both checkboxes */
+.festival-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.8rem;
+  border-top: 1px solid #eee;
+}
+
+.action-attend, .action-ticket {
+  display: flex;
+  align-items: center;
+}
+
+.action-attend label, .action-ticket label {
+  display: flex;
+  align-items: center;
+}
+
+.action-attend span, .action-ticket span {
+  margin-right: 0.5rem;
+  font-weight: bold;
+}
+
+/* For a good visual distinction */
+.action-ticket span {
+  color: #4CAF50;
+}
+
+/* Loading indicator for async operations */
+.checkbox-updating {
+  opacity: 0.5;
+  cursor: wait !important;
+}
+
 /* Filter bar styling - now for all screens */
 .filter-bar {
   display: flex;

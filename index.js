@@ -1,4 +1,4 @@
-// index.js with Festival Streak feature fixed
+// index.js with Festival Streak feature fixed and Ticket Purchase functionality
 
 require('dotenv').config(); // For loading .env variables
 const express = require('express');
@@ -118,6 +118,17 @@ client.connect()
       // Create attendances table if it doesn't exist
       await client.query(`
         CREATE TABLE IF NOT EXISTS attendances (
+          id SERIAL PRIMARY KEY,
+          user_email VARCHAR(255) NOT NULL,
+          festival_name VARCHAR(255) NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(user_email, festival_name)
+        );
+      `);
+
+      // Create tickets table if it doesn't exist
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS tickets (
           id SERIAL PRIMARY KEY,
           user_email VARCHAR(255) NOT NULL,
           festival_name VARCHAR(255) NOT NULL,
@@ -420,6 +431,12 @@ async function handleAttendanceChange(email, festivalName, isAttending) {
         DELETE FROM attendances 
         WHERE user_email = $1 AND festival_name = $2
       `, [email, festivalName]);
+      
+      // Also remove any ticket purchase records when unattending
+      await client.query(`
+        DELETE FROM tickets 
+        WHERE user_email = $1 AND festival_name = $2
+      `, [email, festivalName]);
     }
     
     // Update streak after attendance change
@@ -596,6 +613,84 @@ app.get('/festival-attendees', async (req, res) => {
   }
 });
 
+// ============== TICKET PURCHASE FUNCTIONALITY ==============
+
+// POST /ticket => user has purchased a ticket for a festival
+app.post('/ticket', async (req, res) => {
+  try {
+    const { email, festival } = req.body;
+    if (!email || !festival) {
+      return res.status(400).json({ message: 'Missing email or festival' });
+    }
+    
+    // Check if the user is attending this festival first
+    const attendingResult = await client.query(
+      'SELECT 1 FROM attendances WHERE user_email = $1 AND festival_name = $2',
+      [email, festival]
+    );
+    
+    if (attendingResult.rows.length === 0) {
+      return res.status(400).json({ 
+        message: 'You must be attending this festival before marking a ticket as purchased.' 
+      });
+    }
+    
+    // Add the ticket record
+    await client.query(`
+      INSERT INTO tickets (user_email, festival_name)
+      VALUES ($1, $2)
+      ON CONFLICT (user_email, festival_name) DO NOTHING
+    `, [email, festival]);
+    
+    res.json({ message: `Ticket for ${festival} marked as purchased!` });
+  } catch (err) {
+    console.error('Error in /ticket:', err);
+    res.status(500).json({ message: 'Could not mark ticket as purchased.' });
+  }
+});
+
+// DELETE /ticket => user removes ticket status for a festival
+app.delete('/ticket', async (req, res) => {
+  try {
+    const { email, festival } = req.body;
+    if (!email || !festival) {
+      return res.status(400).json({ message: 'Missing email or festival' });
+    }
+    
+    // Remove the ticket record
+    await client.query(`
+      DELETE FROM tickets 
+      WHERE user_email = $1 AND festival_name = $2
+    `, [email, festival]);
+    
+    res.json({ message: `Ticket for ${festival} no longer marked as purchased.` });
+  } catch (err) {
+    console.error('Error in DELETE /ticket:', err);
+    res.status(500).json({ message: 'Could not unmark ticket.' });
+  }
+});
+
+// GET /my-tickets => list of festivals for which this user has purchased tickets
+app.get('/my-tickets', async (req, res) => {
+  try {
+    const userEmail = req.query.email;
+    if (!userEmail) {
+      return res.status(400).json({ message: 'No email provided' });
+    }
+    
+    const result = await client.query(
+      'SELECT festival_name FROM tickets WHERE user_email = $1',
+      [userEmail]
+    );
+    
+    const tickets = result.rows.map(r => r.festival_name);
+    res.json({ tickets });
+  } catch (err) {
+    console.error('Error in /my-tickets:', err);
+    res.status(500).json({ message: 'Could not get user tickets' });
+  }
+});
+
 // ============== RATING FUNCTIONALITY ==============
 
 // 12) POST /rating => user gives rating (1–10) to a festival
@@ -697,8 +792,7 @@ app.get('/rating', async (req, res) => {
     if (!tableExists) {
       console.log('Ratings table does not exist. Creating it now...');
       await client.query(`
-        CREATE TABLE IF NOT EXISTS ratings (
-          id SERIAL PRIMARY KEY,
+        CREATE TABLE IF NOT EXISTS ratings (id SERIAL PRIMARY KEY,
           user_email VARCHAR(255) NOT NULL,
           festival_name VARCHAR(255) NOT NULL,
           rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 10),
