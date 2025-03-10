@@ -1,4 +1,4 @@
-// card-view.js - Creates card view for festivals on all screen sizes
+// Modification for agenda/javascript/card-view.js to improve checkbox layout
 
 document.addEventListener('DOMContentLoaded', function() {
   // Run this code for all screen sizes, not just mobile
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Get important data
       const number = cells[0].textContent;
       const attendCheckbox = cells[1].querySelector('input');
-      const ticketCheckbox = cells[2].querySelector('input'); // New ticket checkbox
+      const ticketCheckbox = cells[2].querySelector('input');
       const attendeesBtn = cells[3].querySelector('button');
       const date = cells[4].textContent;
       const nameCell = cells[5];
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Check if the festival date is in the past
       const isPast = isFestivalInPast(date);
       
-      // Build the card
+      // Build the card with improved layout
       festivalCard.innerHTML = `
         <div class="festival-header">
           <span class="festival-number">${number}</span>
@@ -107,17 +107,19 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="festival-detail"><strong>Chip Scale:</strong> ${chipScale}</div>
         </div>
         <div class="festival-actions">
-          <div class="action-attend">
-            <label>
-              <span>Ga ik?</span>
-              <div class="checkbox-container"></div>
-            </label>
-          </div>
-          <div class="action-ticket">
-            <label>
-              <span>Ticket?</span>
-              <div class="ticket-checkbox-container"></div>
-            </label>
+          <div class="action-checkboxes">
+            <div class="action-attend">
+              <label>
+                <span>Ga ik?</span>
+                <div class="checkbox-container"></div>
+              </label>
+            </div>
+            <div class="action-ticket">
+              <label>
+                <span>Ticket?</span>
+                <div class="ticket-checkbox-container"></div>
+              </label>
+            </div>
           </div>
           <div class="action-others"></div>
         </div>
@@ -226,6 +228,80 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add event listeners to festival links in card view
     setupCardFestivalLinks();
+    
+    // Add custom CSS to improve the layout
+    addCustomStyles();
+  }
+  
+  // Add custom CSS to improve the layout
+  function addCustomStyles() {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+      /* Improved card view styles */
+      .festival-actions {
+        display: flex;
+        flex-direction: column;
+        padding-top: 0.8rem;
+        border-top: 1px solid #eee;
+        gap: 10px;
+      }
+      
+      .action-checkboxes {
+        display: flex;
+        gap: 20px;
+        justify-content: flex-start;
+        align-items: center;
+      }
+      
+      .action-attend, .action-ticket {
+        display: flex;
+        align-items: center;
+      }
+      
+      .action-attend label, .action-ticket label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .action-attend span, .action-ticket span {
+        font-weight: bold;
+        min-width: 50px;
+      }
+      
+      .action-ticket span {
+        color: #4CAF50;
+      }
+      
+      .attend-checkbox-card, .ticket-checkbox-card {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        cursor: pointer;
+      }
+      
+      .action-others {
+        margin-top: 10px;
+        width: 100%;
+      }
+      
+      .action-others button {
+        width: 100%;
+      }
+      
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .action-checkboxes {
+          justify-content: space-between;
+          width: 100%;
+        }
+        
+        .action-attend span, .action-ticket span {
+          font-size: 0.9rem;
+        }
+      }
+    `;
+    document.head.appendChild(styleElement);
   }
   
   // Add event listeners to festival links in the card view
