@@ -112,10 +112,33 @@ setInterval(updateCountdown, 1000);
 updateCountdown(); // direct uitvoeren
 
 // Function to check if a festival date is in the past
-function isFestivalInPast(festivalDate) {
+function isFestivalInPast(dateStr) {
   const now = new Date();
-  const festDate = new Date(festivalDate);
-  return festDate < now;
+  
+  // Handle date ranges like "18-20 april 2025"
+  if (dateStr.includes('-')) {
+    dateStr = dateStr.split('-')[1]; // Use the end date
+  }
+  
+  // Parse date in Dutch format
+  const months = {
+    'januari': 0, 'februari': 1, 'maart': 2, 'april': 3, 'mei': 4, 'juni': 5,
+    'juli': 6, 'augustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'december': 11
+  };
+  
+  const parts = dateStr.trim().split(' ');
+  if (parts.length >= 3) {
+    const day = parseInt(parts[0], 10);
+    const month = months[parts[1].toLowerCase()];
+    const year = parseInt(parts[2], 10);
+    
+    if (!isNaN(day) && month !== undefined && !isNaN(year)) {
+      const festDate = new Date(year, month, day);
+      return festDate < now;
+    }
+  }
+  
+  return false;
 }
 
 // ================================
@@ -919,4 +942,75 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   `;
   document.head.appendChild(style);
+});
+
+// Function to update attend button text based on festival date
+document.addEventListener('DOMContentLoaded', function() {
+  // Update "Ga ik?" text for past festivals in table view
+  document.querySelectorAll('#festivalTbody tr').forEach(row => {
+    const dateCell = row.querySelector('td:nth-child(5)'); // Date column
+    if (!dateCell) return;
+    
+    const dateText = dateCell.textContent.trim();
+    const isPast = isFestivalInPast(dateText);
+    
+    if (isPast) {
+      // Find the table header and update it
+      const tableHeaders = document.querySelectorAll('thead th');
+      tableHeaders.forEach(th => {
+        if (th.textContent.trim() === 'Ga ik?') {
+          th.textContent = 'Ben ik hier geweest?';
+        }
+      });
+      
+      // Update the attend column for this row
+      const attendCell = row.querySelector('td:nth-child(2)'); // "Ga ik?" column
+      if (attendCell) {
+        // Try to find and update all text nodes in the cell that contain "Ga ik?"
+        const findAndReplaceText = (element) => {
+          // Skip elements that handle their own text via the card view
+          if (element.classList && (element.classList.contains('festival-card') || 
+              element.classList.contains('card-view'))) {
+            return;
+          }
+          
+          // Process element's child nodes
+          for (let i = 0; i < element.childNodes.length; i++) {
+            const node = element.childNodes[i];
+            if (node.nodeType === Node.TEXT_NODE && node.textContent.includes('Ga ik?')) {
+              node.textContent = node.textContent.replace('Ga ik?', 'Ben ik hier geweest?');
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+              findAndReplaceText(node);
+            }
+          }
+        };
+        
+        findAndReplaceText(attendCell);
+        
+        // Look for any label elements specifically
+        const labels = attendCell.querySelectorAll('label');
+        labels.forEach(label => {
+          if (label.textContent.includes('Ga ik?')) {
+            label.textContent = label.textContent.replace('Ga ik?', 'Ben ik hier geweest?');
+          }
+        });
+      }
+    }
+  });
+  
+  // Also update card view labels if they exist
+  document.querySelectorAll('.festival-card').forEach(card => {
+    const dateEl = card.querySelector('.festival-detail');
+    if (!dateEl) return;
+    
+    const dateText = dateEl.textContent.replace('Datum:', '').trim();
+    const isPast = isFestivalInPast(dateText);
+    
+    if (isPast) {
+      const attendSpan = card.querySelector('.action-attend span');
+      if (attendSpan && attendSpan.textContent.trim() === 'Ga ik?') {
+        attendSpan.textContent = 'Ben ik hier geweest?';
+      }
+    }
+  });
 });

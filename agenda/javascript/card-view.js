@@ -91,6 +91,9 @@ document.addEventListener('DOMContentLoaded', function() {
       // Check if the festival date is in the past
       const isPast = isFestivalInPast(date);
       
+      // Determine appropriate label based on whether festival is in the past
+      const attendLabel = isPast ? "Ben ik hier geweest?" : "Ga ik?";
+      
       // Build the card with improved layout
       festivalCard.innerHTML = `
         <div class="festival-header">
@@ -110,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="action-checkboxes">
             <div class="action-attend">
               <label>
-                <span>Ga ik?</span>
+                <span>${attendLabel}</span>
                 <div class="checkbox-container"></div>
               </label>
             </div>
