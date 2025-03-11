@@ -49,6 +49,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     "Boothstock Festival": "2025-07-12"
   };
 
+  // Title based on points
+  function getUserTitle(points) {
+    if (points >= 35) return "S-Team Hall of Famer";
+    if (points >= 31) return "S-Team Sterspeler";
+    if (points >= 26) return "S-Team Elite";
+    if (points >= 21) return "Meester Schaatser";
+    if (points >= 16) return "Schaatser";
+    if (points >= 11) return "Casanova";
+    if (points >= 6) return "Rookie Festivalganger";
+    return "Chimang";
+  }
+
   // Helper functions
   function formatDate(isoDate) {
     const d = new Date(isoDate);
@@ -206,12 +218,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       const rankClass = index < 3 ? `rank-${index + 1}` : '';
       const isCurrentUser = user.email === userEmail || user.username === userEmail;
       const currentUserClass = isCurrentUser ? 'current-user' : '';
+      const userTitle = getUserTitle(user.totalPhoneNumbers);
       
       html += `
         <div class="user-rank-card ${rankClass} ${currentUserClass}">
           <div class="rank-number">#${index + 1}</div>
           <div class="user-info">
             <div class="user-name">${user.username || user.email}</div>
+            <div class="user-title">${userTitle}</div>
             <div class="user-festivals-count">${user.festivalCount} festivals bijgewoond</div>
           </div>
           <div class="phone-numbers-display">
@@ -222,7 +236,75 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
     });
 
+    // Add title information section
+    html += `
+      <div class="title-info-container">
+        <button id="toggle-title-info" class="collapsible-button">
+          Betekenis van de titels <span class="collapsible-icon">▼</span>
+        </button>
+        <div id="title-info-content" class="collapsible-content">
+          <div class="title-meanings">
+            <div class="title-item">
+              <div class="title-name">Chimang</div>
+              <div class="title-range">0-5 nummers</div>
+              <div class="title-description">Betekenis komt hier</div>
+            </div>
+            <div class="title-item">
+              <div class="title-name">Rookie Festivalganger</div>
+              <div class="title-range">6-10 nummers</div>
+              <div class="title-description">Betekenis komt hier</div>
+            </div>
+            <div class="title-item">
+              <div class="title-name">Casanova</div>
+              <div class="title-range">11-15 nummers</div>
+              <div class="title-description">Betekenis komt hier</div>
+            </div>
+            <div class="title-item">
+              <div class="title-name">Schaatser</div>
+              <div class="title-range">16-20 nummers</div>
+              <div class="title-description">Betekenis komt hier</div>
+            </div>
+            <div class="title-item">
+              <div class="title-name">Meester Schaatser</div>
+              <div class="title-range">21-25 nummers</div>
+              <div class="title-description">Betekenis komt hier</div>
+            </div>
+            <div class="title-item">
+              <div class="title-name">S-Team Elite</div>
+              <div class="title-range">26-30 nummers</div>
+              <div class="title-description">Betekenis komt hier</div>
+            </div>
+            <div class="title-item">
+              <div class="title-name">S-Team Sterspeler</div>
+              <div class="title-range">31-35 nummers</div>
+              <div class="title-description">Betekenis komt hier</div>
+            </div>
+            <div class="title-item">
+              <div class="title-name">S-Team Hall of Famer</div>
+              <div class="title-range">35+ nummers</div>
+              <div class="title-description">Betekenis komt hier</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
     rankingsContainer.innerHTML = html;
+
+    // Add event listener to the collapsible button
+    const toggleTitleInfo = document.getElementById('toggle-title-info');
+    const titleInfoContent = document.getElementById('title-info-content');
+    
+    if (toggleTitleInfo && titleInfoContent) {
+      toggleTitleInfo.addEventListener('click', () => {
+        const isActive = titleInfoContent.classList.toggle('active');
+        const icon = toggleTitleInfo.querySelector('.collapsible-icon');
+        
+        if (icon) {
+          icon.textContent = isActive ? '▲' : '▼';
+        }
+      });
+    }
   }
 
   // Display user festivals

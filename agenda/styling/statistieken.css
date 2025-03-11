@@ -136,12 +136,24 @@
 .user-info {
   flex-grow: 1;
   padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
 }
 
 .user-name {
   font-size: 1.2rem;
   font-weight: bold;
   margin-bottom: 0.2rem;
+}
+
+/* User title styling */
+.user-title {
+  font-size: 0.85rem;
+  color: #4CAF50;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  font-style: italic;
 }
 
 /* Phone numbers display */
@@ -310,6 +322,117 @@
   background-color: #45a049;
 }
 
+/* Title information container */
+.title-info-container {
+  margin-top: 2rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Collapsible button for title info */
+.collapsible-button {
+  width: 100%;
+  background-color: #f5f5f5;
+  padding: 1rem;
+  text-align: left;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s;
+}
+
+.collapsible-button:hover {
+  background-color: #e8e8e8;
+}
+
+.collapsible-icon {
+  font-size: 0.8rem;
+  transition: transform 0.3s;
+}
+
+/* Collapsible content */
+.collapsible-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  background-color: #fff;
+}
+
+.collapsible-content.active {
+  max-height: 1000px; /* Large enough to fit all content */
+}
+
+/* Title meanings list */
+.title-meanings {
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.title-item {
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid #4CAF50;
+}
+
+.title-name {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 0.3rem;
+}
+
+.title-range {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.title-description {
+  font-size: 0.9rem;
+  color: #444;
+  font-style: italic;
+}
+
+/* Add different colors for each rank */
+.title-item:nth-child(1) {
+  border-left-color: #888; /* Chimang */
+}
+
+.title-item:nth-child(2) {
+  border-left-color: #5fb85f; /* Rookie */
+}
+
+.title-item:nth-child(3) {
+  border-left-color: #ff9800; /* Casanova */
+}
+
+.title-item:nth-child(4) {
+  border-left-color: #2196F3; /* Schaatser */
+}
+
+.title-item:nth-child(5) {
+  border-left-color: #3F51B5; /* Meester Schaatser */
+}
+
+.title-item:nth-child(6) {
+  border-left-color: #9C27B0; /* S-Team Elite */
+}
+
+.title-item:nth-child(7) {
+  border-left-color: #E91E63; /* S-Team Sterspeler */
+}
+
+.title-item:nth-child(8) {
+  border-left-color: #F44336; /* Hall of Famer */
+}
+
 /* Helper class */
 .hidden {
   display: none !important;
@@ -331,6 +454,7 @@
   .user-info {
     margin-bottom: 0.5rem;
     padding: 0;
+    text-align: center;
   }
   
   .user-festival-card {
@@ -346,5 +470,9 @@
   .current-score {
     margin-right: 0;
     margin-bottom: 0.5rem;
+  }
+  
+  .title-meanings {
+    grid-template-columns: 1fr;
   }
 }
