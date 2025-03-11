@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           userTitleElement.className = 'user-title-display';
           usernameDisplay.parentNode.insertBefore(userTitleElement, usernameDisplay.nextSibling);
         }
-        userTitleElement.textContent = `${titleData.title} (${titleData.points} punten)`;
+        userTitleElement.textContent = `Titel: ${titleData.title}`;
       } else {
         // If unable to get display name, use email
         usernameDisplay.textContent = currentUserEmail;
@@ -639,7 +639,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Load user's festival card
   async function loadUserFestivalCard(userEmail, displayName, userTitle, titlePoints) {
-    // Hide users list and show user festival card
+  // Hide users list and show user festival card
     usersListContainer.classList.remove('active');
     userFestivalCard.classList.remove('hidden');
     
@@ -653,7 +653,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       titlePoints = titleData.points;
     }
     
-    // Add or update title element
+    // Add or update title element 
     let userTitleElement = document.getElementById('user-card-title');
     if (!userTitleElement) {
       userTitleElement = document.createElement('div');
@@ -661,7 +661,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       userTitleElement.className = 'user-card-title';
       userCardName.after(userTitleElement);
     }
-    userTitleElement.textContent = `${userTitle} (${titlePoints} punten)`;
+    // Updated format: "Titel: [title]" without points display
+    userTitleElement.textContent = `Titel: ${userTitle}`;
+  
     
     try {
       // Get user's festivals
