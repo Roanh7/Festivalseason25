@@ -303,7 +303,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (icon) {
           icon.textContent = isActive ? '▲' : '▼';
         }
+        
+        // If opening, ensure description texts are visible (especially on mobile)
+        if (isActive) {
+          setTimeout(() => {
+            document.querySelectorAll('.title-description').forEach(desc => {
+              desc.style.display = 'block';
+              desc.style.visibility = 'visible';
+              desc.style.opacity = '1';
+            });
+            
+            // Scroll to make the content visible
+            toggleTitleInfo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 100);
+        }
       });
+      
+      // If on mobile, set up additional checks for visibility
+      if (window.innerWidth <= 768) {
+        // Optional: Auto-open on mobile devices
+        // titleInfoContent.classList.add('active');
+        // const icon = toggleTitleInfo.querySelector('.collapsible-icon');
+        // if (icon) {
+        //   icon.textContent = '▲';
+        // }
+        
+        // Set up mutation observer to ensure descriptions remain visible
+        const observer = new MutationObserver(mutations => {
+          mutations.forEach(mutation => {
+            if (mutation.attributeName === 'class' && 
+                titleInfoContent.classList.contains('active')) {
+              // Force visibility after transition
+              setTimeout(() => {
+                document.querySelectorAll('.title-description').forEach(desc => {
+                  desc.style.display = 'block';
+                  desc.style.visibility = 'visible';
+                  desc.style.opacity = '1';
+                });
+              }, 500);
+            }
+          });
+        });
+        
+        // Start observing class changes on the content element
+        observer.observe(titleInfoContent, { attributes: true });
+      }
     }
   }
 
@@ -366,4 +410,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize
   setupModal();
   await loadData();
+  
+  // Additional fix for mobile title descriptions
+  function checkDescriptionsVisibility() {
+    const titleInfoContent = document.getElementById('title-info-content');
+    if (titleInfoContent && titleInfoContent.classList.contains('active')) {
+      setTimeout(() => {
+        document.querySelectorAll('.title-description').forEach(desc => {
+          desc.style.display = 'block';
+          desc.style.visibility = 'visible';
+          desc.style.opacity = '1';
+        });
+      }, 600);
+    }
+  }
+  
+  // Run visibility check on page load and window resize
+  window.addEventListener('resize', checkDescriptionsVisibility);
+  setTimeout(checkDescriptionsVisibility, 1000);
 });
