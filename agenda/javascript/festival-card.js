@@ -92,6 +92,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     "Parels van de stad": 36.00,
     "Into the woods": 53.00
   };
+
+  // Title based on points (same as in statistieken.js)
+  function getUserTitle(points) {
+    if (points >= 35) return "S-Team Hall of Famer";
+    if (points >= 31) return "S-Team Sterspeler";
+    if (points >= 26) return "S-Team Elite";
+    if (points >= 21) return "Meester Schaatser";
+    if (points >= 16) return "Schaatser";
+    if (points >= 11) return "Casanova";
+    if (points >= 6) return "Rookie Festivalganger";
+    return "Chimang";
+  }
   
   // Helper function to format date
   function formatDate(isoDate) {
@@ -233,6 +245,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // Get user's title based on phone numbers count
+  async function getUserTitleFromServer(userEmail) {
+    try {
+      // Fetch phone numbers from server
+      const response = await fetch(`/my-phone-numbers?email=${encodeURIComponent(userEmail)}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch phone numbers: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      const phoneNumbers = data.phoneNumbers || {};
+      
+      // Calculate total points (sum of all phone numbers)
+      let totalPoints = 0;
+      for (const festival in phoneNumbers) {
+        totalPoints += phoneNumbers[festival];
+      }
+      
+      // Get title based on total points
+      return {
+        title: getUserTitle(totalPoints),
+        points: totalPoints
+      };
+    } catch (error) {
+      console.error('Error fetching user title:', error);
+      return { title: "Chimang", points: 0 }; // Default title
+    }
+  }
+
   // Load the user's display name (username or email)
   async function loadCurrentUserInfo() {
     try {
@@ -240,6 +281,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (response.ok) {
         const data = await response.json();
         usernameDisplay.textContent = data.displayName;
+        
+        // Add user title
+        const titleData = await getUserTitleFromServer(currentUserEmail);
+        
+        // Create or update user title element
+        let userTitleElement = document.getElementById('user-title-display');
+        if (!userTitleElement) {
+          userTitleElement = document.createElement('div');
+          userTitleElement.id = 'user-title-display';
+          userTitleElement.className = 'user-title-display';
+          usernameDisplay.parentNode.insertBefore(userTitleElement, usernameDisplay.nextSibling);
+        }
+        userTitleElement.textContent = `${titleData.title} (${titleData.points} punten)`;
       } else {
         // If unable to get display name, use email
         usernameDisplay.textContent = currentUserEmail;
@@ -543,12 +597,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       
       // Display all users
-      users.forEach(user => {
+      for (const user of users) {
         // Skip the current user
-        if (user.email === currentUserEmail) return;
+        if (user.email === currentUserEmail) continue;
         
         const displayName = user.username || user.email;
         const initial = displayName.charAt(0).toUpperCase();
+        
+        // Get user's title
+        const titleData = await getUserTitleFromServer(user.email);
         
         const userItem = document.createElement('div');
         userItem.className = 'user-item';
@@ -557,17 +614,18 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="user-avatar">${initial}</div>
           <div class="user-details">
             <div class="user-item-name">${displayName}</div>
+            <div class="user-item-title">${titleData.title}</div>
             ${user.username ? `<div class="user-item-email">${user.email}</div>` : ''}
           </div>
         `;
         
         // Add click event to view user's festival card
         userItem.addEventListener('click', () => {
-          loadUserFestivalCard(user.email, displayName);
+          loadUserFestivalCard(user.email, displayName, titleData.title, titleData.points);
         });
         
         usersList.appendChild(userItem);
-      });
+      }
     } catch (error) {
       console.error('Error loading users:', error);
       usersList.innerHTML = `
@@ -580,13 +638,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   
   // Load user's festival card
-  async function loadUserFestivalCard(userEmail, displayName) {
+  async function loadUserFestivalCard(userEmail, displayName, userTitle, titlePoints) {
     // Hide users list and show user festival card
     usersListContainer.classList.remove('active');
     userFestivalCard.classList.remove('hidden');
     
     // Update user card title
     userCardName.textContent = `${displayName}'s Festival Card`;
+    
+    // Add user title if provided, or fetch it
+    if (!userTitle) {
+      const titleData = await getUserTitleFromServer(userEmail);
+      userTitle = titleData.title;
+      titlePoints = titleData.points;
+    }
+    
+    // Add or update title element
+    let userTitleElement = document.getElementById('user-card-title');
+    if (!userTitleElement) {
+      userTitleElement = document.createElement('div');
+      userTitleElement.id = 'user-card-title';
+      userTitleElement.className = 'user-card-title';
+      userCardName.after(userTitleElement);
+    }
+    userTitleElement.textContent = `${userTitle} (${titlePoints} punten)`;
     
     try {
       // Get user's festivals

@@ -247,42 +247,42 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="title-item">
               <div class="title-name">Chimang</div>
               <div class="title-range">0-5 nummers</div>
-              <div class="title-description">Betekenis komt hier</div>
+              <div class="title-description">Je hebt nog niks geregeld. Dus begin te regelen chimang!</div>
             </div>
             <div class="title-item">
               <div class="title-name">Rookie Festivalganger</div>
               <div class="title-range">6-10 nummers</div>
-              <div class="title-description">Betekenis komt hier</div>
+              <div class="title-description">Je beweegt hier en daar, maar niet genoeg.</div>
             </div>
             <div class="title-item">
               <div class="title-name">Casanova</div>
               <div class="title-range">11-15 nummers</div>
-              <div class="title-description">Betekenis komt hier</div>
+              <div class="title-description">Je regelt net het gemiddelde.</div>
             </div>
             <div class="title-item">
               <div class="title-name">Schaatser</div>
               <div class="title-range">16-20 nummers</div>
-              <div class="title-description">Betekenis komt hier</div>
+              <div class="title-description">Dit is de bare minimum. Links en rechts amsjes aan het regelen.</div>
             </div>
             <div class="title-item">
               <div class="title-name">Meester Schaatser</div>
               <div class="title-range">21-25 nummers</div>
-              <div class="title-description">Betekenis komt hier</div>
+              <div class="title-description">Je bent een ervaren speler op het veld. Mensen kunnen van je leren.</div>
             </div>
             <div class="title-item">
               <div class="title-name">S-Team Elite</div>
               <div class="title-range">26-30 nummers</div>
-              <div class="title-description">Betekenis komt hier</div>
+              <div class="title-description">Een van de top spelers van S-Team.</div>
             </div>
             <div class="title-item">
               <div class="title-name">S-Team Sterspeler</div>
               <div class="title-range">31-35 nummers</div>
-              <div class="title-description">Betekenis komt hier</div>
+              <div class="title-description">De speler van het team. Je regelt altijd zonder enige moeite.</div>
             </div>
             <div class="title-item">
               <div class="title-name">S-Team Hall of Famer</div>
               <div class="title-range">35+ nummers</div>
-              <div class="title-description">Betekenis komt hier</div>
+              <div class="title-description">Je bent een Hall of Famer, een legend in de game.</div>
             </div>
           </div>
         </div>

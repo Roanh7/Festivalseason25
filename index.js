@@ -965,6 +965,38 @@ app.get('/phone-number-rankings', async (req, res) => {
   }
 });
 
+// 17) GET /phone-number-total => get total phone numbers for a user
+app.get('/phone-number-total', async (req, res) => {
+  try {
+    const userEmail = req.query.email;
+    
+    if (!userEmail) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    
+    // Get all the user's phone numbers
+    const result = await client.query(
+      'SELECT SUM(phone_count) as total_points FROM phone_numbers WHERE user_email = $1',
+      [userEmail]
+    );
+    
+    // Get the total points (default to 0 if not found)
+    const totalPoints = result.rows.length > 0 ? 
+      parseInt(result.rows[0].total_points) || 0 : 0;
+    
+    res.json({ 
+      email: userEmail,
+      totalPoints: totalPoints
+    });
+  } catch (err) {
+    console.error('Error in /phone-number-total:', err);
+    res.status(500).json({ 
+      message: 'Could not get total phone numbers',
+      totalPoints: 0
+    });
+  }
+});
+
 // ============== USER STREAK FUNCTIONALITY - FIXED VERSION ==============
 
 // Modified endpoint for user streak to handle errors better
