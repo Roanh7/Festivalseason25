@@ -597,3 +597,31 @@ body {
     font-size: 1.8rem;
   }
 }
+
+
+
+/* Update user title display on personal card to match username */
+.user-title-display {
+  font-size: 1.2rem;
+  color: #4CAF50;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+/* Update user title on other user's card */
+.user-card-title {
+  font-size: 1.2rem;
+  color: #4CAF50;
+  font-weight: bold;
+  margin-top: 0.5rem;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+
+/* Update for mobile responsiveness */
+@media (max-width: 768px) {
+  .user-title-display,
+  .user-card-title {
+    font-size: 1.1rem;
+  }
+}
