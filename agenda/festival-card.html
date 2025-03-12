@@ -61,7 +61,10 @@
       <h2>Mijn Festival Card</h2>
       <div class="user-info-bar">
         <span id="username-display">Username</span>
-        <a href="account.html" class="account-link">Ga naar Mijn Account</a>
+        <!-- Title will be inserted here by JavaScript -->
+        <div class="account-link-container">
+          <a href="account.html" class="account-link">Ga naar Mijn Account</a>
+        </div>
       </div>
       
       <div class="festival-stats">
@@ -151,25 +154,24 @@
         </div>
       </div>
   
-
-        <div class="streak-section">
-          <h3>Festival Streak</h3>
-          <div class="streak-display">
-            <div class="streak-box current-streak">
-              <div class="streak-icon">🔥</div>
-              <div class="streak-value" id="current-streak">0</div>
-              <div class="streak-label">Huidige Streak</div>
-            </div>
-            <div class="streak-box best-streak">
-              <div class="streak-icon">🏆</div>
-              <div class="streak-value" id="best-streak">0</div>
-              <div class="streak-label">Beste Streak</div>
-            </div>
+      <div class="streak-section">
+        <h3>Festival Streak</h3>
+        <div class="streak-display">
+          <div class="streak-box current-streak">
+            <div class="streak-icon">🔥</div>
+            <div class="streak-value" id="current-streak">0</div>
+            <div class="streak-label">Huidige Streak</div>
           </div>
-          <div class="streak-explanation">
-            <p>Je streak verhoogt wanneer je opeenvolgende festivals bijwoont. Als je een festival overslaat, begint je streak opnieuw bij 0.</p>
+          <div class="streak-box best-streak">
+            <div class="streak-icon">🏆</div>
+            <div class="streak-value" id="best-streak">0</div>
+            <div class="streak-label">Beste Streak</div>
           </div>
         </div>
+        <div class="streak-explanation">
+          <p>Je streak verhoogt wanneer je opeenvolgende festivals bijwoont. Als je een festival overslaat, begint je streak opnieuw bij 0.</p>
+        </div>
+      </div>
     </div>
 
     <!-- View Other Users Section - UPDATED -->

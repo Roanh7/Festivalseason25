@@ -285,15 +285,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Add user title
         const titleData = await getUserTitleFromServer(currentUserEmail);
         
-        // Create or update user title element
+        // Create or update user title element - MODIFIED PLACEMENT
         let userTitleElement = document.getElementById('user-title-display');
         if (!userTitleElement) {
           userTitleElement = document.createElement('div');
           userTitleElement.id = 'user-title-display';
           userTitleElement.className = 'user-title-display';
+          // Insert directly after the username instead of using nextSibling
           usernameDisplay.parentNode.insertBefore(userTitleElement, usernameDisplay.nextSibling);
         }
         userTitleElement.textContent = `Titel: ${titleData.title}`;
+        
+        // Move the account link to a container for right alignment
+        const accountLink = document.querySelector('.account-link');
+        if (accountLink) {
+          // Check if the container already exists
+          let linkContainer = document.querySelector('.account-link-container');
+          if (!linkContainer) {
+            linkContainer = document.createElement('div');
+            linkContainer.className = 'account-link-container';
+            // Append the container to the user-info-bar
+            usernameDisplay.parentNode.appendChild(linkContainer);
+          }
+          // Move the account link to the container
+          linkContainer.appendChild(accountLink);
+        }
       } else {
         // If unable to get display name, use email
         usernameDisplay.textContent = currentUserEmail;
@@ -639,7 +655,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Load user's festival card
   async function loadUserFestivalCard(userEmail, displayName, userTitle, titlePoints) {
-  // Hide users list and show user festival card
+    // Hide users list and show user festival card
     usersListContainer.classList.remove('active');
     userFestivalCard.classList.remove('hidden');
     
@@ -653,15 +669,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       titlePoints = titleData.points;
     }
     
-    // Add or update title element 
+    // Add or update title element - MODIFIED PLACEMENT
     let userTitleElement = document.getElementById('user-card-title');
     if (!userTitleElement) {
       userTitleElement = document.createElement('div');
       userTitleElement.id = 'user-card-title';
       userTitleElement.className = 'user-card-title';
-      userCardName.after(userTitleElement);
+      // Insert it directly after the userCardName element
+      userCardName.parentNode.insertBefore(userTitleElement, userCardName.nextSibling);
     }
-    // Updated format: "Titel: [title]" without points display
+    
+    // Updated format: "Titel: [title]"
     userTitleElement.textContent = `Titel: ${userTitle}`;
   
     
@@ -860,3 +878,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   };
 });
+
