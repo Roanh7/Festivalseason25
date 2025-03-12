@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         
         if (response.ok) {
-          alert('Telefoonnummers succesvol opgeslagen!');
+          alert('Score succesvol opgeslagen!');
           closeModal();
           // Refresh data to show the new counts
           await loadData();
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (rankings.length === 0) {
       rankingsContainer.innerHTML = `
         <div class="message-box">
-          Er zijn nog geen telefoonnummers verzameld.
+          Er is nog geen één amsje gereld.
         </div>
       `;
       return;
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
           <div class="phone-numbers-display">
             <div class="phone-count">${user.totalPhoneNumbers}</div>
-            <div class="phone-label">nummers</div>
+            <div class="phone-label">score</div>
           </div>
         </div>
       `;
@@ -246,42 +246,42 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="title-meanings">
             <div class="title-item">
               <div class="title-name">Chimang</div>
-              <div class="title-range">0-5 nummers</div>
+              <div class="title-range">0-5 amsjes geregeld</div>
               <div class="title-description">Je hebt nog niks geregeld. Dus begin te regelen chimang!</div>
             </div>
             <div class="title-item">
               <div class="title-name">Rookie Festivalganger</div>
-              <div class="title-range">6-10 nummers</div>
+              <div class="title-range">6-10 amsjes geregeld</div>
               <div class="title-description">Je beweegt hier en daar, maar niet genoeg.</div>
             </div>
             <div class="title-item">
               <div class="title-name">Casanova</div>
-              <div class="title-range">11-15 nummers</div>
+              <div class="title-range">11-15 amsjes geregeld</div>
               <div class="title-description">Je regelt net het gemiddelde.</div>
             </div>
             <div class="title-item">
               <div class="title-name">Schaatser</div>
-              <div class="title-range">16-20 nummers</div>
+              <div class="title-range">16-20 amsjes geregeld</div>
               <div class="title-description">Dit is de bare minimum. Links en rechts amsjes aan het regelen.</div>
             </div>
             <div class="title-item">
               <div class="title-name">Meester Schaatser</div>
-              <div class="title-range">21-25 nummers</div>
+              <div class="title-range">21-25 amsjes geregeld</div>
               <div class="title-description">Je bent een ervaren speler op het veld. Mensen kunnen van je leren.</div>
             </div>
             <div class="title-item">
               <div class="title-name">S-Team Elite</div>
-              <div class="title-range">26-30 nummers</div>
+              <div class="title-range">26-30 amsjes geregeld</div>
               <div class="title-description">Een van de top spelers van S-Team.</div>
             </div>
             <div class="title-item">
               <div class="title-name">S-Team Sterspeler</div>
-              <div class="title-range">31-35 nummers</div>
+              <div class="title-range">31-35 amsjes geregeld</div>
               <div class="title-description">De speler van het team. Je regelt altijd zonder enige moeite.</div>
             </div>
             <div class="title-item">
               <div class="title-name">S-Team Hall of Famer</div>
-              <div class="title-range">35+ nummers</div>
+              <div class="title-range">35+ amsjes geregeld</div>
               <div class="title-description">Je bent een Hall of Famer, een legend in de game.</div>
             </div>
           </div>
@@ -395,7 +395,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="user-festival-date">${formattedDate}</div>
           </div>
           <div class="user-festival-score">
-            <div class="current-score">${phoneCount} nummers</div>
+            <div class="current-score">${phoneCount} Score</div>
             <button class="phone-btn" onclick="openPhoneModal('${festName}', ${phoneCount})">
               ${phoneCount > 0 ? 'Bijwerken' : 'Toevoegen'}
             </button>
