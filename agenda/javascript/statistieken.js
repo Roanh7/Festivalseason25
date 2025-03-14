@@ -435,18 +435,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Add data attributes to user rank cards to make click functionality work
 function enhanceUserRankCards() {
   document.querySelectorAll('.user-rank-card').forEach(card => {
-    const userEmail = card.querySelector('.user-name')?.textContent || '';
+    // Get the user email - prefer getting it from the content that shows email
+    let userEmail = '';
+    
+    // First check if the card has an email element
+    const emailElement = card.querySelector('.user-item-email');
+    if (emailElement) {
+      userEmail = emailElement.textContent.trim();
+    }
+    
+    // If not found, fall back to the name element (which might contain email)
+    if (!userEmail) {
+      userEmail = card.querySelector('.user-name')?.textContent.trim() || '';
+    }
     
     // Store the email as a data attribute
     if (userEmail && !card.dataset.email) {
       card.dataset.email = userEmail;
     }
     
-    // Store the username if it exists
-    const username = card.querySelector('.user-name')?.textContent || '';
-    if (username && !card.dataset.username) {
-      card.dataset.username = username;
+    // Store the username if it exists (prefer the actual username over email)
+    const usernameElement = card.querySelector('.user-name');
+    if (usernameElement && !card.dataset.username) {
+      card.dataset.username = usernameElement.textContent.trim();
     }
+    
+    console.log(`Enhanced card for user: ${card.dataset.username || card.dataset.email}`);
   });
 }
 

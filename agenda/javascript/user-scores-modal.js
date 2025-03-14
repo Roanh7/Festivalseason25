@@ -334,6 +334,42 @@ document.addEventListener('DOMContentLoaded', function() {
         date: festivalDates[festival] || null
       }));
       
+      // If we have a total score but no individual scores, we need to fetch user festival attendance
+      if (scores.length === 0 && totalPhoneCount > 0) {
+        try {
+          // Get the user's attended festivals
+          const attendanceResponse = await fetch(`/my-festivals?email=${encodeURIComponent(userEmail)}`);
+          
+          if (attendanceResponse.ok) {
+            const attendanceData = await attendanceResponse.json();
+            const attendedFestivals = attendanceData.festivals || [];
+            
+            // If there's exactly one festival, we can assume that's where the score came from
+            if (attendedFestivals.length === 1 && totalPhoneCount > 0) {
+              scores.push({
+                festival: attendedFestivals[0],
+                score: totalPhoneCount, // Use the total as the score for this festival
+                date: festivalDates[attendedFestivals[0]] || null
+              });
+            } else if (attendedFestivals.length > 0) {
+              // For multiple festivals, we don't know the distribution
+              // So we'll just show attended festivals without scores
+              attendedFestivals.forEach(festival => {
+                if (!phoneNumbers[festival]) { // Only add if not already in phoneNumbers
+                  scores.push({
+                    festival: festival,
+                    score: '?', // Unknown distribution
+                    date: festivalDates[festival] || null
+                  });
+                }
+              });
+            }
+          }
+        } catch (e) {
+          console.error('Error fetching attended festivals:', e);
+        }
+      }
+      
       // Display the scores
       if (scores.length === 0) {
         scoresList.innerHTML = '<div class="no-scores">Geen festivalscores gevonden voor deze gebruiker.</div>';
