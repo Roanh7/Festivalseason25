@@ -279,6 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
     "Free your mind Kingsday": "2025-04-26",
     "Loveland Kingsday": "2025-04-26",
     "Verbond": "2025-05-05",
+    "Music On": "2025-05-10",
     "Awakenings Upclose": "2025-05-17",
     "PIV": "2025-05-30",
     "Soenda": "2025-05-31",

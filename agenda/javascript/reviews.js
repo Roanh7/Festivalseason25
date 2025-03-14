@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     "Free your mind Kingsday": "2025-04-26",
     "Loveland Kingsday": "2025-04-26",
     "Verbond": "2025-05-05",
+    "Music On": "2025-05-10",
     "Awakenings Upclose": "2025-05-17",
     "Soenda": "2025-05-31",
     "909": "2025-06-07",

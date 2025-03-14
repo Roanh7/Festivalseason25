@@ -186,6 +186,7 @@ client.connect()
           { name: "Free your mind Kingsday", date: "2025-04-26" },
           { name: "Loveland Kingsday", date: "2025-04-26" },
           { name: "Verbond", date: "2025-05-05" },
+          { name: "Music On", date: "2025-05-10" },
           { name: "Awakenings Upclose", date: "2025-05-17" },
           { name: "PIV", date: "2025-05-30" },
           { name: "Soenda", date: "2025-05-31" },
