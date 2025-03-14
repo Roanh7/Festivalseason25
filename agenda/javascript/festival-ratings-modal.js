@@ -339,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showFestivalRatings(festivalName, avgRating, count);
       });
       
-      // Add cursor style to indicate clickable
+      // Add cursor style to indicate clickable while preserving original design
       card.style.cursor = 'pointer';
     });
   }

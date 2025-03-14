@@ -26,44 +26,11 @@
   <!-- Web App Manifest -->
   <link rel="manifest" href="/manifest.json">
   
-  <!-- Additional inline styles for clickable festival cards -->
+  <!-- Minimal styles for clickable festival cards without changing appearance -->
   <style>
-    /* These styles will be included directly in the HTML */
+    /* Only add cursor pointer to show it's clickable */
     .festival-rank-card {
       cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .festival-rank-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-
-    .festival-rank-card::after {
-      content: "👁️ Bekijk ratings";
-      display: block;
-      text-align: center;
-      padding: 8px;
-      margin-top: 10px;
-      background-color: #f0f9f0;
-      border-radius: 0 0 8px 8px;
-      color: #4CAF50;
-      font-size: 0.85rem;
-      font-weight: bold;
-      opacity: 0;
-      transform: translateY(-5px);
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-
-    .festival-rank-card:hover::after {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Animation for card when clicking */
-    .festival-rank-card:active {
-      transform: translateY(-2px);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
   </style>
 </head>
@@ -96,7 +63,7 @@
     <!-- Festival Rankings Section -->
     <section id="rankings-section">
       <h2>Festival Rankings</h2>
-      <p class="section-description">Hier zie je de ranglijst van alle festivals op basis van gebruikersbeoordelingen. Klik op een festival om alle individuele beoordelingen te bekijken.</p>
+      <p class="section-description">Hier zie je de ranglijst van alle festivals op basis van gebruikersbeoordelingen. Klik op een festival voor meer details.</p>
       <div id="rankingsContainer" class="rankings-container">
         <div class="loading">Laden van festival rankings...</div>
       </div>
