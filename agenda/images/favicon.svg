@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Blue diamond background shape -->
+  <path d="M32 4 L60 32 L32 60 L4 32 Z" fill="#0a3b6b" />
+  
+  <!-- Golden border -->
+  <path d="M32 6 L58 32 L32 58 L6 32 Z" fill="none" stroke="#f0c419" stroke-width="2" />
+  
+  <!-- Inner dark blue background -->
+  <path d="M32 8 L56 32 L32 56 L8 32 Z" fill="#082b4f" />
+  
+  <!-- Center golden horizontal line -->
+  <rect x="15" y="31" width="34" height="2" fill="#f0c419" />
+  
+  <!-- FS text -->
+  <text x="32" y="30" font-family="Arial Black, sans-serif" font-weight="900" font-size="18" 
+        text-anchor="middle" fill="#f0c419" stroke="#000" stroke-width="0.5">FS</text>
+  
+  <!-- 2025 in smaller text -->
+  <text x="32" y="42" font-family="Arial, sans-serif" font-weight="bold" font-size="10" 
+        text-anchor="middle" fill="#ffffff">2025</text>
+  
+  <!-- Star above -->
+  <path d="M32,12 L33.5,15 L37,15.5 L34.5,18 L35,21.5 L32,20 L29,21.5 L29.5,18 L27,15.5 L30.5,15 Z" 
+        fill="#f0c419" />
+  
+  <!-- Soccer ball icon at bottom -->
+  <circle cx="32" cy="50" r="3" fill="#ffffff" />
+  <path d="M32,47 L33,48 L32,49 L31,48 Z M34,49 L35,50 L34,51 L33,50 Z M30,49 L31,50 L30,51 L29,50 Z M32,51 L33,52 L32,53 L31,52 Z" 
+        fill="#333333" />
+</svg>
