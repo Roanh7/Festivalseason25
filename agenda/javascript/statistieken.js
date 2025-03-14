@@ -429,3 +429,44 @@ document.addEventListener('DOMContentLoaded', async () => {
   window.addEventListener('resize', checkDescriptionsVisibility);
   setTimeout(checkDescriptionsVisibility, 1000);
 });
+
+// Add this code to the bottom of your statistieken.js file
+
+// Add data attributes to user rank cards to make click functionality work
+function enhanceUserRankCards() {
+  document.querySelectorAll('.user-rank-card').forEach(card => {
+    const userEmail = card.querySelector('.user-name')?.textContent || '';
+    
+    // Store the email as a data attribute
+    if (userEmail && !card.dataset.email) {
+      card.dataset.email = userEmail;
+    }
+    
+    // Store the username if it exists
+    const username = card.querySelector('.user-name')?.textContent || '';
+    if (username && !card.dataset.username) {
+      card.dataset.username = username;
+    }
+  });
+}
+
+// Call this function after user rank cards are loaded
+document.addEventListener('DOMContentLoaded', function() {
+  // Execute after a short delay to ensure the original script has loaded the cards
+  setTimeout(() => {
+    enhanceUserRankCards();
+  }, 1000);
+  
+  // Also set up a MutationObserver to catch dynamically added cards
+  const rankingsContainer = document.getElementById('rankingsContainer');
+  if (rankingsContainer) {
+    const observer = new MutationObserver(() => {
+      enhanceUserRankCards();
+    });
+    
+    observer.observe(rankingsContainer, { 
+      childList: true, 
+      subtree: true 
+    });
+  }
+});
