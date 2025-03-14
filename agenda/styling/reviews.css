@@ -90,6 +90,8 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   margin-bottom: 1rem;
   position: relative;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 /* Top 3 festival cards with special colors */
@@ -106,6 +108,17 @@
 .festival-rank-card.rank-3 {
   background-color: #CD7F32;
   border: 2px solid #8B4513;
+}
+
+/* Hover effect for the cards */
+.festival-rank-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Removing the after pseudo-element that shows eye icon */
+.festival-rank-card::after {
+  display: none;
 }
 
 /* Rank number */
@@ -141,13 +154,15 @@
 .rating-display {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-end; /* Align to the right */
   justify-content: center;
-  min-width: 80px;
+  min-width: 90px;
+  padding-right: 10px;
+  margin-left: auto; /* Push to the right edge */
 }
 
 .rating-value {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   font-weight: bold;
   color: #4CAF50;
 }
@@ -155,6 +170,14 @@
 .rating-count {
   font-size: 0.8rem;
   color: #666;
+}
+
+/* Subtle highlight on hover */
+.festival-rank-card:hover .rating-display {
+  background-color: rgba(76, 175, 80, 0.1);
+  border-radius: 8px;
+  padding: 5px 10px;
+  transition: background-color 0.3s ease;
 }
 
 /* User festival cards */
@@ -322,6 +345,11 @@
     padding: 0;
   }
   
+  .rating-display {
+    align-items: center;
+    padding-right: 0;
+  }
+  
   .user-festival-card {
     flex-direction: column;
     text-align: center;
@@ -334,42 +362,4 @@
   .stars-container {
     flex-wrap: wrap;
   }
-}
-
-/* Additional styles for clickable festival rank cards */
-.festival-rank-card {
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.festival-rank-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-.festival-rank-card::after {
-  content: "👁️ Bekijk ratings";
-  display: block;
-  text-align: center;
-  padding: 8px;
-  margin-top: 10px;
-  background-color: #f0f9f0;
-  border-radius: 0 0 8px 8px;
-  color: #4CAF50;
-  font-size: 0.85rem;
-  font-weight: bold;
-  opacity: 0;
-  transform: translateY(-5px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.festival-rank-card:hover::after {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Animation for card when clicking */
-.festival-rank-card:active {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
