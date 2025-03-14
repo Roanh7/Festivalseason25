@@ -1,5 +1,4 @@
-// user-scores-modal.js
-// Script to display individual festival scores for a user when clicked in the rankings
+// user-scores-modal.js - Updated with better festival score display functionality
 
 document.addEventListener('DOMContentLoaded', function() {
   // Create the modal HTML and append to body
@@ -8,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="modal-overlay"></div>
       <div class="modal-content">
         <div class="modal-header">
-          <h3 id="user-modal-title">Gebruiker Scores</h3>
+          <h3 id="detail-modal-title">Gebruiker Scores</h3>
           <button class="modal-close">&times;</button>
         </div>
         <div class="modal-body">
@@ -32,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Get DOM elements
   const scoresModal = document.getElementById('user-scores-modal');
-  const modalTitle = document.getElementById('user-modal-title');
+  const modalTitle = document.getElementById('detail-modal-title');
   const totalScore = document.getElementById('total-score');
   const festivalsCount = document.getElementById('festivals-count');
   const scoresList = document.getElementById('scores-list');
@@ -327,12 +326,16 @@ document.addEventListener('DOMContentLoaded', function() {
       const data = await response.json();
       const phoneNumbers = data.phoneNumbers || {};
       
+      console.log("Received phone numbers data:", phoneNumbers);
+      
       // Convert to array format for easier sorting
       const scores = Object.entries(phoneNumbers).map(([festival, score]) => ({
         festival,
         score,
         date: festivalDates[festival] || null
       }));
+      
+      console.log("Transformed scores array:", scores);
       
       // If we have a total score but no individual scores, we need to fetch user festival attendance
       if (scores.length === 0 && totalPhoneCount > 0) {
@@ -442,6 +445,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const match = countText.match(/(\d+)/);
             festivalCount = match ? parseInt(match[1]) : 0;
           }
+          
+          console.log("Opening scores for user:", {
+            email: userEmail,
+            name: displayName,
+            totalPoints: totalPoints,
+            festivalCount: festivalCount
+          });
           
           // Show the scores modal
           showUserScores(userEmail, displayName, totalPoints, festivalCount);
