@@ -553,9 +553,13 @@ header {
   border: 1px solid #ddd;
   border-radius: 5px;
   box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 .bank-player:hover {
-  background-color: #f2f2f2;
+  background-color: #e8f5e9;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /* PDF-download */
@@ -579,7 +583,7 @@ header {
   background-color: #45a049;
 }
 
-/* Popup (spelerstats) */
+/* Improved player stats popup */
 .popup {
   position: fixed;
   top: 0;
@@ -589,36 +593,159 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(0,0,0,0.5);
-  z-index: 1000;
+  background-color: rgba(0,0,0,0.75);
+  z-index: 2000;
+  animation: fadeIn 0.3s ease-out;
 }
-.popup.hidden {
-  display: none;
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
+
 .popup-content {
-  background-color: #f4f4f4;
-  border: 3px solid #4CAF50;
+  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  color: white;
   border-radius: 15px;
-  padding: 2rem;
-  max-width: 450px;
+  padding: 0;
   width: 90%;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-  text-align: center;
-  color: #333;
+  max-width: 400px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  transform: scale(0.95);
+  animation: scaleIn 0.3s forwards;
 }
+
+@keyframes scaleIn {
+  to { transform: scale(1); }
+}
+
+.player-header {
+  padding: 20px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+
+.player-name {
+  font-size: 26px;
+  font-weight: bold;
+  margin: 0;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.player-position {
+  font-size: 16px;
+  opacity: 0.8;
+  margin-top: 5px;
+}
+
+.player-stats {
+  display: flex;
+  padding: 15px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.rating-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  width: 35%;
+}
+
+.rating-box {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 10px 15px;
+  text-align: center;
+  width: 100%;
+}
+
+.rating-value {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0;
+  color: #FFD700; /* Gold color for rating */
+}
+
+.rating-label {
+  margin: 5px 0 0 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.info-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 15px;
+}
+
+.info-section p {
+  margin: 5px 0;
+  font-size: 15px;
+}
+
+.skills-section {
+  padding: 15px 20px 20px;
+}
+
+.skills-section h3 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 5px;
+}
+
+.skills-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.skill-item {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.skill-item:before {
+  content: "✓";
+  margin-right: 8px;
+  color: #8eff8e;
+}
+
 .close-popup-btn {
-  background-color: #4CAF50;
+  background-color: #388E3C;
   color: white;
   border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 10px;
-  font-size: 1.1rem;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: background-color 0.2s, transform 0.2s;
+  display: block;
+  margin: 0 auto 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 .close-popup-btn:hover {
-  background-color: #45a049;
-  transform: scale(1.1);
+  background-color: #2E7D32;
+  transform: translateY(-2px);
+}
+
+.close-popup-btn:active {
+  transform: translateY(0);
 }
 
 /* Form containers (login/register) */
@@ -679,6 +806,36 @@ footer {
   margin: 2rem 0;
   font-size: 0.9rem;
   color: #666;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .skills-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .player-header {
+    padding: 15px;
+  }
+  
+  .player-name {
+    font-size: 22px;
+  }
+  
+  .player-stats {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .rating-section {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  
+  .info-section {
+    padding-left: 0;
+    text-align: center;
+  }
 }
 
 /* For mobile devices - adapt the navigation */
