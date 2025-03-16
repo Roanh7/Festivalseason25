@@ -322,13 +322,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // If on mobile, set up additional checks for visibility
       if (window.innerWidth <= 768) {
-        // Optional: Auto-open on mobile devices
-        // titleInfoContent.classList.add('active');
-        // const icon = toggleTitleInfo.querySelector('.collapsible-icon');
-        // if (icon) {
-        //   icon.textContent = '▲';
-        // }
-        
         // Set up mutation observer to ensure descriptions remain visible
         const observer = new MutationObserver(mutations => {
           mutations.forEach(mutation => {
@@ -431,9 +424,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setTimeout(checkDescriptionsVisibility, 1000);
 });
 
-// Add this code to the bottom of your statistieken.js file
-
-// Add data attributes to user rank cards to make click functionality work
+// Enhanced user rank cards data-attribute setup with click handlers
 function enhanceUserRankCards() {
   document.querySelectorAll('.user-rank-card').forEach(card => {
     // Get the user email - prefer getting it from the content that shows email
@@ -447,12 +438,14 @@ function enhanceUserRankCards() {
     
     // If not found, fall back to the name element (which might contain email)
     if (!userEmail) {
-      userEmail = card.querySelector('.user-name')?.textContent.trim() || '';
+      const nameElement = card.querySelector('.user-name');
+      userEmail = nameElement ? nameElement.textContent.trim() : '';
     }
     
     // Store the email as a data attribute
     if (userEmail && !card.dataset.email) {
       card.dataset.email = userEmail;
+      console.log(`Added email data attribute: ${userEmail}`);
     }
     
     // Store the username if it exists (prefer the actual username over email)
@@ -461,7 +454,20 @@ function enhanceUserRankCards() {
       card.dataset.username = usernameElement.textContent.trim();
     }
     
-    console.log(`Enhanced card for user: ${card.dataset.username || card.dataset.email}`);
+    // Also store the points for easier access
+    const pointsElement = card.querySelector('.phone-count');
+    if (pointsElement && !card.dataset.points) {
+      card.dataset.points = pointsElement.textContent.trim();
+    }
+    
+    // Store festival count
+    const festivalCountElement = card.querySelector('.user-festivals-count');
+    if (festivalCountElement && !card.dataset.festivalCount) {
+      const countText = festivalCountElement.textContent;
+      const match = countText.match(/(\d+)/);
+      const count = match ? match[1] : '0';
+      card.dataset.festivalCount = count;
+    }
   });
 }
 
@@ -470,6 +476,34 @@ document.addEventListener('DOMContentLoaded', function() {
   // Execute after a short delay to ensure the original script has loaded the cards
   setTimeout(() => {
     enhanceUserRankCards();
+    
+    // Add click handlers now that data attributes are set
+    document.querySelectorAll('.user-rank-card').forEach(card => {
+      if (!card.hasClickListener) {
+        card.addEventListener('click', function() {
+          const email = this.dataset.email;
+          const displayName = this.dataset.username || email;
+          const totalPoints = parseInt(this.dataset.points || '0');
+          const festivalCount = parseInt(this.dataset.festivalCount || '0');
+          
+          console.log(`Card clicked with data attributes:`, {
+            email,
+            displayName,
+            totalPoints,
+            festivalCount
+          });
+          
+          if (typeof showUserScores === 'function') {
+            showUserScores(email, displayName, totalPoints, festivalCount);
+          } else {
+            console.error('showUserScores function not found');
+          }
+        });
+        
+        card.hasClickListener = true;
+        card.style.cursor = 'pointer';
+      }
+    });
   }, 1000);
   
   // Also set up a MutationObserver to catch dynamically added cards

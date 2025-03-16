@@ -1,5 +1,4 @@
-// user-scores-modal.js - Updated with better festival score display functionality
-
+// user-scores-modal.js - Fixed version to properly display user festival scores
 document.addEventListener('DOMContentLoaded', function() {
   // Create the modal HTML and append to body
   const modalHTML = `
@@ -144,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
       background-color: #45a049;
     }
     
-    /* User total score styles */
+    /* Festival average rating styles */
     .user-total {
       text-align: center;
       margin-bottom: 20px;
@@ -305,6 +304,8 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Function to open the modal with user festival scores
   window.showUserScores = async function(userEmail, displayName, totalPhoneCount, festivalCount) {
+    console.log(`Opening scores modal for: ${displayName} (${userEmail}) - Total: ${totalPhoneCount}, Count: ${festivalCount}`);
+    
     modalTitle.textContent = `${displayName || userEmail} - Festival Scores`;
     totalScore.textContent = totalPhoneCount;
     festivalsCount.textContent = festivalCount;
@@ -424,58 +425,96 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
   
-  // Make user rank cards clickable
+  // Make user rank cards clickable - FIXED VERSION
   function setupUserCardClicks() {
-    document.querySelectorAll('.user-rank-card').forEach(card => {
-      // Only add event listener if it doesn't already have one
-      if (!card.hasClickListener) {
+    console.log('Setting up user card clicks');
+    
+    // Target the correct user rank cards by selecting them directly
+    const userRankCards = document.querySelectorAll('.user-rank-card');
+    console.log(`Found ${userRankCards.length} user rank cards`);
+    
+    userRankCards.forEach(card => {
+      // Skip if card already has a click handler
+      if (card.hasClickListener) return;
+      
+      // Find the user email and display name from the card
+      const emailElement = card.querySelector('.user-item-email');
+      const nameElement = card.querySelector('.user-name');
+      const pointsElement = card.querySelector('.phone-count');
+      const festivalsElement = card.querySelector('.user-festivals-count');
+      
+      // Extract the email - first try the card's data attribute
+      let userEmail = card.dataset.email;
+      
+      // If not found in data attribute, try to find it in the elements
+      if (!userEmail && emailElement) {
+        userEmail = emailElement.textContent.trim();
+      } else if (!userEmail && nameElement) {
+        // If no explicit email field, use the name (which might be the email)
+        userEmail = nameElement.textContent.trim();
+      }
+      
+      // Extract the display name
+      const displayName = nameElement ? nameElement.textContent.trim() : null;
+      
+      // Extract the points
+      const totalPoints = pointsElement ? parseInt(pointsElement.textContent) || 0 : 0;
+      
+      // Extract festival count from text like "5 festivals bijgewoond"
+      let festivalCount = 0;
+      if (festivalsElement) {
+        const countText = festivalsElement.textContent;
+        const match = countText.match(/(\d+)/);
+        festivalCount = match ? parseInt(match[1]) : 0;
+      }
+      
+      if (userEmail) {
+        console.log(`Setting up click for ${displayName || userEmail}`);
+        
+        // Add click event (and store a reference to it)
         card.addEventListener('click', function() {
-          const userEmail = this.dataset.email;
-          const displayName = this.dataset.username || this.querySelector('.user-name')?.textContent;
-          
-          // Get the total points value
-          const pointsDisplay = this.querySelector('.phone-count');
-          const totalPoints = pointsDisplay ? parseInt(pointsDisplay.textContent) : 0;
-          
-          // Get the festival count
-          const festivalCountEl = this.querySelector('.user-festivals-count');
-          let festivalCount = 0;
-          
-          if (festivalCountEl) {
-            const countText = festivalCountEl.textContent;
-            const match = countText.match(/(\d+)/);
-            festivalCount = match ? parseInt(match[1]) : 0;
-          }
-          
-          console.log("Opening scores for user:", {
-            email: userEmail,
-            name: displayName,
-            totalPoints: totalPoints,
-            festivalCount: festivalCount
-          });
-          
-          // Show the scores modal
+          console.log(`Card clicked: ${displayName || userEmail}`);
           showUserScores(userEmail, displayName, totalPoints, festivalCount);
         });
         
+        // Mark the card as having a click handler
+        card.hasClickListener = true;
+        
         // Add cursor style to indicate clickable
         card.style.cursor = 'pointer';
-        
-        // Mark as having a listener to avoid duplicates
-        card.hasClickListener = true;
       }
     });
   }
   
-  // Initial setup
-  setupUserCardClicks();
+  // Initial setup with a small delay to ensure DOM is ready
+  setTimeout(() => {
+    setupUserCardClicks();
+  }, 500);
   
   // Set up MutationObserver to handle dynamically added user cards
   const rankingsContainer = document.getElementById('rankingsContainer');
   
   if (rankingsContainer) {
-    const observer = new MutationObserver(() => {
-      setupUserCardClicks();
+    const observer = new MutationObserver((mutations) => {
+      let shouldSetupClicks = false;
+      
+      mutations.forEach(mutation => {
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+          // Check if any user rank cards were added
+          mutation.addedNodes.forEach(node => {
+            if (node.nodeType === 1 && 
+                (node.classList?.contains('user-rank-card') || 
+                 node.querySelector?.('.user-rank-card'))) {
+              shouldSetupClicks = true;
+            }
+          });
+        }
+      });
+      
+      if (shouldSetupClicks) {
+        console.log('DOM changed, updating click handlers');
+        setupUserCardClicks();
+      }
     });
     
     observer.observe(rankingsContainer, { 
@@ -483,4 +522,13 @@ document.addEventListener('DOMContentLoaded', function() {
       subtree: true 
     });
   }
+  
+  // Also integrate with statistieken.js on page load
+  setTimeout(() => {
+    if (typeof enhanceUserRankCards === 'function') {
+      enhanceUserRankCards();
+    }
+    
+    setupUserCardClicks();
+  }, 1000);
 });
