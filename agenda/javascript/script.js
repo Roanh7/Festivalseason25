@@ -1153,4 +1153,3 @@ benchPlayerStyle.textContent = `
   }
 `;
 document.head.appendChild(benchPlayerStyle);
-
