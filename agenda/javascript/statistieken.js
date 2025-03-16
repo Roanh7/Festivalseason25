@@ -1,4 +1,5 @@
 // statistieken.js - Handles S-team statistics for phone numbers collected at festivals
+// MODIFIED: Removed user rank card click functionality
 
 document.addEventListener('DOMContentLoaded', async () => {
   // DOM Elements
@@ -26,7 +27,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     "Free your mind Kingsday": "2025-04-26",
     "Loveland Kingsday": "2025-04-26",
     "Verbond": "2025-05-05",
-    "Music On": "2025-05-10",
     "Awakenings Upclose": "2025-05-17",
     "Soenda": "2025-05-31",
     "Toffler": "2025-05-31",
@@ -35,8 +35,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     "Open Air": "2025-06-08",
     "Free Your Mind": "2025-06-08",
     "Mystic Garden Festival": "2025-06-14",
-    "Vunzige Deuntjes": "2025-07-05",
-    "KeineMusik": "2025-07-05",
     "Awakenings Festival": "2025-07-11",
     "Tomorrowland": "2025-07-18",
     "Mysteryland": "2025-07-22",
@@ -45,9 +43,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     "Strafwerk": "2025-08-16",
     "Latin Village": "2025-08-17",
     "Parels van de stad": "2025-09-13",
-    "Into the woods": "2025-09-19",
+    "KeineMusik": "2025-07-05",
+    "Vunzige Deuntjes": "2025-07-05",
     "PIV": "2025-05-30",
-    "Boothstock Festival": "2025-07-12"
+    "Into the woods": "2025-09-19"
   };
 
   // Title based on points
@@ -221,6 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const currentUserClass = isCurrentUser ? 'current-user' : '';
       const userTitle = getUserTitle(user.totalPhoneNumbers);
       
+      // MODIFIED: Removed cursor pointer and click functionality
       html += `
         <div class="user-rank-card ${rankClass} ${currentUserClass}">
           <div class="rank-number">#${index + 1}</div>
@@ -422,100 +422,4 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Run visibility check on page load and window resize
   window.addEventListener('resize', checkDescriptionsVisibility);
   setTimeout(checkDescriptionsVisibility, 1000);
-});
-
-// Enhanced user rank cards data-attribute setup with click handlers
-function enhanceUserRankCards() {
-  document.querySelectorAll('.user-rank-card').forEach(card => {
-    // Get the user email - prefer getting it from the content that shows email
-    let userEmail = '';
-    
-    // First check if the card has an email element
-    const emailElement = card.querySelector('.user-item-email');
-    if (emailElement) {
-      userEmail = emailElement.textContent.trim();
-    }
-    
-    // If not found, fall back to the name element (which might contain email)
-    if (!userEmail) {
-      const nameElement = card.querySelector('.user-name');
-      userEmail = nameElement ? nameElement.textContent.trim() : '';
-    }
-    
-    // Store the email as a data attribute
-    if (userEmail && !card.dataset.email) {
-      card.dataset.email = userEmail;
-      console.log(`Added email data attribute: ${userEmail}`);
-    }
-    
-    // Store the username if it exists (prefer the actual username over email)
-    const usernameElement = card.querySelector('.user-name');
-    if (usernameElement && !card.dataset.username) {
-      card.dataset.username = usernameElement.textContent.trim();
-    }
-    
-    // Also store the points for easier access
-    const pointsElement = card.querySelector('.phone-count');
-    if (pointsElement && !card.dataset.points) {
-      card.dataset.points = pointsElement.textContent.trim();
-    }
-    
-    // Store festival count
-    const festivalCountElement = card.querySelector('.user-festivals-count');
-    if (festivalCountElement && !card.dataset.festivalCount) {
-      const countText = festivalCountElement.textContent;
-      const match = countText.match(/(\d+)/);
-      const count = match ? match[1] : '0';
-      card.dataset.festivalCount = count;
-    }
-  });
-}
-
-// Call this function after user rank cards are loaded
-document.addEventListener('DOMContentLoaded', function() {
-  // Execute after a short delay to ensure the original script has loaded the cards
-  setTimeout(() => {
-    enhanceUserRankCards();
-    
-    // Add click handlers now that data attributes are set
-    document.querySelectorAll('.user-rank-card').forEach(card => {
-      if (!card.hasClickListener) {
-        card.addEventListener('click', function() {
-          const email = this.dataset.email;
-          const displayName = this.dataset.username || email;
-          const totalPoints = parseInt(this.dataset.points || '0');
-          const festivalCount = parseInt(this.dataset.festivalCount || '0');
-          
-          console.log(`Card clicked with data attributes:`, {
-            email,
-            displayName,
-            totalPoints,
-            festivalCount
-          });
-          
-          if (typeof showUserScores === 'function') {
-            showUserScores(email, displayName, totalPoints, festivalCount);
-          } else {
-            console.error('showUserScores function not found');
-          }
-        });
-        
-        card.hasClickListener = true;
-        card.style.cursor = 'pointer';
-      }
-    });
-  }, 1000);
-  
-  // Also set up a MutationObserver to catch dynamically added cards
-  const rankingsContainer = document.getElementById('rankingsContainer');
-  if (rankingsContainer) {
-    const observer = new MutationObserver(() => {
-      enhanceUserRankCards();
-    });
-    
-    observer.observe(rankingsContainer, { 
-      childList: true, 
-      subtree: true 
-    });
-  }
 });
