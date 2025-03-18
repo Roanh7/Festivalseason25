@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const festivalLineups = {
     "Wavy": {
       days: ["Main Lineup"],
-      images: ["/images/lineups/wavy.jpg"]
+      images: ["/images/lineups/lineup-placeholder.png"]
     },
     "DGTL": {
       days: ["Day 1", "Day 2"],
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
     },
     "Tomorrowland": {
       days: ["Weekend 1", "Weekend 2"],
-      images: ["/images/lineups/tomorrowland-w1.jpeg", "/images/lineups/tomorrowland-w2.jpeg"]
+      images: ["/images/lineups/tomorrowland-w1.jpeg", "/images/lineups/lineup-placeholder.png"]
     },
     "Mystic Garden Festival": {
       days: ["Main Lineup"],
@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
   },
   "Verbond" : {
     days: ["Main Lineup"],
-    images: ["/images/lineups/verbond.png"]
+    images: ["/images/lineups/lineup-placeholder.png"]
   },
   "Music On" : {
     days: ["main lineup"],
@@ -296,7 +296,7 @@ document.addEventListener('DOMContentLoaded', function() {
   },
   "PIV" : {
     days: ["main lineup"],
-    images: ["/images/lineups/piv.jpeg"]
+    images: ["/images/lineups/lineup-placeholder.png"]
   },
   "Soenda" : {
     days: ["main lineup"],
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function() {
   },
   "KeineMusik" : { 
     days: ["main lineup"], 
-    images: ["/images/lineups/keinemusik.jpeg"]
+    images: ["/images/lineups/lineup-placeholder.png"]
   },
   "Boothstock Festival" : {
     days: ["main lineup"],
@@ -332,23 +332,23 @@ document.addEventListener('DOMContentLoaded', function() {
   },
   "No Art" : {
     days: ["main lineup"],
-    images: ["/images/lineups/noart.jpeg"]
+    images: ["/images/lineups/lineup-placeholder.png"]
   },
   "Strafwerk" : { 
     days: ["main lineup"],
-    images: ["/images/lineups/strafwerk.jpeg"]
+    images: ["/images/lineups/lineup-placeholder.png"]
   },
   "Latin Village" : { 
     days: ["main lineup"],  
-    images: ["/images/lineups/latin.jpeg"]
+    images: ["/images/lineups/lineup-placeholder.png"]
   },
   "Parels van de stad" : {
     days: ["main lineup"],
-    images: ["/images/lineups/parels.jpeg"]
+    images: ["/images/lineups/lineup-placeholder.png"]
   },
   "Into the woods" : {
     days: ["main lineup"],
-    images: ["/images/lineups/intothewoods.jpeg"]
+    images: ["/images/lineups/lineup-placeholder.png"]
   },
   "Free Your Mind" : {
     days: ["main lineup"],
