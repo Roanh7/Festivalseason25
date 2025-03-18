@@ -1019,7 +1019,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // This script adds clickable functionality to bench players
-// It should be added to your existing script.js file
 
 document.addEventListener("DOMContentLoaded", () => {
   // Define stats for bench players
