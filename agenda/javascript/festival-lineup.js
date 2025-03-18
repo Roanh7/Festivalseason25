@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
     },
     "DGTL": {
       days: ["Day 1", "Day 2"],
-      images: ["/images/lineups/dgtlzaterdag.jpeg", "/images/lineups/dgtlzondag.jpeg"]
+      images: ["/images/lineups/dgtlzaterdag.png", "/images/lineups/dgtlzondag.png"]
     },
     "Awakenings Festival": {
       days: ["Day 1", "Day 2", "Day 3"],
@@ -260,19 +260,19 @@ document.addEventListener('DOMContentLoaded', function() {
     },
     "Tomorrowland": {
       days: ["Weekend 1", "Weekend 2"],
-      images: ["/images/lineups/tomorrowland-w1.jpeg", "/images/lineups/lineup-placeholder.png"]
+      images: ["/images/lineups/tomorrowland-w1.png", "/images/lineups/lineup-placeholder.png"]
     },
     "Mystic Garden Festival": {
       days: ["Main Lineup"],
-      images: ["/images/lineups/mysticgarden.jpeg"]
+      images: ["/images/lineups/mysticgarden.png"]
     },
     "Loveland": {
       days: ["Day 1", "Day 2"],
-      images: ["/images/lineups/lovelandzaterdag.jpeg", "/images/lineups/lovelandzondag.jpeg"]
+      images: ["/images/lineups/lovelandzaterdag.png", "/images/lineups/lovelandzondag.png"]
     },
     "Mysteryland": {
       days: ["Day 1", "Day 2"],
-      images: ["/images/lineups/mysterylandzaterdag.jpeg", "/images/lineups/mysterylandzondag.jpeg"]
+      images: ["/images/lineups/mysterylandzaterdag.png", "/images/lineups/mysterylandzondag.png"]
     },
     "Free your mind Kingsday": {
       days: ["Main Lineup"],
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
   },
   "Loveland Kingsday": {
     days: ["Main Lineup"],
-    images: ["/images/lineups/lovelandkingsday.jpeg"]
+    images: ["/images/lineups/lovelandkingsday.png"]
   },
   "Verbond" : {
     days: ["Main Lineup"],
@@ -288,11 +288,11 @@ document.addEventListener('DOMContentLoaded', function() {
   },
   "Music On" : {
     days: ["main lineup"],
-    images: ["/images/lineups/musicon.jpeg"]
+    images: ["/images/lineups/musicon.png"]
   },
   "Awakenings Upclose" : {
     days: ["main lineup"],
-    images: ["/images/lineups/awakeningsupclose.jpeg"]
+    images: ["/images/lineups/awakeningsupclose.png"]
   },
   "PIV" : {
     days: ["main lineup"],
@@ -300,27 +300,27 @@ document.addEventListener('DOMContentLoaded', function() {
   },
   "Soenda" : {
     days: ["main lineup"],
-    images: ["/images/lineups/soenda.jpeg"]
+    images: ["/images/lineups/soenda.png"]
   },
   "Toffler" : {
     days: ["main lineup"],
-    images: ["/images/lineups/toffler.jpeg"]
+    images: ["/images/lineups/toffler.png"]
   },
   "909" : {
     days: ["day 1", "day 2"],
-    images: ["/images/lineups/909zaterdag.jpeg", "/images/lineups/909zondag.jpeg"]
+    images: ["/images/lineups/909zaterdag.png", "/images/lineups/909zondag.png"]
   },
   "Diynamic" : {
     days: ["main lineup"],
-    images: ["/images/lineups/diynamic.jpeg"]
+    images: ["/images/lineups/diynamic.png"]
   },
   "Open Air" : {
     days: ["main lineup"],
-    images: ["/images/lineups/openair.jpeg"]
+    images: ["/images/lineups/openair.png"]
   },
   "Vunzige Deuntjes" : {
     days: ["main lineup"],
-    images: ["/images/lineups/vunzigedeuntjes.jpeg"]
+    images: ["/images/lineups/vunzigedeuntjes.png"]
   },
   "KeineMusik" : { 
     days: ["main lineup"], 
@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
   },
   "Boothstock Festival" : {
     days: ["main lineup"],
-    images: ["/images/lineups/boothstock.jpeg"]
+    images: ["/images/lineups/boothstock.png"]
   },
   "No Art" : {
     days: ["main lineup"],
@@ -352,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
   },
   "Free Your Mind" : {
     days: ["main lineup"],
-    images: ["/images/lineups/freeyourmind.jpeg"]
+    images: ["/images/lineups/freeyourmind.png"]
   },
   };
 
