@@ -278,31 +278,31 @@ document.addEventListener('DOMContentLoaded', function() {
       days: ["Main Lineup"],
       images: ["/images/lineups/freeyourmindkingsday.png"]
   },
-  "loveland kingsday": {
+  "Loveland Kingsday": {
     days: ["Main Lineup"],
     images: ["/images/lineups/lovelandkingsday.jpeg"]
   },
-  "verbond" : {
+  "Verbond" : {
     days: ["Main Lineup"],
     images: ["/images/lineups/verbond.png"]
   },
-  "music on festival" : {
+  "Music On" : {
     days: ["main lineup"],
     images: ["/images/lineups/musicon.jpeg"]
   },
-  "awakenings upclose" : {
+  "Awakenings Upclose" : {
     days: ["main lineup"],
     images: ["/images/lineups/awakeningsupclose.jpeg"]
   },
-  "piv " : {
+  "PIV" : {
     days: ["main lineup"],
     images: ["/images/lineups/piv.jpeg"]
   },
-  "soenda" : {
+  "Soenda" : {
     days: ["main lineup"],
     images: ["/images/lineups/soenda.jpeg"]
   },
-  "toffler" : {
+  "Toffler" : {
     days: ["main lineup"],
     images: ["/images/lineups/toffler.jpeg"]
   },
@@ -314,41 +314,45 @@ document.addEventListener('DOMContentLoaded', function() {
     days: ["main lineup"],
     images: ["/images/lineups/diynamic.jpeg"]
   },
-  "open air" : {
+  "Open Air" : {
     days: ["main lineup"],
     images: ["/images/lineups/openair.jpeg"]
   },
-  "vunzige deuntjes" : {
+  "Vunzige Deuntjes" : {
     days: ["main lineup"],
     images: ["/images/lineups/vunzigedeuntjes.jpeg"]
   },
-  "keineMusik" : { 
+  "KeineMusik" : { 
     days: ["main lineup"], 
     images: ["/images/lineups/keinemusik.jpeg"]
   },
-  "Boothstock" : {
+  "Boothstock Festival" : {
     days: ["main lineup"],
     images: ["/images/lineups/boothstock.jpeg"]
   },
-  "noart" : {
+  "No Art" : {
     days: ["main lineup"],
     images: ["/images/lineups/noart.jpeg"]
   },
-  "strafwerk" : { 
+  "Strafwerk" : { 
     days: ["main lineup"],
     images: ["/images/lineups/strafwerk.jpeg"]
   },
-"Latin Village" : { 
+  "Latin Village" : { 
     days: ["main lineup"],  
     images: ["/images/lineups/latin.jpeg"]
   },
-  "parels van de stad" : {
+  "Parels van de stad" : {
     days: ["main lineup"],
     images: ["/images/lineups/parels.jpeg"]
   },
-  "into the woods" : {
+  "Into the woods" : {
     days: ["main lineup"],
     images: ["/images/lineups/intothewoods.jpeg"]
+  },
+  "Free Your Mind" : {
+    days: ["main lineup"],
+    images: ["/images/lineups/freeyourmind.jpeg"]
   },
   };
 
