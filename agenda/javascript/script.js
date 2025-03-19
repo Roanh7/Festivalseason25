@@ -147,6 +147,7 @@ function isFestivalInPast(dateStr) {
 // 2. SPELER-STATS (popup)
 // ================================
 document.addEventListener("DOMContentLoaded", () => {
+  // Player stats data - same as original
   const playerStats = {
     "Roan": {
       position: "Keeper",
@@ -243,7 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
       position: "Aanvaller",
       age: 32,
       rating: "Rating: 70",
-      skills: ["Is met pensioen", "veteraan in de game",]
+      skills: ["Is met pensioen", "veteraan in de game"]
     },
     "Zana": {
       position: "Middenvelder",
@@ -253,15 +254,80 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  // Create enhanced popup template
+  const popupTemplate = `
+    <div id="player-stats-popup" class="popup hidden">
+      <div class="popup-overlay"></div>
+      <div class="popup-content">
+        <div class="player-stats">
+          <div class="rating-section">
+            <div class="rating-box">
+              <p class="rating-label">Rating: 82</p>
+              <div class="player-position">Midfielder</div>
+            </div>
+          </div>
+          <div class="info-section">
+            <p><strong>Naam:</strong> <span id="player-name">Roan</span></p>
+            <p><strong>Leeftijd:</strong> <span id="player-age">23</span></p>
+          </div>
+        </div>
+        <div class="skills-section">
+          <h3>Skills:</h3>
+          <ul id="player-skills">
+            <!-- Skills will be added dynamically -->
+          </ul>
+        </div>
+        <button id="close-popup" class="close-popup-btn">Terug</button>
+      </div>
+    </div>
+  `;
+
+  // Replace the old popup with our new template
+  const oldPopup = document.getElementById("player-stats-popup");
+  if (oldPopup) {
+    oldPopup.remove();
+  }
+  document.body.insertAdjacentHTML('beforeend', popupTemplate);
+  
   // Function to display player stats in popup
   const showPopup = (playerName) => {
     const stats = playerStats[playerName];
     if (stats) {
-      // Update popup
+      const popup = document.getElementById("player-stats-popup");
+      const ratingSection = popup.querySelector(".rating-section");
+      const ratingLabel = popup.querySelector(".rating-label");
+      const playerPositionEl = popup.querySelector(".player-position");
+      
+      // Update player data
       document.getElementById("player-name").textContent = playerName;
       document.getElementById("player-age").textContent = stats.age;
-      document.querySelector(".rating-label").textContent = stats.rating;
+      ratingLabel.textContent = stats.rating;
+      playerPositionEl.textContent = stats.position;
+      
+      // Remove any previous position classes
+      ratingSection.className = "rating-section";
+      
+      // Add position-specific class for styling
+      let positionClass = "";
+      switch(stats.position.toLowerCase()) {
+        case "keeper":
+          positionClass = "player-position-keeper";
+          break;
+        case "verdediger":
+          positionClass = "player-position-defender";
+          break;
+        case "middenvelder":
+          positionClass = "player-position-midfielder";
+          break;
+        case "aanvaller":
+          positionClass = "player-position-striker";
+          break;
+        default:
+          positionClass = "player-position-bank";
+      }
+      ratingSection.classList.add(positionClass);
 
+      // Update skills
       const skillsList = document.getElementById("player-skills");
       skillsList.innerHTML = ""; 
       stats.skills.forEach(skill => {
@@ -269,12 +335,13 @@ document.addEventListener("DOMContentLoaded", () => {
         li.textContent = skill;
         skillsList.appendChild(li);
       });
-      // Toon popup
-      document.getElementById("player-stats-popup").classList.remove("hidden");
+      
+      // Show popup with animation
+      popup.classList.remove("hidden");
     }
   };
 
-  // Klik op player-cirkeltje
+  // Set click handlers for player elements
   document.querySelectorAll(".player").forEach(player => {
     player.addEventListener("click", () => {
       const playerName = player.nextElementSibling?.textContent.trim();
@@ -284,7 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Klik op de naam
+  // Set click handlers for player names
   document.querySelectorAll(".player-name").forEach(name => {
     name.addEventListener("click", () => {
       const playerName = name.textContent.trim();
@@ -300,13 +367,235 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Sluiten
+  // Close button handler
   document.getElementById("close-popup").addEventListener("click", () => {
     document.getElementById("player-stats-popup").classList.add("hidden");
   });
 
   // Make showPopup available globally
   window.showPopup = showPopup;
+  
+  // Add popup styles for enhanced visual experience
+  const styleElement = document.createElement('style');
+  styleElement.textContent = `
+  /* Enhanced Player Stats Popup Styles */
+
+  /* Base popup styling */
+  .popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .popup.hidden {
+    display: none;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Enhanced popup content */
+  .popup-content {
+    background: linear-gradient(to bottom, #ffffff, #f4f9f4);
+    border: none;
+    border-radius: 16px;
+    padding: 0;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    transform: translateY(0);
+    animation: slideUp 0.4s ease-out;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* Player header with colored background based on position */
+  .player-stats {
+    padding: 0;
+  }
+
+  .rating-section {
+    color: white;
+    padding: 25px 20px;
+    text-align: center;
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Add a subtle pattern overlay to the header */
+  .rating-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+    z-index: 0;
+  }
+
+  .rating-box {
+    position: relative;
+    z-index: 1;
+  }
+
+  .rating-label {
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    letter-spacing: 1px;
+  }
+
+  .player-position {
+    font-size: 1rem;
+    text-transform: uppercase;
+    margin-top: 5px;
+    letter-spacing: 1px;
+    opacity: 0.9;
+  }
+
+  /* Player info section */
+  .info-section {
+    padding: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .info-section p {
+    margin: 8px 0;
+    font-size: 1.1rem;
+    color: #333;
+  }
+
+  .info-section strong {
+    color: #2E7D32;
+    font-weight: 600;
+  }
+
+  /* Skills section */
+  .skills-section {
+    padding: 15px 20px 20px;
+  }
+
+  .skills-section h3 {
+    color: #2E7D32;
+    margin-bottom: 12px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 8px;
+  }
+
+  .skills-section h3:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background-color: #4CAF50;
+    border-radius: 2px;
+  }
+
+  #player-skills {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  #player-skills li {
+    padding: 8px 0;
+    position: relative;
+    padding-left: 28px;
+    font-size: 1rem;
+    color: #444;
+  }
+
+  #player-skills li:before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    color: #4CAF50;
+    font-weight: bold;
+  }
+
+  /* Close button */
+  .close-popup-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .close-popup-btn:hover {
+    background-color: #3d9140;
+  }
+
+  .close-popup-btn:active {
+    transform: scale(0.98);
+  }
+
+  /* Position-based variations for header */
+  .player-position-keeper .rating-section {
+    background: linear-gradient(135deg, #FFC107, #FF8F00);
+  }
+
+  .player-position-defender .rating-section {
+    background: linear-gradient(135deg, #2196F3, #0D47A1);
+  }
+
+  .player-position-midfielder .rating-section {
+    background: linear-gradient(135deg, #9C27B0, #6A1B9A);
+  }
+
+  .player-position-striker .rating-section {
+    background: linear-gradient(135deg, #F44336, #B71C1C);
+  }
+
+  .player-position-bank .rating-section {
+    background: linear-gradient(135deg, #607D8B, #455A64);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 480px) {
+    .popup-content {
+      width: 95%;
+    }
+    
+    .rating-label {
+      font-size: 1.8rem;
+    }
+    
+    .info-section p {
+      font-size: 1rem;
+    }
+  }
+  `;
+  
+  document.head.appendChild(styleElement);
 });
 
 // ================================
@@ -780,6 +1069,18 @@ function syncAllCheckboxes(userFestivals, userTickets) {
   document.querySelectorAll('.attend-checkbox').forEach(tableCheckbox => {
     const festName = tableCheckbox.dataset.festival;
     const isChecked = userFestivals.includes(festName);
+    
+    // Update the checkbox in table view
+    tableCheckbox.checked = isChecked;
+    
+    // Find and update the corresponding card view checkbox
+    syncCheckboxes(festName, isChecked, 'attend');
+  });
+  
+  // Then sync table checkboxes for tickets based on server data
+  document.querySelectorAll('.ticket-checkbox').forEach(tableCheckbox => {
+    const festName = tableCheckbox.dataset.festival;
+    const isChecked = userTickets.includes(festName);
     
     // Update the checkbox in table view
     tableCheckbox.checked = isChecked;
