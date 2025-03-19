@@ -177,9 +177,83 @@ document.addEventListener("DOMContentLoaded", () => {
       age: 29,
       rating: "Rating: ???",
       skills: ["CHEATCODE ACTIVATED", "Glow in the dark ogen", "Regelt de beste afters"]
+    },
+    // Bench player stats
+    "Avend": {
+      position: "Verdediger",
+      age: 25,
+      rating: "Rating: 70",
+      skills: ["Fatoe's maken", "Klein", "Kleine blaas"]
+    },
+    "Awdar": {
+      position: "Verdediger",
+      age: 24,
+      rating: "Rating: 75",
+      skills: ["Vibed heel het feest lang", "Voorziet iedereen van een sigaret", "Gekke handschoen"]
+    },
+    "Faro": {
+      position: "Verdediger",
+      age: 28,
+      rating: "Rating: 78",
+      skills: ["Prins", "Model", "Geil"]
+    },
+    "Hamada": {
+      position: "Aanvaller",
+      age: 25,
+      rating: "Rating: 83",
+      skills: ["Lang", "Lijkt op de eifeltoren", "Niet te missen op de dansvloer"]
+    },
+    "Joost": {
+      position: "Middenvelder",
+      age: 27,
+      rating: "Rating: 77",
+      skills: ["Veteraan in de game", "Positie vasthouden", "Lange jan"]
+    },
+    "Kosjber": {
+      position: "Middenvelder",
+      age: 29,
+      rating: "Rating: 85",
+      skills: ["Techniek", "Veld overzicht", "Overal te vinden"]
+    },
+    "Menno": {
+      position: "Verdediger",
+      age: 18,
+      rating: "Rating: 70",
+      skills: ["Breed", "Breed voor shit", "Filmt heel het feest"]
+    },
+    "MD": {
+      position: "Aanvaller",
+      age: 29,
+      rating: "Rating: 90",
+      skills: ["Blauwe cheat code ogen", "Gezelligheid", "Rivaal van Messi", "Kon pro worden, maar kreeg knie blessure"]
+    },
+    "Shawkat": {
+      position: "Keeper",
+      age: 24,
+      rating: "Rating: 75",
+      skills: ["Cheat code ogen", "Gaat door rollecoster", "Warmte bron"]
+    },
+    "Tom": {
+      position: "Bank",
+      age: 25,
+      rating: "Rating: 80",
+      skills: ["Heeft wifey", "Hele dag jokes maken", "captain team-W"]
+    },
+    "Trim": {
+      position: "Aanvaller",
+      age: 32,
+      rating: "Rating: 70",
+      skills: ["Is met pensioen", "veteraan in de game",]
+    },
+    "Zana": {
+      position: "Middenvelder",
+      age: 33,
+      rating: "Rating: 79",
+      skills: ["Surpise act van elke festival", "captain in de lucht"]
     }
   };
 
+  // Function to display player stats in popup
   const showPopup = (playerName) => {
     const stats = playerStats[playerName];
     if (stats) {
@@ -218,10 +292,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Make bench players clickable
+  document.querySelectorAll(".bank-player").forEach(player => {
+    player.addEventListener("click", () => {
+      const playerName = player.textContent.trim();
+      showPopup(playerName);
+    });
+  });
+
   // Sluiten
   document.getElementById("close-popup").addEventListener("click", () => {
     document.getElementById("player-stats-popup").classList.add("hidden");
   });
+
+  // Make showPopup available globally
+  window.showPopup = showPopup;
 });
 
 // ================================
@@ -1017,138 +1102,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
-
-// This script adds clickable functionality to bench players
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Define stats for bench players
-  const benchPlayerStats = {
-    "Avend": {
-      position: "Verdediger",
-      age: 25,
-      rating: "Rating: 70",
-      skills: ["Fatoe's maken", "Klein", "Kleine blaas"]
-    },
-    "Awdar": {
-      position: "Verdediger",
-      age: 24,
-      rating: "Rating: 75",
-      skills: ["Vibed heel het feest lang", "Voorziet iedereen van een sigaret", "Gekke handschoen"]
-    },
-    "Faro": {
-      position: "Verdediger",
-      age: 28,
-      rating: "Rating: 78",
-      skills: ["Prins", "Model", "Geil"]
-    },
-    "Hamada": {
-      position: "Aanvaller",
-      age: 25,
-      rating: "Rating: 83",
-      skills: ["Lang", "Lijkt op de eifeltoren", "Niet te missen op de dansvloer"]
-    },
-    "Joost": {
-      position: "Middenvelder",
-      age: 27,
-      rating: "Rating: 77",
-      skills: ["Veteraan in de game", "Positie vasthouden", "Lange jan"]
-    },
-    "Kosjber": {
-      position: "Middenvelder",
-      age: 29,
-      rating: "Rating: 85",
-      skills: ["Techniek", "Veld overzicht", "Overal te vinden"]
-    },
-    "Menno": {
-      position: "Verdediger",
-      age: 18,
-      rating: "Rating: 70",
-      skills: ["Breed", "Breed voor shit", "Filmt heel het feest"]
-    },
-    "MD": {
-      position: "Aanvaller",
-      age: 29,
-      rating: "Rating: 90",
-      skills: ["Blauwe cheat code ogen", "Gezelligheid", "Rivaal van Messi", "Kon pro worden, maar kreeg knie blessure"]
-    },
-    "Shawkat": {
-      position: "Keeper",
-      age: 24,
-      rating: "Rating: 75",
-      skills: ["Cheat code ogen", "Gaat door rollecoster", "Warmte bron"]
-    },
-    "Tom": {
-      position: "Bank",
-      age: 25,
-      rating: "Rating: 80",
-      skills: ["Heeft wifey", "Hele dag jokes maken", "captain team-W"]
-    },
-    "Trim": {
-      position: "Aanvaller",
-      age: 32,
-      rating: "Rating: 70",
-      skills: ["Is met pensioen", "veteraan in de game",]
-    },
-    "Zana": {
-      position: "Middenvelder",
-      age: 33,
-      rating: "Rating: 79",
-      skills: ["Surpise act van elke festival", "captain in de lucht"]
-    }
-  };
-
-  // Get existing showPopup function that's used for field players
-  const existingShowPopup = window.showPopup || function(playerName) {
-    const stats = playerStats[playerName] || benchPlayerStats[playerName];
-    if (stats) {
-      // Update popup
-      document.getElementById("player-name").textContent = playerName;
-      document.getElementById("player-age").textContent = stats.age;
-      document.querySelector(".rating-label").textContent = stats.rating;
-
-      const skillsList = document.getElementById("player-skills");
-      skillsList.innerHTML = ""; 
-      stats.skills.forEach(skill => {
-        const li = document.createElement("li");
-        li.textContent = skill;
-        skillsList.appendChild(li);
-      });
-      // Toon popup
-      document.getElementById("player-stats-popup").classList.remove("hidden");
-    }
-  };
-
-  // Store the showPopup function globally if not already done
-  window.showPopup = existingShowPopup;
-
-  // Make bench players clickable
-  const benchPlayers = document.querySelectorAll('.bank-player');
-  benchPlayers.forEach(player => {
-    // Add cursor style to show they're clickable
-    player.style.cursor = 'pointer';
-    
-    // Add click event listener
-    player.addEventListener('click', () => {
-      const playerName = player.textContent.trim();
-      if (benchPlayerStats[playerName]) {
-        showPopup(playerName);
-      }
-    });
-  });
-});
-
-// Add CSS for bench players
-const benchPlayerStyle = document.createElement('style');
-benchPlayerStyle.textContent = `
-  .bank-player {
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  
-  .bank-player:hover {
-    background-color: #e8f5e9;
-    transform: translateY(-2px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-`;
-document.head.appendChild(benchPlayerStyle);
