@@ -612,3 +612,52 @@ window.fixAllProblemFestivals = async function() {
     return { success: false, error: err.message };
   }
 };
+
+// Add to your festival-sync-fix.js
+function showLoadingState() {
+  document.querySelectorAll('.attend-checkbox, .ticket-checkbox').forEach(cb => {
+    cb.disabled = true;
+    cb.classList.add('loading');
+  });
+  
+  // Add a message at the top of the table
+  const table = document.querySelector('.table-container');
+  if (table) {
+    const loadingMsg = document.createElement('div');
+    loadingMsg.id = 'sync-loading-msg';
+    loadingMsg.className = 'loading-message';
+    loadingMsg.textContent = 'Laden van festivalkeuzes...';
+    table.prepend(loadingMsg);
+  }
+}
+
+function hideLoadingState() {
+  document.querySelectorAll('.attend-checkbox, .ticket-checkbox').forEach(cb => {
+    cb.disabled = false;
+    cb.classList.remove('loading');
+  });
+  
+  const loadingMsg = document.getElementById('sync-loading-msg');
+  if (loadingMsg) loadingMsg.remove();
+}
+
+// Add to festival-sync-fix.js
+function syncFestivalsWithDatabase() {
+  // Check cache first
+  const cachedData = localStorage.getItem('festivalSyncCache');
+  const cacheTimestamp = localStorage.getItem('festivalSyncTimestamp');
+  
+  // Use cache if it's less than 5 minutes old
+  if (cachedData && cacheTimestamp) {
+    const now = Date.now();
+    const cacheAge = now - parseInt(cacheTimestamp);
+    
+    if (cacheAge < 5 * 60 * 1000) { // 5 minutes
+      console.log('Using cached festival data');
+      applyFestivalDataFromCache(JSON.parse(cachedData));
+      return;
+    }
+  }
+  
+  // Proceed with normal synchronization...
+}
