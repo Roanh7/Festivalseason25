@@ -1302,3 +1302,106 @@ app.post('/recalculate-streaks', async (req, res) => {
     res.status(500).json({ message: 'Failed to recalculate streaks' });
   }
 });
+
+// Add this function to your index.js file
+// It will normalize festival names on the server side as well
+
+/**
+ * Normalize festival names to ensure consistency
+ * @param {string} festivalName - The festival name to normalize
+ * @return {string} - The normalized festival name
+ */
+function normalizeFestivalName(festivalName) {
+  if (!festivalName) return '';
+  
+  // Remove extra whitespace and standardize case
+  return festivalName.trim();
+  
+  // Note: We're only trimming whitespace here and not changing case
+  // If you want to make it fully case-insensitive, you can use:
+  // return festivalName.trim().toLowerCase();
+}
+
+// Modify these endpoints in your index.js file to use the normalized festival names
+
+// Updated /attend endpoint
+app.post('/attend', async (req, res) => {
+  try {
+    const { email, festival } = req.body;
+    if (!email || !festival) {
+      return res.status(400).json({ message: 'Missing email or festival' });
+    }
+    
+    // Normalize the festival name
+    const normalizedFestival = normalizeFestivalName(festival);
+    
+    // Log before and after for debugging
+    console.log(`Normalizing festival name: "${festival}" -> "${normalizedFestival}"`);
+    
+    // Add the attendance record with normalized name
+    const streakInfo = await handleAttendanceChange(email, normalizedFestival, true);
+    
+    // Rest of your code...
+    res.json({ 
+      message: `You are attending ${normalizedFestival}!`,
+      streak: streakInfo.currentStreak,
+      bestStreak: streakInfo.maxStreak
+    });
+  } catch (err) {
+    console.error('Error in /attend:', err);
+    res.status(500).json({ message: 'Could not attend festival.' });
+  }
+});
+
+// Similarly update DELETE /attend
+app.delete('/attend', async (req, res) => {
+  try {
+    const { email, festival } = req.body;
+    if (!email || !festival) {
+      return res.status(400).json({ message: 'Missing email or festival' });
+    }
+    
+    // Normalize the festival name
+    const normalizedFestival = normalizeFestivalName(festival);
+    
+    // Remove the attendance record with normalized name
+    const streakInfo = await handleAttendanceChange(email, normalizedFestival, false);
+    
+    res.json({ 
+      message: `You are no longer attending ${normalizedFestival}.`,
+      streak: streakInfo.currentStreak,
+      bestStreak: streakInfo.maxStreak
+    });
+  } catch (err) {
+    console.error('Error in DELETE /attend:', err);
+    res.status(500).json({ message: 'Could not unattend festival.' });
+  }
+});
+
+// Update /my-festivals to normalize when comparing
+app.get('/my-festivals', async (req, res) => {
+  try {
+    const userEmail = req.query.email;
+    if (!userEmail) {
+      return res.status(400).json({ message: 'No email provided' });
+    }
+    
+    const result = await client.query(
+      'SELECT festival_name FROM attendances WHERE user_email=$1',
+      [userEmail]
+    );
+    
+    // Return the raw festival names from the database
+    const festivals = result.rows.map(r => r.festival_name);
+    
+    // Log for debugging
+    console.log(`User ${userEmail} has ${festivals.length} festivals:`, festivals);
+
+    res.json({ festivals });
+  } catch (err) {
+    console.error('Error in /my-festivals:', err);
+    res.status(500).json({ message: 'Could not get user festivals' });
+  }
+});
+
+// Also update the ticket endpoints similarly, using the same normalization
