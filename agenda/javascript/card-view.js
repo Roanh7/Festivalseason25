@@ -1,8 +1,164 @@
-// Modification for agenda/javascript/card-view.js to improve checkbox layout
+// Function to normalize festival names for consistent comparison
+function normalizeFestivalNameForComparison(name) {
+  if (!name) return '';
+  
+  // Trim whitespace, convert to lowercase, and remove any special characters
+  return name.trim().toLowerCase()
+    .replace(/\s+/g, ' ')    // Replace multiple spaces with single space
+    .replace(/[^a-z0-9\s]/g, ''); // Remove special characters
+}
+
+// Enhanced function to update card checkboxes from table view
+function updateCardCheckboxes() {
+  // Create maps for faster lookup
+  const tableAttendCheckboxes = {};
+  const tableTicketCheckboxes = {};
+  
+  // Map all table checkboxes by normalized festival name
+  document.querySelectorAll('.attend-checkbox').forEach(checkbox => {
+    if (checkbox.dataset.festival) {
+      const normalizedName = normalizeFestivalNameForComparison(checkbox.dataset.festival);
+      tableAttendCheckboxes[normalizedName] = checkbox;
+    }
+  });
+  
+  document.querySelectorAll('.ticket-checkbox').forEach(checkbox => {
+    if (checkbox.dataset.festival) {
+      const normalizedName = normalizeFestivalNameForComparison(checkbox.dataset.festival);
+      tableTicketCheckboxes[normalizedName] = checkbox;
+    }
+  });
+  
+  // Update attendance checkboxes in card view
+  document.querySelectorAll('.attend-checkbox-card').forEach(cardCheckbox => {
+    if (!cardCheckbox.dataset.festival) return;
+    
+    const normalizedName = normalizeFestivalNameForComparison(cardCheckbox.dataset.festival);
+    const tableCheckbox = tableAttendCheckboxes[normalizedName];
+    
+    if (tableCheckbox) {
+      cardCheckbox.checked = tableCheckbox.checked;
+    }
+  });
+  
+  // Update ticket checkboxes in card view
+  document.querySelectorAll('.ticket-checkbox-card').forEach(cardCheckbox => {
+    if (!cardCheckbox.dataset.festival) return;
+    
+    const normalizedName = normalizeFestivalNameForComparison(cardCheckbox.dataset.festival);
+    const tableCheckbox = tableTicketCheckboxes[normalizedName];
+    
+    if (tableCheckbox) {
+      cardCheckbox.checked = tableCheckbox.checked;
+    }
+  });
+}
+
+// Enhanced function to synchronize checkbox state back to server
+function syncCheckboxesToServer(festivalName, isChecked, type) {
+  // Skip if not logged in
+  const token = localStorage.getItem('token');
+  const userEmail = localStorage.getItem('email');
+  if (!token || !userEmail) return;
+  
+  const endpoint = type === 'attend' ? '/attend' : '/ticket';
+  const method = isChecked ? 'POST' : 'DELETE';
+  
+  // Add logging for debugging
+  console.log(`Syncing ${type} for "${festivalName}" (${isChecked ? 'checked' : 'unchecked'})`);
+  
+  // Send the update to the server
+  fetch(endpoint, {
+    method: method,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      email: userEmail,
+      festival: festivalName
+    })
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Server returned ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log(`Successfully ${isChecked ? 'added' : 'removed'} ${type} for "${festivalName}"`);
+    
+    // Update all corresponding checkboxes to maintain consistency
+    syncCheckboxes(festivalName, isChecked, type);
+    
+    // If unattending, also uncheck ticket purchase
+    if (type === 'attend' && !isChecked) {
+      syncCheckboxes(festivalName, false, 'ticket');
+    }
+  })
+  .catch(err => {
+    console.error(`Error syncing ${type} for "${festivalName}":`, err);
+    // Revert the checkbox state on error
+    syncCheckboxes(festivalName, !isChecked, type);
+  });
+}
+
+// Helper function to sync checkboxes between views with better matching
+function syncCheckboxes(festivalName, isChecked, type) {
+  const selector = type === 'attend' ? '.attend-checkbox' : '.ticket-checkbox';
+  const cardSelector = type === 'attend' ? '.attend-checkbox-card' : '.ticket-checkbox-card';
+  const mobileSelector = type === 'attend' ? '.attend-checkbox-mobile' : '.ticket-checkbox-mobile';
+  
+  const normalizedName = normalizeFestivalNameForComparison(festivalName);
+  
+  // Update table view checkboxes
+  document.querySelectorAll(selector).forEach(checkbox => {
+    const checkboxFestName = normalizeFestivalNameForComparison(checkbox.dataset.festival);
+    if (checkboxFestName === normalizedName) {
+      checkbox.checked = isChecked;
+    }
+  });
+  
+  // Update card view checkboxes
+  document.querySelectorAll(cardSelector).forEach(checkbox => {
+    const checkboxFestName = normalizeFestivalNameForComparison(checkbox.dataset.festival);
+    if (checkboxFestName === normalizedName) {
+      checkbox.checked = isChecked;
+    }
+  });
+  
+  // Update mobile view checkboxes if they exist
+  document.querySelectorAll(mobileSelector).forEach(checkbox => {
+    const checkboxFestName = normalizeFestivalNameForComparison(checkbox.dataset.festival);
+    if (checkboxFestName === normalizedName) {
+      checkbox.checked = isChecked;
+    }
+  });
+}
+
+// Schedule periodic sync with the server
+function schedulePeriodicSync() {
+  // Sync every 30 seconds
+  setInterval(() => {
+    if (document.visibilityState === 'visible') {
+      console.log('Running periodic checkbox sync');
+      
+      if (typeof syncFestivalsWithDatabase === 'function') {
+        syncFestivalsWithDatabase();
+      } else {
+        console.warn('syncFestivalsWithDatabase function not available');
+        // Fallback to manual sync
+        updateCardCheckboxes();
+      }
+    }
+  }, 30000);
+}
 
 document.addEventListener('DOMContentLoaded', function() {
   // Run this code for all screen sizes, not just mobile
   createCardView();
+  
+  // Initialize periodic sync
+  schedulePeriodicSync();
   
   // Function to check if a festival date is in the past
   function isFestivalInPast(dateStr) {
@@ -335,43 +491,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Function to update card checkboxes from table view
-  function updateCardCheckboxes() {
-    // Update attendance checkboxes
-    const tableCheckboxes = document.querySelectorAll('.attend-checkbox');
-    tableCheckboxes.forEach(tableCheckbox => {
-      const festivalName = tableCheckbox.dataset.festival;
-      if (festivalName) {
-        // Find the corresponding card and checkbox
-        const card = document.querySelector(`.festival-card[data-festival="${festivalName}"]`);
-        if (card) {
-          const cardCheckbox = card.querySelector('.attend-checkbox-card');
-          if (cardCheckbox) {
-            // Sync the checked state
-            cardCheckbox.checked = tableCheckbox.checked;
-          }
-        }
-      }
-    });
-    
-    // Update ticket checkboxes
-    const ticketCheckboxes = document.querySelectorAll('.ticket-checkbox');
-    ticketCheckboxes.forEach(tableCheckbox => {
-      const festivalName = tableCheckbox.dataset.festival;
-      if (festivalName) {
-        // Find the corresponding card and checkbox
-        const card = document.querySelector(`.festival-card[data-festival="${festivalName}"]`);
-        if (card) {
-          const cardCheckbox = card.querySelector('.ticket-checkbox-card');
-          if (cardCheckbox) {
-            // Sync the checked state
-            cardCheckbox.checked = tableCheckbox.checked;
-          }
-        }
-      }
-    });
-  }
-  
   // Set up filtering functionality for all screen sizes
   setupFilterButtons();
   
@@ -571,166 +690,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     return null;
   }
-});
-
-// Add this to your card-view.js or update the existing functions
-
-// Function to normalize festival names for consistent comparison
-function normalizeFestivalNameForComparison(name) {
-  if (!name) return '';
-  
-  // Trim whitespace, convert to lowercase, and remove any special characters
-  return name.trim().toLowerCase()
-    .replace(/\s+/g, ' ')    // Replace multiple spaces with single space
-    .replace(/[^a-z0-9\s]/g, ''); // Remove special characters
-}
-
-// Enhanced function to update card checkboxes from table view
-function updateCardCheckboxes() {
-  // Create maps for faster lookup
-  const tableAttendCheckboxes = {};
-  const tableTicketCheckboxes = {};
-  
-  // Map all table checkboxes by normalized festival name
-  document.querySelectorAll('.attend-checkbox').forEach(checkbox => {
-    if (checkbox.dataset.festival) {
-      const normalizedName = normalizeFestivalNameForComparison(checkbox.dataset.festival);
-      tableAttendCheckboxes[normalizedName] = checkbox;
-    }
-  });
-  
-  document.querySelectorAll('.ticket-checkbox').forEach(checkbox => {
-    if (checkbox.dataset.festival) {
-      const normalizedName = normalizeFestivalNameForComparison(checkbox.dataset.festival);
-      tableTicketCheckboxes[normalizedName] = checkbox;
-    }
-  });
-  
-  // Update attendance checkboxes in card view
-  document.querySelectorAll('.attend-checkbox-card').forEach(cardCheckbox => {
-    if (!cardCheckbox.dataset.festival) return;
-    
-    const normalizedName = normalizeFestivalNameForComparison(cardCheckbox.dataset.festival);
-    const tableCheckbox = tableAttendCheckboxes[normalizedName];
-    
-    if (tableCheckbox) {
-      cardCheckbox.checked = tableCheckbox.checked;
-    }
-  });
-  
-  // Update ticket checkboxes in card view
-  document.querySelectorAll('.ticket-checkbox-card').forEach(cardCheckbox => {
-    if (!cardCheckbox.dataset.festival) return;
-    
-    const normalizedName = normalizeFestivalNameForComparison(cardCheckbox.dataset.festival);
-    const tableCheckbox = tableTicketCheckboxes[normalizedName];
-    
-    if (tableCheckbox) {
-      cardCheckbox.checked = tableCheckbox.checked;
-    }
-  });
-}
-
-// Enhanced function to synchronize checkbox state back to server
-function syncCheckboxesToServer(festivalName, isChecked, type) {
-  // Skip if not logged in
-  const token = localStorage.getItem('token');
-  const userEmail = localStorage.getItem('email');
-  if (!token || !userEmail) return;
-  
-  const endpoint = type === 'attend' ? '/attend' : '/ticket';
-  const method = isChecked ? 'POST' : 'DELETE';
-  
-  // Add logging for debugging
-  console.log(`Syncing ${type} for "${festivalName}" (${isChecked ? 'checked' : 'unchecked'})`);
-  
-  // Send the update to the server
-  fetch(endpoint, {
-    method: method,
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      email: userEmail,
-      festival: festivalName
-    })
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error(`Server returned ${response.status}`);
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log(`Successfully ${isChecked ? 'added' : 'removed'} ${type} for "${festivalName}"`);
-    
-    // Update all corresponding checkboxes to maintain consistency
-    syncCheckboxes(festivalName, isChecked, type);
-    
-    // If unattending, also uncheck ticket purchase
-    if (type === 'attend' && !isChecked) {
-      syncCheckboxes(festivalName, false, 'ticket');
-    }
-  })
-  .catch(err => {
-    console.error(`Error syncing ${type} for "${festivalName}":`, err);
-    // Revert the checkbox state on error
-    syncCheckboxes(festivalName, !isChecked, type);
-  });
-}
-
-// Helper function to sync checkboxes between views with better matching
-function syncCheckboxes(festivalName, isChecked, type) {
-  const selector = type === 'attend' ? '.attend-checkbox' : '.ticket-checkbox';
-  const cardSelector = type === 'attend' ? '.attend-checkbox-card' : '.ticket-checkbox-card';
-  const mobileSelector = type === 'attend' ? '.attend-checkbox-mobile' : '.ticket-checkbox-mobile';
-  
-  const normalizedName = normalizeFestivalNameForComparison(festivalName);
-  
-  // Update table view checkboxes
-  document.querySelectorAll(selector).forEach(checkbox => {
-    const checkboxFestName = normalizeFestivalNameForComparison(checkbox.dataset.festival);
-    if (checkboxFestName === normalizedName) {
-      checkbox.checked = isChecked;
-    }
-  });
-  
-  // Update card view checkboxes
-  document.querySelectorAll(cardSelector).forEach(checkbox => {
-    const checkboxFestName = normalizeFestivalNameForComparison(checkbox.dataset.festival);
-    if (checkboxFestName === normalizedName) {
-      checkbox.checked = isChecked;
-    }
-  });
-  
-  // Update mobile view checkboxes if they exist
-  document.querySelectorAll(mobileSelector).forEach(checkbox => {
-    const checkboxFestName = normalizeFestivalNameForComparison(checkbox.dataset.festival);
-    if (checkboxFestName === normalizedName) {
-      checkbox.checked = isChecked;
-    }
-  });
-}
-
-// Schedule periodic sync with the server
-function schedulePeriodicSync() {
-  // Sync every 30 seconds
-  setInterval(() => {
-    if (document.visibilityState === 'visible') {
-      console.log('Running periodic checkbox sync');
-      
-      if (typeof syncFestivalsWithDatabase === 'function') {
-        syncFestivalsWithDatabase();
-      } else {
-        console.warn('syncFestivalsWithDatabase function not available');
-        // Fallback to manual sync
-        updateCardCheckboxes();
-      }
-    }
-  }, 30000);
-}
-
-// Initialize periodic sync
-document.addEventListener('DOMContentLoaded', () => {
-  schedulePeriodicSync();
 });
