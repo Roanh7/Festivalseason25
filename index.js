@@ -414,30 +414,75 @@ app.get('/all-users', async (req, res) => {
   }
 });
 
+// Add an explicit mapping for problem festivals
+const festivalNamesMapping = {
+  // Lowercase normalized keys for lookup, exact preservation for storage
+  'strafwerk': 'Strafwerk',
+  'boothstock': 'Boothstock Festival',
+  'boothstockfestival': 'Boothstock Festival',
+  'toffler': 'Toffler',
+  'latinvillage': 'Latin Village',
+  'latin village': 'Latin Village',
+  'piv': 'PIV',
+  'mysteryland': 'Mysteryland',
+  'intothewoods': 'Into the woods',
+  'into the woods': 'Into the woods'
+};
+
+// Enhanced normalization function for festival names with explicit mapping
+function normalizeFestivalName(festivalName) {
+  if (!festivalName) return '';
+  
+  // First preserve the original format for storage
+  const originalName = festivalName.trim();
+  
+  // Normalize for lookup
+  const normalizedKey = originalName.toLowerCase()
+    .replace(/\s+/g, '')    // Remove all spaces
+    .replace(/[^a-z0-9]/g, ''); // Remove special characters
+  
+  // Check if this is one of our problem festivals with explicit mapping
+  if (festivalNamesMapping[normalizedKey]) {
+    console.log(`Fixed problematic festival: "${originalName}" -> "${festivalNamesMapping[normalizedKey]}"`);
+    return festivalNamesMapping[normalizedKey];
+  }
+  
+  // Otherwise, just return the original trimmed name
+  return originalName;
+}
+
 // 8) Festival attendance endpoints (modified to update streak)
 
 // Function to handle attendance change and update streak
 async function handleAttendanceChange(email, festivalName, isAttending) {
   try {
+    // Normalize the festival name for consistent comparison
+    const normalizedFestName = normalizeFestivalName(festivalName);
+    
     if (isAttending) {
       // User is attending a festival
       await client.query(`
         INSERT INTO attendances (user_email, festival_name)
         VALUES ($1, $2)
         ON CONFLICT (user_email, festival_name) DO NOTHING
-      `, [email, festivalName]);
+      `, [email, normalizedFestName]);
+      
+      // Log successful attendance
+      console.log(`User ${email} is now attending "${normalizedFestName}"`);
     } else {
       // User is no longer attending a festival
       await client.query(`
         DELETE FROM attendances 
         WHERE user_email = $1 AND festival_name = $2
-      `, [email, festivalName]);
+      `, [email, normalizedFestName]);
       
       // Also remove any ticket purchase records when unattending
       await client.query(`
         DELETE FROM tickets 
         WHERE user_email = $1 AND festival_name = $2
-      `, [email, festivalName]);
+      `, [email, normalizedFestName]);
+      
+      console.log(`User ${email} is no longer attending "${normalizedFestName}"`);
     }
     
     // Update streak after attendance change
@@ -445,6 +490,28 @@ async function handleAttendanceChange(email, festivalName, isAttending) {
   } catch (err) {
     console.error('Error handling attendance change:', err);
     throw err;
+  }
+}
+
+// Enhanced function to get user festivals with case-insensitive comparison
+async function getUserFestivals(userEmail) {
+  try {
+    // Use case-insensitive comparison if your database supports it
+    const result = await client.query(
+      'SELECT festival_name FROM attendances WHERE user_email = $1',
+      [userEmail]
+    );
+    
+    // Extract festival names
+    const festivals = result.rows.map(r => r.festival_name);
+    
+    // Log fetched festivals for debugging
+    console.log(`Fetched ${festivals.length} festivals for ${userEmail}:`, festivals);
+    
+    return festivals;
+  } catch (err) {
+    console.error('Error fetching user festivals:', err);
+    return [];
   }
 }
 
@@ -561,12 +628,8 @@ app.get('/my-festivals', async (req, res) => {
     if (!userEmail) {
       return res.status(400).json({ message: 'No email provided' });
     }
-    const result = await client.query(
-      'SELECT festival_name FROM attendances WHERE user_email=$1',
-      [userEmail]
-    );
-    const festivals = result.rows.map(r => r.festival_name);
-
+    
+    const festivals = await getUserFestivals(userEmail);
     res.json({ festivals });
   } catch (err) {
     console.error('Error in /my-festivals:', err);
@@ -624,10 +687,13 @@ app.post('/ticket', async (req, res) => {
       return res.status(400).json({ message: 'Missing email or festival' });
     }
     
+    // Normalize the festival name
+    const normalizedFestival = normalizeFestivalName(festival);
+    
     // Check if the user is attending this festival first
     const attendingResult = await client.query(
       'SELECT 1 FROM attendances WHERE user_email = $1 AND festival_name = $2',
-      [email, festival]
+      [email, normalizedFestival]
     );
     
     if (attendingResult.rows.length === 0) {
@@ -641,9 +707,9 @@ app.post('/ticket', async (req, res) => {
       INSERT INTO tickets (user_email, festival_name)
       VALUES ($1, $2)
       ON CONFLICT (user_email, festival_name) DO NOTHING
-    `, [email, festival]);
+    `, [email, normalizedFestival]);
     
-    res.json({ message: `Ticket for ${festival} marked as purchased!` });
+    res.json({ message: `Ticket for ${normalizedFestival} marked as purchased!` });
   } catch (err) {
     console.error('Error in /ticket:', err);
     res.status(500).json({ message: 'Could not mark ticket as purchased.' });
@@ -658,13 +724,16 @@ app.delete('/ticket', async (req, res) => {
       return res.status(400).json({ message: 'Missing email or festival' });
     }
     
+    // Normalize the festival name
+    const normalizedFestival = normalizeFestivalName(festival);
+    
     // Remove the ticket record
     await client.query(`
       DELETE FROM tickets 
       WHERE user_email = $1 AND festival_name = $2
-    `, [email, festival]);
+    `, [email, normalizedFestival]);
     
-    res.json({ message: `Ticket for ${festival} no longer marked as purchased.` });
+    res.json({ message: `Ticket for ${normalizedFestival} no longer marked as purchased.` });
   } catch (err) {
     console.error('Error in DELETE /ticket:', err);
     res.status(500).json({ message: 'Could not unmark ticket.' });
@@ -704,6 +773,9 @@ app.post('/rating', async (req, res) => {
     if (!email || !festival || rating == null) {
       return res.status(400).json({ message: 'Missing rating data' });
     }
+    
+    // Normalize the festival name
+    const normalizedFestival = normalizeFestivalName(festival);
 
     // Check that rating is between 1 and 10
     if (rating < 1 || rating > 10) {
@@ -744,13 +816,13 @@ app.post('/rating', async (req, res) => {
          ON CONFLICT (user_email, festival_name)
          DO UPDATE SET rating = EXCLUDED.rating
          RETURNING *`,
-        [email, festival, rating]
+        [email, normalizedFestival, rating]
       );
       
       console.log('Rating saved successfully:', result.rows[0]);
       
       res.status(200).json({ 
-        message: `Rating ${rating} saved for festival ${festival}`,
+        message: `Rating ${rating} saved for festival ${normalizedFestival}`,
         data: result.rows[0]
       });
     } catch (dbError) {
@@ -762,646 +834,6 @@ app.post('/rating', async (req, res) => {
     }
   } catch (err) {
     console.error('Error in POST /rating:', err);
-    res.status(500).json({ 
-      message: 'Could not save rating',
-      error: err.message
-    });
+    res.status(500).json({ message: 'Could not save rating' });
   }
-});
-
-// 13) GET /rating => get average rating (and optionally all ratings)
-// Example: GET /rating?festival=DGTL
-app.get('/rating', async (req, res) => {
-  try {
-    const fest = req.query.festival;
-    if (!fest) {
-      return res.status(400).json({ message: 'No festival provided' });
-    }
-
-    console.log(`Processing rating request for festival: ${fest}`);
-
-    // Check if the ratings table exists
-    const tableCheck = await client.query(`
-      SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' 
-        AND table_name = 'ratings'
-      );
-    `);
-    
-    const tableExists = tableCheck.rows[0].exists;
-    if (!tableExists) {
-      console.log('Ratings table does not exist. Creating it now...');
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS ratings (id SERIAL PRIMARY KEY,
-          user_email VARCHAR(255) NOT NULL,
-          festival_name VARCHAR(255) NOT NULL,
-          rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 10),
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          UNIQUE(user_email, festival_name)
-        );
-      `);
-      console.log('Ratings table created successfully');
-      
-      // If table was just created, return empty ratings
-      return res.json({
-        festival: fest,
-        averageRating: null,
-        ratings: []
-      });
-    }
-
-    // Get average
-    const avgResult = await client.query(
-      'SELECT AVG(rating) as avg_rating FROM ratings WHERE festival_name=$1',
-      [fest]
-    );
-    const average = avgResult.rows[0].avg_rating;
-    console.log(`Average rating for ${fest}: ${average}`);
-
-    // Optionally also get all individual ratings:
-    const allResult = await client.query(
-      'SELECT r.user_email, r.rating, u.username FROM ratings r LEFT JOIN users u ON r.user_email = u.email WHERE r.festival_name=$1',
-      [fest]
-    );
-    
-    // Format the result to use username if available
-    const allRatings = allResult.rows.map(row => ({
-      user_email: row.username || row.user_email, // Use username if available
-      rating: row.rating
-    }));
-    
-    console.log(`Found ${allRatings.length} ratings for ${fest}`);
-
-    res.json({
-      festival: fest,
-      averageRating: average,   // can be null if no ratings yet
-      ratings: allRatings
-    });
-  } catch (err) {
-    console.error('Error in GET /rating:', err);
-    res.status(500).json({ 
-      message: 'Could not get rating',
-      error: err.message 
-    });
-  }
-});
-
-// ============== S-TEAM PHONE NUMBER FUNCTIONALITY ==============
-
-// 14) POST /phone-numbers => user submits phone numbers for a festival
-app.post('/phone-numbers', async (req, res) => {
-  try {
-    const { email, festival, phoneCount } = req.body;
-    
-    if (!email || !festival || phoneCount === undefined) {
-      return res.status(400).json({ message: 'Missing required data' });
-    }
-    
-    // Ensure phoneCount is a non-negative integer
-    const count = Math.max(0, parseInt(phoneCount) || 0);
-    
-    // Check if this record already exists
-    const existingResult = await client.query(
-      'SELECT * FROM phone_numbers WHERE user_email = $1 AND festival_name = $2',
-      [email, festival]
-    );
-    
-    if (existingResult.rows.length > 0) {
-      // Update existing record
-      await client.query(
-        `UPDATE phone_numbers 
-         SET phone_count = $3, updated_at = CURRENT_TIMESTAMP
-         WHERE user_email = $1 AND festival_name = $2`,
-        [email, festival, count]
-      );
-    } else {
-      // Insert new record
-      await client.query(
-        `INSERT INTO phone_numbers (user_email, festival_name, phone_count)
-         VALUES ($1, $2, $3)`,
-        [email, festival, count]
-      );
-    }
-    
-    res.status(200).json({ 
-      message: 'Phone numbers saved successfully',
-      email,
-      festival,
-      phoneCount: count
-    });
-  } catch (err) {
-    console.error('Error in /phone-numbers:', err);
-    res.status(500).json({ message: 'Could not save phone numbers' });
-  }
-});
-
-// 15) GET /my-phone-numbers => get all phone numbers for current user
-app.get('/my-phone-numbers', async (req, res) => {
-  try {
-    const userEmail = req.query.email;
-    
-    if (!userEmail) {
-      return res.status(400).json({ message: 'Email is required' });
-    }
-    
-    const result = await client.query(
-      'SELECT festival_name, phone_count FROM phone_numbers WHERE user_email = $1',
-      [userEmail]
-    );
-    
-    // Convert to object format for easier lookup
-    const phoneNumbers = {};
-    result.rows.forEach(row => {
-      phoneNumbers[row.festival_name] = row.phone_count;
-    });
-    
-    res.json({ phoneNumbers });
-  } catch (err) {
-    console.error('Error in /my-phone-numbers:', err);
-    res.status(500).json({ message: 'Could not get phone numbers' });
-  }
-});
-
-// 16) GET /phone-number-rankings => get rankings of users by total phone numbers
-app.get('/phone-number-rankings', async (req, res) => {
-  try {
-    // Query to get total phone numbers per user with festival count
-    const result = await client.query(`
-      WITH user_totals AS (
-        SELECT 
-          pn.user_email,
-          SUM(pn.phone_count) AS total_phone_count,
-          COUNT(DISTINCT pn.festival_name) AS festival_count
-        FROM 
-          phone_numbers pn
-        GROUP BY 
-          pn.user_email
-      )
-      SELECT 
-        ut.user_email,
-        u.username,
-        ut.total_phone_count,
-        ut.festival_count
-      FROM 
-        user_totals ut
-      LEFT JOIN 
-        users u ON ut.user_email = u.email
-      ORDER BY 
-        ut.total_phone_count DESC
-    `);
-    
-    // Format the rankings
-    const rankings = result.rows.map(row => ({
-      email: row.user_email,
-      username: row.username,
-      totalPhoneNumbers: parseInt(row.total_phone_count) || 0,
-      festivalCount: parseInt(row.festival_count) || 0
-    }));
-    
-    res.json({ rankings });
-  } catch (err) {
-    console.error('Error in /phone-number-rankings:', err);
-    res.status(500).json({ message: 'Could not get phone number rankings' });
-  }
-});
-
-// 17) GET /phone-number-total => get total phone numbers for a user
-app.get('/phone-number-total', async (req, res) => {
-  try {
-    const userEmail = req.query.email;
-    
-    if (!userEmail) {
-      return res.status(400).json({ message: 'Email is required' });
-    }
-    
-    // Get all the user's phone numbers
-    const result = await client.query(
-      'SELECT SUM(phone_count) as total_points FROM phone_numbers WHERE user_email = $1',
-      [userEmail]
-    );
-    
-    // Get the total points (default to 0 if not found)
-    const totalPoints = result.rows.length > 0 ? 
-      parseInt(result.rows[0].total_points) || 0 : 0;
-    
-    res.json({ 
-      email: userEmail,
-      totalPoints: totalPoints
-    });
-  } catch (err) {
-    console.error('Error in /phone-number-total:', err);
-    res.status(500).json({ 
-      message: 'Could not get total phone numbers',
-      totalPoints: 0
-    });
-  }
-});
-
-// ============== USER STREAK FUNCTIONALITY - FIXED VERSION ==============
-
-// Modified endpoint for user streak to handle errors better
-app.get('/user-streak', async (req, res) => {
-  try {
-    const userEmail = req.query.email;
-    if (!userEmail) {
-      return res.status(400).json({ 
-        message: 'Email is required',
-        currentStreak: 0,
-        bestStreak: 0
-      });
-    }
-    
-    // Check if user exists first
-    const userCheck = await client.query('SELECT email FROM users WHERE email = $1', [userEmail]);
-    if (userCheck.rows.length === 0) {
-      return res.status(200).json({
-        message: 'User not found, but returning default values',
-        currentStreak: 0,
-        bestStreak: 0
-      });
-    }
-    
-    // Get streak information from the database
-    const result = await client.query(`
-      SELECT current_streak, best_streak 
-      FROM users 
-      WHERE email = $1
-    `, [userEmail]);
-    
-    // Return even if no results (with defaults)
-    res.json({
-      currentStreak: result.rows.length > 0 ? (result.rows[0].current_streak || 0) : 0,
-      bestStreak: result.rows.length > 0 ? (result.rows[0].best_streak || 0) : 0
-    });
-  } catch (err) {
-    console.error('Error getting user streak:', err);
-    // Return default values instead of error to prevent UI breaking
-    res.status(200).json({ 
-      message: 'Error occurred, using default values',
-      currentStreak: 0,
-      bestStreak: 0 
-    });
-  }
-});
-
-// Fixed endpoint for streak ranking
-app.get('/streak-ranking', async (req, res) => {
-  try {
-    const userEmail = req.query.email;
-    if (!userEmail) {
-      return res.status(200).json({ 
-        message: 'Email is required',
-        rank: 0,
-        totalUsers: 0,
-        percentile: 0
-      });
-    }
-    
-    // Check if user exists first
-    const userCheck = await client.query('SELECT email FROM users WHERE email = $1', [userEmail]);
-    if (userCheck.rows.length === 0) {
-      return res.status(200).json({
-        message: 'User not found',
-        rank: 0,
-        totalUsers: 0,
-        percentile: 0
-      });
-    }
-    
-    // Get user's best streak
-    const userResult = await client.query(`
-      SELECT best_streak FROM users WHERE email = $1
-    `, [userEmail]);
-    
-    const userBestStreak = userResult.rows.length > 0 ? (userResult.rows[0].best_streak || 0) : 0;
-    
-    // Count how many users have a higher best streak
-    const rankingResult = await client.query(`
-      SELECT COUNT(*) as rank_position 
-      FROM users 
-      WHERE best_streak > $1
-    `, [userBestStreak]);
-    
-    // Get total number of users with streaks
-    const totalResult = await client.query(`
-      SELECT COUNT(*) as total 
-      FROM users 
-      WHERE best_streak > 0
-    `);
-    
-    // User's rank is their position plus 1 (0-indexed to 1-indexed)
-    const rankPosition = parseInt(rankingResult.rows[0].rank_position) + 1;
-    const totalUsers = parseInt(totalResult.rows[0].total) || 1; // Avoid division by zero
-    
-    res.json({
-      rank: rankPosition,
-      totalUsers: totalUsers,
-      percentile: totalUsers > 0 ? Math.round(((totalUsers - rankPosition) / totalUsers) * 100) : 0
-    });
-  } catch (err) {
-    console.error('Error getting streak ranking:', err);
-    res.status(200).json({ 
-      message: 'Error retrieving streak ranking',
-      rank: 0,
-      totalUsers: 0,
-      percentile: 0
-    });
-  }
-});
-
-// Improved updateUserStreak function with better error handling
-async function updateUserStreak(email) {
-  try {
-    console.log(`Updating streak for user: ${email}`);
-    
-    // Check if user exists
-    const userCheck = await client.query('SELECT email FROM users WHERE email = $1', [email]);
-    if (userCheck.rows.length === 0) {
-      console.error(`User not found: ${email}`);
-      return { currentStreak: 0, bestStreak: 0 };
-    }
-    
-    // Get current streak value for notifications
-    const currentStreakResult = await client.query(`
-      SELECT current_streak, best_streak FROM users WHERE email = $1
-    `, [email]);
-    
-    const previousStreak = currentStreakResult.rows.length > 0 ? 
-      (currentStreakResult.rows[0].current_streak || 0) : 0;
-    const previousBestStreak = currentStreakResult.rows.length > 0 ? 
-      (currentStreakResult.rows[0].best_streak || 0) : 0;
-    
-    // Get all festivals sorted by date
-    const allFestivalsResult = await client.query(`
-      SELECT name, to_date(date, 'YYYY-MM-DD') as date_obj 
-      FROM festivals 
-      ORDER BY date_obj ASC
-    `);
-    
-    if (allFestivalsResult.rows.length === 0) {
-      console.log('No festivals found in database');
-      return { currentStreak: 0, bestStreak: previousBestStreak };
-    }
-    
-    const allFestivals = allFestivalsResult.rows;
-    console.log(`Found ${allFestivals.length} festivals for streak calculation`);
-    
-    // Get user's attended festivals
-    const userFestivalsResult = await client.query(`
-      SELECT festival_name 
-      FROM attendances 
-      WHERE user_email = $1
-    `, [email]);
-    
-    // Create a Set of festival names the user has attended for faster lookups
-    const userFestivals = new Set();
-    userFestivalsResult.rows.forEach(row => {
-      userFestivals.add(row.festival_name);
-    });
-    
-    console.log(`User has attended ${userFestivals.size} festivals`);
-    
-    // If user hasn't attended any festivals, return zeros
-    if (userFestivals.size === 0) {
-      console.log('User has not attended any festivals');
-      
-      // Update database with zeros
-      await client.query(`
-        UPDATE users 
-        SET current_streak = 0, 
-            best_streak = $1
-        WHERE email = $2
-      `, [previousBestStreak, email]);
-      
-      return { currentStreak: 0, bestStreak: previousBestStreak };
-    }
-    
-    // Calculate the current streak
-    let currentStreak = 0;
-    let maxStreak = previousBestStreak; // Start with previous best to avoid resetting
-    let lastAttendedIndex = -1;
-    
-    // Get today's date for comparison
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    // Loop through festivals in chronological order
-    for (let i = 0; i < allFestivals.length; i++) {
-      const festival = allFestivals[i];
-      const festivalName = festival.name;
-      const festivalDate = new Date(festival.date_obj);
-      
-      // Skip future festivals for streak calculation
-      if (festivalDate > today) {
-        continue;
-      }
-      
-      const hasAttended = userFestivals.has(festivalName);
-      console.log(`Festival: ${festivalName}, Date: ${festivalDate.toISOString().split('T')[0]}, Attended: ${hasAttended}`);
-      
-      if (hasAttended) {
-        // Check if this is the next festival in sequence or the first one
-        if (lastAttendedIndex === -1 || lastAttendedIndex === i - 1) {
-          currentStreak++;
-          console.log(`Streak increased to ${currentStreak}`);
-        } else {
-          // User missed a festival, reset streak
-          console.log(`Streak reset (missed festival between index ${lastAttendedIndex} and ${i})`);
-          currentStreak = 1;
-        }
-        
-        lastAttendedIndex = i;
-        maxStreak = Math.max(maxStreak, currentStreak);
-      }
-    }
-    
-    console.log(`Final calculation: currentStreak=${currentStreak}, maxStreak=${maxStreak}`);
-    
-    // Update user's streak information
-    await client.query(`
-      UPDATE users 
-      SET current_streak = $1, 
-          best_streak = $2
-      WHERE email = $3
-    `, [currentStreak, maxStreak, email]);
-    
-    return { currentStreak, bestStreak: maxStreak };
-  } catch (err) {
-    console.error('Error updating streak:', err);
-    // Don't throw error, just return current values or zeros
-    return { currentStreak: 0, bestStreak: 0 };
-  }
-}
-
-// Add a simplified endpoint for manual streak recalculation
-app.post('/recalculate-streak', async (req, res) => {
-  try {
-    const userEmail = req.body.email;
-    
-    if (!userEmail) {
-      return res.status(400).json({ message: 'Email is required' });
-    }
-    
-    // Perform streak recalculation
-    const result = await updateUserStreak(userEmail);
-    
-    res.json({
-      message: 'Streak recalculated successfully',
-      currentStreak: result.currentStreak,
-      bestStreak: result.bestStreak
-    });
-  } catch (err) {
-    console.error('Error in streak recalculation:', err);
-    res.status(200).json({ 
-      message: 'Error recalculating streak, using default values',
-      currentStreak: 0,
-      bestStreak: 0
-    });
-  }
-});
-
-// POST /recalculate-streaks => Force recalculation of all user streaks
-// This endpoint is useful after database changes or to fix incorrect streaks
-app.post('/recalculate-streaks', async (req, res) => {
-  try {
-    // Get all users
-    const usersResult = await client.query('SELECT email FROM users');
-    const users = usersResult.rows;
-    
-    console.log(`Recalculating streaks for ${users.length} users`);
-    
-    // Process results
-    const results = {
-      totalProcessed: users.length,
-      successful: 0,
-      failed: 0,
-      errors: []
-    };
-    
-    // Update streak for each user
-    for (const user of users) {
-      try {
-        await updateUserStreak(user.email);
-        results.successful++;
-      } catch (error) {
-        results.failed++;
-        results.errors.push({
-          email: user.email,
-          error: error.message
-        });
-      }
-    }
-    
-    res.json({
-      message: 'Streak recalculation completed',
-      results
-    });
-  } catch (err) {
-    console.error('Error in streak recalculation:', err);
-    res.status(500).json({ message: 'Failed to recalculate streaks' });
-  }
-});
-
-// Add this function to your index.js file
-// It will normalize festival names on the server side as well
-
-/**
- * Normalize festival names to ensure consistency
- * @param {string} festivalName - The festival name to normalize
- * @return {string} - The normalized festival name
- */
-function normalizeFestivalName(festivalName) {
-  if (!festivalName) return '';
-  
-  // Remove extra whitespace and standardize case
-  return festivalName.trim();
-  
-  // Note: We're only trimming whitespace here and not changing case
-  // If you want to make it fully case-insensitive, you can use:
-  // return festivalName.trim().toLowerCase();
-}
-
-// Modify these endpoints in your index.js file to use the normalized festival names
-
-// Updated /attend endpoint
-app.post('/attend', async (req, res) => {
-  try {
-    const { email, festival } = req.body;
-    if (!email || !festival) {
-      return res.status(400).json({ message: 'Missing email or festival' });
-    }
-    
-    // Normalize the festival name
-    const normalizedFestival = normalizeFestivalName(festival);
-    
-    // Log before and after for debugging
-    console.log(`Normalizing festival name: "${festival}" -> "${normalizedFestival}"`);
-    
-    // Add the attendance record with normalized name
-    const streakInfo = await handleAttendanceChange(email, normalizedFestival, true);
-    
-    // Rest of your code...
-    res.json({ 
-      message: `You are attending ${normalizedFestival}!`,
-      streak: streakInfo.currentStreak,
-      bestStreak: streakInfo.maxStreak
-    });
-  } catch (err) {
-    console.error('Error in /attend:', err);
-    res.status(500).json({ message: 'Could not attend festival.' });
-  }
-});
-
-// Similarly update DELETE /attend
-app.delete('/attend', async (req, res) => {
-  try {
-    const { email, festival } = req.body;
-    if (!email || !festival) {
-      return res.status(400).json({ message: 'Missing email or festival' });
-    }
-    
-    // Normalize the festival name
-    const normalizedFestival = normalizeFestivalName(festival);
-    
-    // Remove the attendance record with normalized name
-    const streakInfo = await handleAttendanceChange(email, normalizedFestival, false);
-    
-    res.json({ 
-      message: `You are no longer attending ${normalizedFestival}.`,
-      streak: streakInfo.currentStreak,
-      bestStreak: streakInfo.maxStreak
-    });
-  } catch (err) {
-    console.error('Error in DELETE /attend:', err);
-    res.status(500).json({ message: 'Could not unattend festival.' });
-  }
-});
-
-// Update /my-festivals to normalize when comparing
-app.get('/my-festivals', async (req, res) => {
-  try {
-    const userEmail = req.query.email;
-    if (!userEmail) {
-      return res.status(400).json({ message: 'No email provided' });
-    }
-    
-    const result = await client.query(
-      'SELECT festival_name FROM attendances WHERE user_email=$1',
-      [userEmail]
-    );
-    
-    // Return the raw festival names from the database
-    const festivals = result.rows.map(r => r.festival_name);
-    
-    // Log for debugging
-    console.log(`User ${userEmail} has ${festivals.length} festivals:`, festivals);
-
-    res.json({ festivals });
-  } catch (err) {
-    console.error('Error in /my-festivals:', err);
-    res.status(500).json({ message: 'Could not get user festivals' });
-  }
-});
-
-// Also update the ticket endpoints similarly, using the same normalization
+} );
