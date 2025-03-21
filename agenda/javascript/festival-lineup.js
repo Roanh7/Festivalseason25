@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
     },
     "Tomorrowland": {
       days: ["Weekend 1", "Weekend 2"],
-      images: ["/images/lineups/tomorrowland-w1.png", "/images/lineups/lineup-placeholder.png"]
+      images: ["/images/lineups/lineup-placeholder.png", "/images/lineups/lineup-placeholder.png"]
     },
     "Mystic Garden Festival": {
       days: ["Main Lineup"],
