@@ -414,27 +414,52 @@ app.get('/all-users', async (req, res) => {
   }
 });
 
-// Add an explicit mapping for problem festivals
-const festivalNamesMapping = {
-  // Lowercase normalized keys for lookup, exact preservation for storage
-  'strafwerk': 'Strafwerk',
-  'boothstock': 'Boothstock Festival',
-  'boothstockfestival': 'Boothstock Festival',
-  'toffler': 'Toffler',
-  'latinvillage': 'Latin Village',
-  'latin village': 'Latin Village',
-  'piv': 'PIV',
-  'mysteryland': 'Mysteryland',
-  'intothewoods': 'Into the woods',
-  'into the woods': 'Into the woods'
-};
-
 // Enhanced normalization function for festival names with explicit mapping
 function normalizeFestivalName(festivalName) {
   if (!festivalName) return '';
   
   // First preserve the original format for storage
   const originalName = festivalName.trim();
+  
+  // Check the explicit mapping for problematic festivals
+  const festivalNamesMapping = {
+    // Lowercase normalized keys for lookup, exact preservation for storage
+    'strafwerk': 'Strafwerk',
+    'boothstock': 'Boothstock Festival',
+    'boothstockfestival': 'Boothstock Festival',
+    'toffler': 'Toffler',
+    'latinvillage': 'Latin Village',
+    'latin village': 'Latin Village',
+    'piv': 'PIV',
+    'mysteryland': 'Mysteryland',
+    'intothewoods': 'Into the woods',
+    'into the woods': 'Into the woods',
+    '909': '909',
+    'freeyourmind': 'Free Your Mind',
+    'free your mind': 'Free Your Mind',
+    'freeyourmindkingsday': 'Free your mind Kingsday',
+    'free your mind kingsday': 'Free your mind Kingsday',
+    'lovelandkingsday': 'Loveland Kingsday',
+    'loveland kingsday': 'Loveland Kingsday',
+    'mysticgarden': 'Mystic Garden Festival',
+    'mystic garden': 'Mystic Garden Festival',
+    'diynamic': 'Diynamic', 
+    'openair': 'Open Air',
+    'open air': 'Open Air',
+    'keinemusik': 'KeineMusik',
+    'vunzigedeuntjes': 'Vunzige Deuntjes',
+    'vunzige deuntjes': 'Vunzige Deuntjes',
+    'noart': 'No Art',
+    'no art': 'No Art',
+    'parelsvandestad': 'Parels van de stad',
+    'parels van de stad': 'Parels van de stad',
+    'music on': 'Music On',
+    'musicon': 'Music On',
+    'awakeningsupclose': 'Awakenings Upclose',
+    'awakenings upclose': 'Awakenings Upclose',
+    'awakeningsfestival': 'Awakenings Festival',
+    'awakenings festival': 'Awakenings Festival'
+  };
   
   // Normalize for lookup
   const normalizedKey = originalName.toLowerCase()
@@ -443,7 +468,7 @@ function normalizeFestivalName(festivalName) {
   
   // Check if this is one of our problem festivals with explicit mapping
   if (festivalNamesMapping[normalizedKey]) {
-    console.log(`Fixed problematic festival: "${originalName}" -> "${festivalNamesMapping[normalizedKey]}"`);
+    console.log(`[SERVER] Fixed problematic festival: "${originalName}" -> "${festivalNamesMapping[normalizedKey]}"`);
     return festivalNamesMapping[normalizedKey];
   }
   
@@ -453,11 +478,12 @@ function normalizeFestivalName(festivalName) {
 
 // 8) Festival attendance endpoints (modified to update streak)
 
-// Function to handle attendance change and update streak
+// Enhanced function to handle attendance change and update streak
 async function handleAttendanceChange(email, festivalName, isAttending) {
   try {
-    // Normalize the festival name for consistent comparison
+    // Normalize the festival name for consistent storage
     const normalizedFestName = normalizeFestivalName(festivalName);
+    console.log(`[SERVER] Processing attendance change: ${email}, Festival: "${normalizedFestName}", Attending: ${isAttending}`);
     
     if (isAttending) {
       // User is attending a festival
@@ -468,7 +494,7 @@ async function handleAttendanceChange(email, festivalName, isAttending) {
       `, [email, normalizedFestName]);
       
       // Log successful attendance
-      console.log(`User ${email} is now attending "${normalizedFestName}"`);
+      console.log(`[SERVER] User ${email} is now attending "${normalizedFestName}"`);
     } else {
       // User is no longer attending a festival
       await client.query(`
@@ -482,13 +508,13 @@ async function handleAttendanceChange(email, festivalName, isAttending) {
         WHERE user_email = $1 AND festival_name = $2
       `, [email, normalizedFestName]);
       
-      console.log(`User ${email} is no longer attending "${normalizedFestName}"`);
+      console.log(`[SERVER] User ${email} is no longer attending "${normalizedFestName}"`);
     }
     
     // Update streak after attendance change
     return await updateUserStreak(email);
   } catch (err) {
-    console.error('Error handling attendance change:', err);
+    console.error('[SERVER] Error handling attendance change:', err);
     throw err;
   }
 }
@@ -496,26 +522,27 @@ async function handleAttendanceChange(email, festivalName, isAttending) {
 // Enhanced function to get user festivals with case-insensitive comparison
 async function getUserFestivals(userEmail) {
   try {
-    // Use case-insensitive comparison if your database supports it
+    console.log(`[SERVER] Fetching festivals for user: ${userEmail}`);
+    
+    // Get festivals directly from the attendances table
     const result = await client.query(
       'SELECT festival_name FROM attendances WHERE user_email = $1',
       [userEmail]
     );
     
     // Extract festival names
-    const festivals = result.rows.map(r => r.festival_name);
+    const festivals = result.rows.map(row => row.festival_name);
     
-    // Log fetched festivals for debugging
-    console.log(`Fetched ${festivals.length} festivals for ${userEmail}:`, festivals);
+    console.log(`[SERVER] Fetched ${festivals.length} festivals for ${userEmail}:`, festivals);
     
     return festivals;
   } catch (err) {
-    console.error('Error fetching user festivals:', err);
+    console.error('[SERVER] Error fetching user festivals:', err);
     return [];
   }
 }
 
-// POST /attend => user signs up for festival
+// POST /attend => user signs up for festival (Enhanced version)
 app.post('/attend', async (req, res) => {
   try {
     const { email, festival } = req.body;
@@ -523,78 +550,19 @@ app.post('/attend', async (req, res) => {
       return res.status(400).json({ message: 'Missing email or festival' });
     }
     
+    console.log(`[SERVER] POST /attend request: ${email}, Festival: "${festival}"`);
+    
     // Add the attendance record and update streak
     const streakInfo = await handleAttendanceChange(email, festival, true);
     
-    // Get the festival date for the notification
-    const festivals = [
-      { name: "Wavy", date: "2024-12-21" },
-      { name: "DGTL", date: "2025-04-18" },
-      { name: "Free your mind Kingsday", date: "2025-04-26" },
-      { name: "Loveland Kingsday", date: "2025-04-26" },
-      { name: "Verbond", date: "2025-05-05" },
-      { name: "Awakenings Upclose", date: "2025-05-17" },
-      { name: "Soenda", date: "2025-05-31" },
-      { name: "909", date: "2025-06-07" },
-      { name: "Diynamic", date: "2025-06-07" },
-      { name: "Open Air", date: "2025-06-08" },
-      { name: "Free Your Mind", date: "2025-06-08" },
-      { name: "Mystic Garden Festival", date: "2025-06-14" },
-      { name: "Awakenings Festival", date: "2025-07-11" },
-      { name: "Tomorrowland", date: "2025-07-18" },
-      { name: "Mysteryland", date: "2025-07-22" },
-      { name: "No Art", date: "2025-07-26" },
-      { name: "Loveland", date: "2025-08-09" },
-      { name: "Strafwerk", date: "2025-08-16" },
-      { name: "Latin Village", date: "2025-08-17" },
-      { name: "Parels van de stad", date: "2025-09-13" },
-      { name: "KeineMusik", date: "2025-07-05" },
-      { name: "Vunzige Deuntjes", date: "2025-07-05" },
-      { name: "Toffler", date: "2025-05-31" },
-      { name: "PIV", date: "2025-05-30" },
-      { name: "Into the woods", date: "2025-09-19" }
-    ];
-    
-    const festivalData = festivals.find(f => f.name === festival);
-    const festivalDate = festivalData ? festivalData.date : 'Unknown date';
-    
-    // Format the date for display
-    const formatDate = (dateString) => {
-      const date = new Date(dateString);
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const year = date.getFullYear();
-      return `${day}-${month}-${year}`;
-    };
-    
-    // Get other users attending this festival (excluding the current user)
-    const otherAttendeesResult = await client.query(
-      'SELECT user_email FROM attendances WHERE festival_name = $1 AND user_email != $2',
-      [festival, email]
-    );
-    
-    // Notify other attendees about this new person joining
-    for (const row of otherAttendeesResult.rows) {
-      try {
-        await emailService.sendAttendanceNotification(
-          row.user_email,  // recipient
-          email,           // new attendee
-          festival,
-          formatDate(festivalDate)
-        );
-        console.log(`Sent notification to ${row.user_email} about ${email} attending ${festival}`);
-      } catch (emailError) {
-        console.error(`Failed to send attendance notification to ${row.user_email}:`, emailError);
-      }
-    }
-    
+    // Return success response with streak info
     res.json({ 
       message: `You are attending ${festival}!`,
       streak: streakInfo.currentStreak,
       bestStreak: streakInfo.maxStreak
     });
   } catch (err) {
-    console.error('Error in /attend:', err);
+    console.error('[SERVER] Error in POST /attend:', err);
     res.status(500).json({ message: 'Could not attend festival.' });
   }
 });
@@ -836,4 +804,146 @@ app.post('/rating', async (req, res) => {
     console.error('Error in POST /rating:', err);
     res.status(500).json({ message: 'Could not save rating' });
   }
-} );
+});
+
+// Function to update user's streak (called by attendance endpoints)
+async function updateUserStreak(email) {
+  try {
+    console.log(`[SERVER] Updating streak for user: ${email}`);
+    
+    // Get current user data
+    const userResult = await client.query(
+      'SELECT current_streak, best_streak FROM users WHERE email = $1',
+      [email]
+    );
+    
+    if (userResult.rows.length === 0) {
+      console.error(`[SERVER] User ${email} not found when updating streak`);
+      return { currentStreak: 0, maxStreak: 0 };
+    }
+    
+    // Get attendance count
+    const attendanceResult = await client.query(
+      'SELECT COUNT(*) as count FROM attendances WHERE user_email = $1',
+      [email]
+    );
+    
+    const attendanceCount = parseInt(attendanceResult.rows[0].count);
+    
+    // Current streak is the attendance count
+    const currentStreak = attendanceCount;
+    
+    // Best streak is max of current or previous best
+    const previousBest = userResult.rows[0].best_streak || 0;
+    const newBestStreak = Math.max(currentStreak, previousBest);
+    
+    // Update the user record
+    await client.query(
+      'UPDATE users SET current_streak = $1, best_streak = $2 WHERE email = $3',
+      [currentStreak, newBestStreak, email]
+    );
+    
+    console.log(`[SERVER] Updated streak for ${email}: current=${currentStreak}, best=${newBestStreak}`);
+    
+    return {
+      currentStreak,
+      maxStreak: newBestStreak
+    };
+  } catch (err) {
+    console.error('[SERVER] Error updating user streak:', err);
+    return { currentStreak: 0, maxStreak: 0 };
+  }
+}
+
+// Add the special endpoint for fixing problem festivals
+app.post('/fix-problem-festivals', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    
+    console.log(`[SERVER] Fixing problem festivals for: ${email}`);
+    
+    // List of festivals this user is attending
+    const festivals = await getUserFestivals(email);
+    
+    // Fix each festival name
+    const fixedFestivals = [];
+    for (const festName of festivals) {
+      // Normalize the festival name
+      const normalizedName = normalizeFestivalName(festName);
+      
+      // If the normalized name is different, update it
+      if (normalizedName !== festName) {
+        console.log(`[SERVER] Fixing festival name: "${festName}" -> "${normalizedName}"`);
+        
+        // Delete the old record
+        await client.query(
+          'DELETE FROM attendances WHERE user_email = $1 AND festival_name = $2',
+          [email, festName]
+        );
+        
+        // Insert the new normalized record
+        await client.query(
+          'INSERT INTO attendances (user_email, festival_name) VALUES ($1, $2) ON CONFLICT (user_email, festival_name) DO NOTHING',
+          [email, normalizedName]
+        );
+        
+        // Fix any ticket records too
+        await client.query(
+          'UPDATE tickets SET festival_name = $1 WHERE user_email = $2 AND festival_name = $3',
+          [normalizedName, email, festName]
+        );
+        
+        fixedFestivals.push({
+          old: festName,
+          new: normalizedName
+        });
+      }
+    }
+    
+    // Return the results
+    res.json({
+      message: `Fixed ${fixedFestivals.length} festival names`,
+      fixed: fixedFestivals
+    });
+  } catch (err) {
+    console.error('[SERVER] Error fixing problem festivals:', err);
+    res.status(500).json({ message: 'Error fixing problem festivals', error: err.message });
+  }
+});
+
+// Add a diagnostic endpoint to inspect festival names in the database
+app.get('/debug-festivals', async (req, res) => {
+  try {
+    const email = req.query.email;
+    if (!email) {
+      return res.status(400).json({ message: 'Email parameter is required' });
+    }
+    
+    // Get all user's festivals from the database
+    const result = await client.query(
+      'SELECT festival_name FROM attendances WHERE user_email = $1',
+      [email]
+    );
+    
+    const festivalsInDb = result.rows.map(row => row.festival_name);
+    
+    // Get all festivals with normalized versions
+    const normalizedFestivals = festivalsInDb.map(fest => ({
+      original: fest,
+      normalized: normalizeFestivalName(fest)
+    }));
+    
+    // Return the complete dataset
+    res.json({
+      email,
+      festivalsInDb,
+      normalizedFestivals
+    });
+  } catch (err) {
+    console.error('[SERVER] Error in debug-festivals:', err);
+    res.status(500).json({ message: 'Error fetching festival debug info', error: err.message });
+  }
+});
