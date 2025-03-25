@@ -880,4 +880,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   };
 });
-
