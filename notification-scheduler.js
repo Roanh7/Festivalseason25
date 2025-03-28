@@ -114,3 +114,115 @@ module.exports = {
   initNotificationScheduler,
   sendFestivalReminders
 };
+
+// Add this function to notification-scheduler.js
+
+// Function to send email notification for MVP voting
+async function sendMvpVoteReminder(userEmail, festivalName, festivalDate) {
+  const subject = `Vote for MVP: ${festivalName}`;
+  
+  const text = `
+    Hallo festival ganger!
+    
+    Je bent naar ${festivalName} op ${festivalDate} geweest en we willen graag weten wie volgens jou de MVP was!
+    
+    Log in op de Festival Agenda website en stem op je MVP.
+    
+    Groeten,
+    
+    Festival Agenda 2025
+  `;
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #4CAF50; border-radius: 10px;">
+      <h2 style="color: #F44336;">Stem op de Festival MVP! 🏆</h2>
+      <p>Hallo festival ganger!</p>
+      <p>Je bent naar <strong style="color: #4CAF50;">${festivalName}</strong> op ${festivalDate} geweest en we willen graag weten wie volgens jou de MVP was!</p>
+      <p>Log in op de Festival Agenda website en stem op je MVP.</p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="https://festival-agenda.vercel.app" style="background-color: #F44336; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Stem nu op je MVP</a>
+      </div>
+      <p style="margin-top: 30px; color: #666;">Festival Agenda 2025</p>
+    </div>
+  `;
+  
+  return await emailService.sendNotificationEmail(userEmail, subject, text, html);
+}
+
+// Function to send MVP vote reminders
+async function sendMvpVoteReminders() {
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+  });
+
+  try {
+    // Connect to the database
+    await client.connect();
+    console.log('Connected to database for sending MVP vote reminders');
+
+    // Get pending MVP votes
+    // Get users who attended festivals but haven't voted for MVP
+    const result = await client.query(`
+      SELECT DISTINCT a.user_email, a.festival_name, f.date
+      FROM attendances a
+      LEFT JOIN mvp_votes m ON a.user_email = m.user_email AND a.festival_name = m.festival_name
+      JOIN festivals f ON a.festival_name = f.name
+      WHERE m.id IS NULL
+      AND f.date < CURRENT_DATE - INTERVAL '1 day'
+      AND f.date > CURRENT_DATE - INTERVAL '7 days'
+    `);
+    
+    console.log(`Found ${result.rows.length} pending MVP votes to remind about`);
+    
+    // Send reminders
+    for (const row of result.rows) {
+      try {
+        await sendMvpVoteReminder(
+          row.user_email,
+          row.festival_name,
+          formatDate(row.date)
+        );
+        console.log(`Sent MVP vote reminder to ${row.user_email} for ${row.festival_name}`);
+        
+        // Add a small delay between emails to avoid overwhelming the mail server
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } catch (emailError) {
+        console.error(`Failed to send MVP vote reminder to ${row.user_email}:`, emailError);
+      }
+    }
+  } catch (error) {
+    console.error('Error sending MVP vote reminders:', error);
+  } finally {
+    // Close the database connection
+    await client.end();
+    console.log('Database connection closed after sending MVP vote reminders');
+  }
+}
+
+// Modify the initNotificationScheduler function to include MVP vote reminders
+function initNotificationScheduler() {
+  console.log('Initializing notification scheduler...');
+  
+  // Schedule daily check for festival reminders
+  // This runs every day at 10:00 AM
+  cron.schedule('0 10 * * *', async () => {
+    console.log('Running scheduled festival reminder check...');
+    await sendFestivalReminders();
+  });
+  
+  // Schedule daily check for MVP vote reminders
+  // This runs every day at 3:00 PM
+  cron.schedule('0 15 * * *', async () => {
+    console.log('Running scheduled MVP vote reminder check...');
+    await sendMvpVoteReminders();
+  });
+  
+  console.log('Notification scheduler initialized');
+}
+
+// Update module exports
+module.exports = {
+  initNotificationScheduler,
+  sendFestivalReminders,
+  sendMvpVoteReminders
+};

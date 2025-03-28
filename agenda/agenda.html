@@ -9,6 +9,7 @@
   <!-- Link naar je CSS waar de hamburger-styles in staan -->
   <link rel="stylesheet" href="/styling/navbar-styles.css">
   <link rel="stylesheet" href="/styling/agenda.css" />
+  <link rel="stylesheet" href="/styling/mvp-styles.css" />
   <link rel="icon" type="image/svg+xml" href="/images/favicon.svg">
 <link rel="shortcut icon" href="/images/favicon.svg" type="image/x-icon">
   <!-- Web app meta tags -->
@@ -29,6 +30,32 @@
   <!-- Web App Manifest -->
   <link rel="manifest" href="/manifest.json">
 </head>
+
+<!-- MVP Voting Modal -->
+<div id="mvp-vote-modal" class="modal hidden">
+  <div class="modal-overlay"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="mvp-modal-title">Vote for Festival MVP</h3>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-description">Wie was volgens jou de meest waardevolle speler van dit festival?</p>
+      
+      <div class="mvp-candidates">
+        <!-- MVP candidates will be populated dynamically -->
+        <div class="loading-indicator">Laden van S-team leden...</div>
+      </div>
+      
+      <div class="mvp-vote-confirmation hidden">
+        <p>Bedankt voor je stem! Je hebt gestemd op: <span id="selected-mvp">Naam</span></p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="submit-mvp-vote" class="submit-btn" disabled>Stem uitbrengen</button>
+    </div>
+  </div>
+</div>
 <body>
   <header>
     <h1>Festival Agenda 2025</h1>
@@ -722,5 +749,6 @@
   <script src="/javascript/custom-attendees-dialog.js"></script>
   <script src="/javascript/festival-lineup.js"></script>
   <script src="/javascript/festival-sync-fix.js"></script>
+  <script src="/javascript/mvp-vote.js"></script>
 </body>
 </html>
