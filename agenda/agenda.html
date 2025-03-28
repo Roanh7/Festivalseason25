@@ -62,17 +62,34 @@
 
 
   <main>
-    <!-- Countdown container -->
-    <div id="countdown-container">
-      <h2>Volgend festival:</h2>
-      <p id="festival-name"></p>
-      <div id="countdown">
-        <span id="days">00</span>d :
-        <span id="hours">00</span>u :
-        <span id="minutes">00</span>m :
-        <span id="seconds">00</span>s
-      </div>
+  <!-- Enhanced Countdown Timer -->
+<div id="countdown-container">
+  <div class="countdown-header">
+    <h2>Volgend festival:</h2>
+  </div>
+  <div id="festival-name"></div>
+  <div id="countdown">
+    <div class="countdown-segment">
+      <div class="countdown-number" id="days">00</div>
+      <div class="countdown-label">dagen</div>
     </div>
+    <div class="countdown-separator">:</div>
+    <div class="countdown-segment">
+      <div class="countdown-number" id="hours">00</div>
+      <div class="countdown-label">uren</div>
+    </div>
+    <div class="countdown-separator">:</div>
+    <div class="countdown-segment">
+      <div class="countdown-number" id="minutes">00</div>
+      <div class="countdown-label">minuten</div>
+    </div>
+    <div class="countdown-separator">:</div>
+    <div class="countdown-segment">
+      <div class="countdown-number" id="seconds">00</div>
+      <div class="countdown-label">seconden</div>
+    </div>
+  </div>
+</div>
 
     <!-- Filter Bar -->
     <div class="filter-bar">

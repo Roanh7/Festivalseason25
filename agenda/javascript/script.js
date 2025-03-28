@@ -68,7 +68,7 @@ function updateCountdown() {
   const now = new Date();
   let nextFestival = null;
 
-  // Zoek het eerstvolgende festival op basis van datum
+  // Find the next upcoming festival based on date
   for (const festival of festivals) {
     const festivalDate = new Date(festival.date);
     if (festivalDate > now) {
@@ -77,41 +77,63 @@ function updateCountdown() {
     }
   }
 
-  // Als er geen toekomstige festivals zijn, toon "END OF SEASON"
+  // If there are no future festivals, show "END OF SEASON"
   if (!nextFestival) {
     document.getElementById("festival-name").textContent = "END OF SEASON";
-    document.getElementById("countdown").textContent = "";
+    document.getElementById("countdown").innerHTML = '<div class="no-festivals">Het festivalseizoen is afgelopen</div>';
     return;
   }
 
-  // Update festivalnaam
+  // Update festival name
   document.getElementById("festival-name").textContent = nextFestival.name;
 
-  // Bereken het verschil
+  // Calculate time difference
   const festivalDate = new Date(nextFestival.date);
   const diff = festivalDate - now;
 
   if (diff <= 0) {
-    // Festival is al bezig of net afgelopen
+    // Festival is already ongoing or just ended
     setTimeout(updateCountdown, 1000);
     return;
   }
 
+  // Calculate time units
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-  // Update DOM
+  // Update DOM with padded values
   document.getElementById("days").textContent = days.toString().padStart(2, '0');
   document.getElementById("hours").textContent = hours.toString().padStart(2, '0');
   document.getElementById("minutes").textContent = minutes.toString().padStart(2, '0');
-  document.getElementById("seconds").textContent = seconds.toString().padStart(2, '0');
+  
+  // Get seconds element
+  const secondsEl = document.getElementById("seconds");
+  // Update seconds
+  secondsEl.textContent = seconds.toString().padStart(2, '0');
+  
+  // Add pulse animation when seconds change
+  secondsEl.classList.add('seconds-animate');
+  setTimeout(() => {
+    secondsEl.classList.remove('seconds-animate');
+  }, 500);
+
+  // Add pulse animation to days when they change
+  if (seconds === 0 && minutes === 0 && hours === 0) {
+    const daysEl = document.getElementById("days");
+    daysEl.classList.add('animate-pulse');
+    setTimeout(() => {
+      daysEl.classList.remove('animate-pulse');
+    }, 1000);
+  }
+
+  // Schedule the next update
+  setTimeout(updateCountdown, 1000);
 }
 
-// Elke seconde update
-setInterval(updateCountdown, 1000);
-updateCountdown(); // direct uitvoeren
+// Run the countdown immediately
+updateCountdown();
 
 // Function to check if a festival date is in the past
 function isFestivalInPast(dateStr) {
