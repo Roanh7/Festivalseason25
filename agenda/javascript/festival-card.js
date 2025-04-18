@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Festival date information
   const festivalDates = {
     "Wavy": "2024-12-21",
-    "DGTL": "2025-04-18",
+    "DGTL": "2025-04-19",
     "Free your mind Kingsday": "2025-04-26",
     "Loveland Kingsday": "2025-04-26",
     "Verbond": "2025-05-05",
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Festival prices for spending calculation
   const festivalPrices = {
     "Wavy": 26.04,
-    "DGTL": 90.00,
+    "DGTL": 120.00,
     "Free your mind Kingsday": 33.33,
     "Loveland Kingsday": 51.00,
     "Verbond": 60.00,

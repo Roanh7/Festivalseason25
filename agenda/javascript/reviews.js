@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Festival dates (same as in mijn-festivals.js)
   const festivalDates = {
     "Wavy": "2024-12-21",
-    "DGTL": "2025-04-18",
+    "DGTL": "2025-04-19",
     "Free your mind Kingsday": "2025-04-26",
     "Loveland Kingsday": "2025-04-26",
     "Verbond": "2025-05-05",

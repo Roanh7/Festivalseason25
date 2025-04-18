@@ -5,7 +5,7 @@
 // ================================
 const festivals = [
   { name: "Wavy", date: "2024-12-21" },
-  { name: "DGTL", date: "2025-04-18" },
+  { name: "DGTL", date: "2025-04-19" },
   { name: "Free your mind Kingsday", date: "2025-04-26" },
   { name: "Loveland Kingsday", date: "2025-04-26" },
   { name: "Verbond", date: "2025-05-05" },
@@ -36,7 +36,7 @@ const festivals = [
 // Festival prices for spending calculation
 const festivalPrices = {
   "Wavy": 26.04,
-  "DGTL": 90.00,
+  "DGTL": 120.00,
   "Free your mind Kingsday": 33.33,
   "Loveland Kingsday": 51.00,
   "Verbond": 60.00,
