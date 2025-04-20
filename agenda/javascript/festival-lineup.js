@@ -278,7 +278,7 @@ document.addEventListener('DOMContentLoaded', function() {
       days: ["Main Lineup"],
       images: ["/images/lineups/freeyourmindkingsday.png"]
   },
-  "Loveland Kingsday": {
+  "Loveland (Burst) Kingsday": {
     days: ["Main Lineup"],
     images: ["/images/lineups/lovelandkingsday.png"]
   },
