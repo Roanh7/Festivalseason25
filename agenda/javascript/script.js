@@ -241,7 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
       position: "Verdediger",
       age: 18,
       rating: "Rating: 70",
-      skills: ["Breed", "Breed voor shit", "Filmt heel het feest"]
+      skills: ["Breed", "Breed voor shit", "Filmt heel het feest", "Is een lolbroek", "Heeft wifey sindskort"]
     },
     "MD": {
       position: "Aanvaller",
