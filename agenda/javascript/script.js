@@ -240,7 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "Menno": {
       position: "Verdediger",
       age: 18,
-      rating: "Rating: 69",
+      rating: "Rating: 68.5",
       skills: ["Breed", "Breed voor shit", "Filmt heel het feest", "Is een lolbroek", "Heeft wifey sindskort"]
     },
     "MD": {
