@@ -12,8 +12,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Jef's email (the user we want to display stats for)
   const jefEmail = 'JFConstancia@hotmail.com';
   
-  // Hard-coded after party data
-  const afterParties = [
+  // Hard-coded after party data 
+ // const afterParties = [
     {
       festival: "DGTL",
       date: "2025-04-19",
@@ -32,7 +32,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       location: "Bij Chip thuis",
       notes: "Kleine after met alleen S-team, maar wel tot 14:00 doorgegaan."
     }
-  ];
+ // ];
+
 
   // Function to load Jef's festivals from the server
   async function loadJefFestivals() {
