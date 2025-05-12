@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jef's After Counter - Festival Agenda 2025</title>
+  <link rel="stylesheet" href="/styling/navbar-styles.css">
+  <link rel="stylesheet" href="/styling/jef-after.css" />
+  <link rel="icon" type="image/svg+xml" href="/images/favicon.svg">
+  <link rel="shortcut icon" href="/images/favicon.svg" type="image/x-icon">
+
+  <!-- Web app meta tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Festival Agenda 2025">
+
+  <!-- iOS icons -->
+  <link rel="apple-touch-icon" href="/images/app-icon-180.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/app-icon-180.png">
+
+  <!-- Android icon -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/app-icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="/images/app-icon-192.png">
+
+  <!-- Web App Manifest -->
+  <link rel="manifest" href="/manifest.json">
+</head>
+<body>
+  <header>
+    <h1>Jef's After Counter</h1>
+  </header>
+
+  <div class="logo-container">
+    <img src="/images/logo.png" alt="Festival Logo">
+  </div>
+
+  <nav class="nav-bar">
+    <div id="navToggle" class="nav-toggle">☰</div>
+    <ul class="nav-menu" id="navMenu">
+      <li><a href="agenda.html">Home</a></li>
+      <li><a href="reviews.html">Reviews</a></li>
+      <li><a href="extra-info.html">Extra Info</a></li>
+      <li><a href="statistieken.html">S-team Statistieken</a></li>
+      <li><a href="jef-after.html" class="active">Jef's After Counter</a></li>
+      <li><a href="register.html">Registreren</a></li>
+      <li><a href="login.html">Inloggen</a></li>
+      <li><a href="account.html">Mijn Account</a></li>
+      <li><a href="festival-card.html">Festival Card</a></li>
+    </ul>
+    <div id="userMenu" style="float:right;"></div>
+  </nav>
+
+  <main>
+    <div class="jef-stats-container">
+      <div class="jef-image-container">
+        <div class="jef-avatar">
+          <span>J</span>
+        </div>
+        <h2>Jef "After Party King" Constancia</h2>
+        <p class="jef-title">S-team Aanvaller</p>
+      </div>
+
+      <div class="stat-boxes">
+        <div class="stat-box">
+          <div class="stat-icon">🎭</div>
+          <div class="stat-value" id="festivalsAttended">0</div>
+          <div class="stat-label">Festivals bezocht</div>
+        </div>
+        
+        <div class="stat-box highlight">
+          <div class="stat-icon">🎉</div>
+          <div class="stat-value" id="afterParties">0</div>
+          <div class="stat-label">After parties georganiseerd</div>
+        </div>
+        
+        <div class="stat-box">
+          <div class="stat-icon">🔄</div>
+          <div class="stat-value" id="successRate">0%</div>
+          <div class="stat-label">Success rate</div>
+        </div>
+      </div>
+
+      <!-- After Party Timeline -->
+      <div class="timeline-container">
+        <h3>After Party Timeline</h3>
+        <div class="timeline" id="afterTimeline">
+          <div class="loading-message">Laden van after parties...</div>
+        </div>
+      </div>
+
+      <!-- Festivals Attended List -->
+      <div class="festivals-container">
+        <h3>Festivals Bezocht</h3>
+        <div class="festival-list" id="festivalsList">
+          <div class="loading-message">Laden van festivals...</div>
+        </div>
+      </div>
+
+      <!-- Admin Controls - Only visible to admins -->
+      <div class="admin-controls" id="adminControls">
+        <h3>Admin Controls</h3>
+        <p>Als admin kun je after parties toevoegen of verwijderen</p>
+        
+        <div class="admin-form">
+          <div class="form-group">
+            <label for="festivalSelect">Festival:</label>
+            <select id="festivalSelect">
+              <option value="">Selecteer festival...</option>
+              <!-- Will be populated via JavaScript -->
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="afterDate">Datum van after:</label>
+            <input type="date" id="afterDate">
+          </div>
+          
+          <div class="form-group">
+            <label for="afterLocation">Locatie:</label>
+            <input type="text" id="afterLocation" placeholder="Bijv. Jef's appartement">
+          </div>
+          
+          <div class="form-group">
+            <label for="afterNotes">Notities:</label>
+            <textarea id="afterNotes" placeholder="Wat gebeurde er tijdens deze after?"></textarea>
+          </div>
+          
+          <button id="addAfterBtn" class="admin-btn">After Party Toevoegen</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="notificationModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <div id="modalMessage"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Festival Agenda - Gecreëerd door Roan Hassan, S-team vertegenwoordiger</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/javascript/navstatus.js"></script>
+  <script src="/javascript/jef-after.js"></script>
+</body>
+</html>
