@@ -14,12 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Hard-coded after party data 
  const afterParties = [
-    {
-      festival: "DGTL",
-      date: "2025-04-19",
-      location: "Jef's appartement in Amsterdam",
-      notes: "De eerste after van het seizoen. 8 mensen bleven tot 13:00 de volgende dag."
-    },
+  //none
    
  ];
 
