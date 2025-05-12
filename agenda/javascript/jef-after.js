@@ -13,26 +13,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const jefEmail = 'JFConstancia@hotmail.com';
   
   // Hard-coded after party data 
- // const afterParties = [
+ const afterParties = [
     {
       festival: "DGTL",
       date: "2025-04-19",
       location: "Jef's appartement in Amsterdam",
       notes: "De eerste after van het seizoen. 8 mensen bleven tot 13:00 de volgende dag."
     },
-    {
-      festival: "Loveland (Burst) Kingsday",
-      date: "2025-04-26",
-      location: "Hotel Ibis Amsterdam Centre",
-      notes: "Met S-team en een paar gappies van Rick tot 11:00 doorgegaan."
-    },
-    {
-      festival: "Awakenings Upclose",
-      date: "2025-05-17",
-      location: "Bij Chip thuis",
-      notes: "Kleine after met alleen S-team, maar wel tot 14:00 doorgegaan."
-    }
- // ];
+   
+ ];
 
 
   // Function to load Jef's festivals from the server
