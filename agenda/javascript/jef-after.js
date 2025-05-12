@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     let festivalsHTML = '';
     
-    // Sort festivals by date
+    // Festival dates mapping
     const festivalDates = {
       "Wavy": "2024-12-21",
       "DGTL": "2025-04-19",
@@ -126,26 +126,42 @@ document.addEventListener('DOMContentLoaded', async () => {
       "Into the woods": "2025-09-19"
     };
     
-    // Sort festivals by date
-    const sortedFestivals = [...festivals].sort((a, b) => {
-      const dateA = festivalDates[a] ? new Date(festivalDates[a]) : new Date();
-      const dateB = festivalDates[b] ? new Date(festivalDates[b]) : new Date();
-      return dateA - dateB; // Chronological order
+    // Get current date
+    const currentDate = new Date();
+    
+    // Filter festivals to only include those that have already happened
+    const pastFestivals = festivals.filter(festival => {
+      if (!festivalDates[festival]) return false; // Skip if no date available
+      const festivalDate = new Date(festivalDates[festival]);
+      return festivalDate < currentDate; // Only include if date is in the past
     });
     
-    sortedFestivals.forEach(festival => {
+    // Sort past festivals by date (most recent first)
+    const sortedPastFestivals = [...pastFestivals].sort((a, b) => {
+      const dateA = new Date(festivalDates[a]);
+      const dateB = new Date(festivalDates[b]);
+      return dateB - dateA; // Most recent first
+    });
+    
+    // Update the counter to show only past festivals
+    updateCounters(pastFestivals.length, afterParties.length);
+    
+    // If no past festivals found
+    if (sortedPastFestivals.length === 0) {
+      festivalsListElement.innerHTML = '<p>Nog geen festivals bezocht.</p>';
+      return;
+    }
+    
+    sortedPastFestivals.forEach(festival => {
       const hasAfter = festivalWithAfters.has(festival);
-      const festDate = festivalDates[festival] ? new Date(festivalDates[festival]) : null;
+      const festDate = new Date(festivalDates[festival]);
       
-      // Format date if available
-      let dateText = "Datum onbekend";
-      if (festDate) {
-        dateText = festDate.toLocaleDateString('nl-NL', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric'
-        });
-      }
+      // Format date
+      const dateText = festDate.toLocaleDateString('nl-NL', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
       
       festivalsHTML += `
         <div class="festival-item ${hasAfter ? 'with-after' : ''}">
@@ -242,13 +258,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load Jef's festivals
     const festivals = await loadJefFestivals();
     
-    // Update counters
-    updateCounters(festivals.length, afterParties.length);
-    
     // Display after timeline
     displayAfterTimeline(afterParties);
     
-    // Display festivals list
+    // Display festivals list (the function now filters for past festivals)
     displayFestivalsList(festivals, afterParties);
     
     // Check if admin
