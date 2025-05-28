@@ -118,9 +118,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       "Awakenings Festival": "2025-07-11",
       "Tomorrowland": "2025-07-18",
       "Mysteryland": "2025-07-22",
+      "Thuishaven Colyn": "2025-06-21",
       "No Art": "2025-07-26",
       "Loveland": "2025-08-09",
-      "Strafwerk": "2025-08-16",
+      "Circoloco": "2025-09-13",
       "Latin Village": "2025-08-17",
       "Parels van de stad": "2025-09-13",
       "Into the woods": "2025-09-19"

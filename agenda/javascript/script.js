@@ -18,6 +18,7 @@ const festivals = [
   { name: "Open Air", date: "2025-06-08" },
   { name: "Free Your Mind", date: "2025-06-08" },
   { name: "Mystic Garden Festival", date: "2025-06-14" },
+  { name: "Thuishaven Colyn", date: "2025-06-21" },
   { name: "Vunzige Deuntjes", date: "2025-07-05" },
   { name: "KeineMusik", date: "2025-07-05" },
   { name: "Boothstock Festival", date: "2025-07-12" },
@@ -26,7 +27,7 @@ const festivals = [
   { name: "Mysteryland", date: "2025-07-22" },
   { name: "No Art", date: "2025-07-26" },
   { name: "Loveland", date: "2025-08-09" },
-  { name: "Strafwerk", date: "2025-08-16" },
+  { name: "Circoloco", date: "2025-09-13" },
   { name: "Latin Village", date: "2025-08-17" },
   { name: "Parels van de stad", date: "2025-09-13" },
   { name: "Into the woods", date: "2025-09-19" }
@@ -51,6 +52,7 @@ const festivalPrices = {
   "Mystic Garden Festival": 85.00,
   "Vunzige Deuntjes": 69.00,
   "KeineMusik": 100.00,
+  "Thuishaven Colyn": 35.00,
   "Boothstock Festival": 70.00,
   "Awakenings Festival": 109.00,
   "Tomorrowland": 105.00,
@@ -58,7 +60,7 @@ const festivalPrices = {
   "No Art": 70.00,
   "Loveland": 82.50,
   "Latin Village": 50.00,
-  "Strafwerk": 0.00, // Price not provided, setting to 0
+  "Circoloco": 100.00, // Price not provided, setting to 0
   "Parels van de stad": 36.00,
   "Into the woods": 53.00
 };
@@ -643,7 +645,7 @@ const festivalLinks = {
   "Loveland": "https://www.loveland.nl",
   "Vunzige Deuntjes": "https://www.vunzigedeuntjes.nl",
   "Latin Village": "https://www.latinvillage.nl",
-  "Strafwerk": "https://www.strafwerkfestival.nl",
+  "Circoloco": "https://www.strafwerkfestival.nl",
   "Parels van de stad": "https://www.parelsvandestad.nl",
   "Toffler": "https://tofflerfestival.nl",
   "PIV": "https://pivrecords.com/pages/piv-10-years",

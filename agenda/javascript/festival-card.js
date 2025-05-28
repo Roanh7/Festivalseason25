@@ -54,11 +54,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     "KeineMusik": "2025-07-05",
     "Boothstock Festival": "2025-07-12",
     "Awakenings Festival": "2025-07-11",
+    "Thuishaven Colyn": "2025-06-21",
     "Tomorrowland": "2025-07-18",
     "Mysteryland": "2025-07-22",
     "No Art": "2025-07-26",
     "Loveland": "2025-08-09",
-    "Strafwerk": "2025-08-16",
+    "Circoloco": "2025-09-13",
     "Latin Village": "2025-08-17",
     "Parels van de stad": "2025-09-13",
     "Into the woods": "2025-09-19"
@@ -90,9 +91,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     "No Art": 70.00,
     "Loveland": 82.50,
     "Latin Village": 50.00,
-    "Strafwerk": 0.00, // Price not provided, setting to 0
+    "Circoloco": 100.00, 
     "Parels van de stad": 36.00,
-    "Into the woods": 53.00
+    "Into the woods": 53.00,
+    "Thuishaven Colyn": 35.00
   };
 
   // Title based on points (same as in statistieken.js)

@@ -334,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
     days: ["main lineup"],
     images: ["/images/lineups/lineup-placeholder.png"]
   },
-  "Strafwerk" : { 
+  "Circoloco" : { 
     days: ["main lineup"],
     images: ["/images/lineups/lineup-placeholder.png"]
   },
