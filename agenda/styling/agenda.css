@@ -891,3 +891,37 @@ footer {
     font-size: 0.7rem;
   }
 }
+
+/* ================ Grap Advertentie Styling ================ */
+.grap-advertentie {
+  max-width: 650px; /* Zelfde breedte als de countdown voor een strakke look */
+  margin: 2.5rem auto; /* Zelfde margin als de countdown */
+  padding: 20px;
+  background-color: #fff3cd; /* Lichtgele 'belangrijke' achtergrond, past bij je site */
+  border: 2px dashed #e0a800; /* Een gestippelde, opvallende rand */
+  border-radius: 16px; /* Zelfde afronding als de countdown */
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.grap-advertentie img {
+  max-width: 250px; /* Zorgt dat het logo niet te gigantisch wordt */
+  margin-bottom: 15px;
+}
+
+.grap-advertentie p {
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: bold;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.grap-advertentie a {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.grap-advertentie a:hover {
+  color: #003d80;
+}
